@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/GoHoliday"
 )
 
 // GitHubSyncer handles real GitHub API integration for Python holidays sync

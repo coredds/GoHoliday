@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/GoHoliday"
 )
 
 func main() {
