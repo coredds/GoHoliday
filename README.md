@@ -1,10 +1,10 @@
 # GoHoliday
 
-[![CI](https://github.com/davidhintelmann/GoHoliday/workflows/CI/badge.svg)](https://github.com/davidhintelmann/GoHoliday/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/davidhintelmann/GoHoliday/branch/main/graph/badge.svg)](https://codecov.io/gh/davidhintelmann/GoHoliday)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/davidhintelmann/GoHoliday)](https://golang.org/)
-[![License](https://img.shields.io/github/license/davidhintelmann/GoHoliday)](LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/davidhintelmann/GoHoliday)](https://goreportcard.com/report/github.com/davidhintelmann/GoHoliday)
+[![CI](https://github.com/coredds/GoHoliday/workflows/CI/badge.svg)](https://github.com/coredds/GoHoliday/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/coredds/GoHoliday/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/GoHoliday)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/GoHoliday)](https://golang.org/)
+[![License](https://img.shields.io/github/license/coredds/GoHoliday)](LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/coredds/GoHoliday)](https://goreportcard.com/report/github.com/coredds/GoHoliday)
 
 A comprehensive Go library for holiday data and business day calculations, designed as a high-performance backend for date/time applications including [ChronoGo](https://github.com/davidhintelmann/ChronoGo).
 
