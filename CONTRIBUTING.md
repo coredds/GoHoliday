@@ -5,7 +5,7 @@ Thank you for your interest in contributing to GoHolidays! This document provide
 ## Development Setup
 
 1. **Prerequisites**
-   - Go 1.21 or later
+   - Go 1.23 or later
    - Git
 
 2. **Clone the repository**

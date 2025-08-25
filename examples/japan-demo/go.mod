@@ -1,6 +1,6 @@
 module japan-demo
 
-go 1.21
+go 1.23
 
 replace github.com/coredds/GoHoliday => ../..
 
