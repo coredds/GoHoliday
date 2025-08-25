@@ -205,8 +205,8 @@ cd examples/chronogo-japan && go run main.go
 
 This project builds upon and extends the excellent work of the Python holidays ecosystem:
 
-- **Python holidays library**: [github.com/python-holidays/python-holidays](https://github.com/python-holidays/python-holidays) - Comprehensive holiday data for 200+ countries
-- **Vacanza organization**: [github.com/vacanza](https://github.com/vacanza) - Current maintainers of the Python holidays ecosystem including the vacanza/python-holidays fork
+- **Python holidays library**: [github.com/vacanza/holidays](https://github.com/vacanza/holidays) - Comprehensive holiday data for 200+ countries
+- **Vacanza organization**: [github.com/vacanza](https://github.com/vacanza) - Current maintainers of the Python holidays ecosystem
 - **Original python-holidays contributors**: The community that built the foundational holiday calculation algorithms and country-specific implementations
 
 GoHoliday provides a Go-native implementation optimized for performance and ChronoGo integration while maintaining compatibility with the data structures and calculations established by the Python holidays community.
