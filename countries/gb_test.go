@@ -198,7 +198,7 @@ func TestGBProvider_MultipleRegions(t *testing.T) {
 
 	// Test multiple regions
 	regionalHolidays := provider.GetRegionalHolidays(2024, []string{"SCT", "WLS", "NIR"})
-	
+
 	// Should have all regional holidays
 	expectedCount := 4 // St. Andrew's, St. David's, St. Patrick's, Battle of Boyne
 	if len(regionalHolidays) != expectedCount {
@@ -234,10 +234,10 @@ func TestGBProvider_HolidayDateCalculations(t *testing.T) {
 
 	// Test multiple years to ensure calculations are correct
 	testYears := []int{2023, 2024, 2025, 2026}
-	
+
 	for _, year := range testYears {
 		holidays := provider.LoadHolidays(year)
-		
+
 		// Verify we have the expected number of standard holidays
 		expectedStandardHolidays := 8
 		standardCount := 0
@@ -246,21 +246,21 @@ func TestGBProvider_HolidayDateCalculations(t *testing.T) {
 				standardCount++
 			}
 		}
-		
+
 		if standardCount < expectedStandardHolidays {
-			t.Errorf("Year %d: Expected at least %d standard holidays, got %d", 
+			t.Errorf("Year %d: Expected at least %d standard holidays, got %d",
 				year, expectedStandardHolidays, standardCount)
 		}
-		
+
 		// Verify Easter-based holidays are calculated correctly
 		easter := EasterSunday(year)
 		goodFriday := easter.AddDate(0, 0, -2)
 		easterMonday := easter.AddDate(0, 0, 1)
-		
+
 		if _, exists := holidays[goodFriday]; !exists {
 			t.Errorf("Year %d: Good Friday missing for Easter %v", year, easter)
 		}
-		
+
 		if _, exists := holidays[easterMonday]; !exists {
 			t.Errorf("Year %d: Easter Monday missing for Easter %v", year, easter)
 		}

@@ -32,14 +32,14 @@ func NewNZProvider() *NZProvider {
 		"CIT", // Chatham Islands Territory
 	}
 	base.categories = []string{"public", "regional"}
-	
+
 	return &NZProvider{BaseProvider: base}
 }
 
 // LoadHolidays loads all New Zealand holidays for a given year
 func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Fixed date holidays
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = nz.CreateHoliday(
 		"New Year's Day",
@@ -50,7 +50,7 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Te Rā Tau Hou", // Māori
 		},
 	)
-	
+
 	holidays[time.Date(year, 1, 2, 0, 0, 0, 0, time.UTC)] = nz.CreateHoliday(
 		"Day after New Year's Day",
 		time.Date(year, 1, 2, 0, 0, 0, 0, time.UTC),
@@ -60,7 +60,7 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Te Rā i muri i te Rā Tau Hou",
 		},
 	)
-	
+
 	holidays[time.Date(year, 2, 6, 0, 0, 0, 0, time.UTC)] = nz.CreateHoliday(
 		"Waitangi Day",
 		time.Date(year, 2, 6, 0, 0, 0, 0, time.UTC),
@@ -70,7 +70,7 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Te Rā o Waitangi",
 		},
 	)
-	
+
 	holidays[time.Date(year, 4, 25, 0, 0, 0, 0, time.UTC)] = nz.CreateHoliday(
 		"ANZAC Day",
 		time.Date(year, 4, 25, 0, 0, 0, 0, time.UTC),
@@ -80,7 +80,7 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Te Rā ANZAC",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = nz.CreateHoliday(
 		"Christmas Day",
 		time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC),
@@ -90,7 +90,7 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Te Rā Kirihimete",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)] = nz.CreateHoliday(
 		"Boxing Day",
 		time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC),
@@ -100,10 +100,10 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Te Rā Pākete",
 		},
 	)
-	
+
 	// Easter-based holidays
 	easter := EasterSunday(year)
-	
+
 	// Good Friday
 	goodFriday := easter.AddDate(0, 0, -2)
 	holidays[goodFriday] = nz.CreateHoliday(
@@ -115,7 +115,7 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Paraire Pai",
 		},
 	)
-	
+
 	// Easter Monday
 	easterMonday := easter.AddDate(0, 0, 1)
 	holidays[easterMonday] = nz.CreateHoliday(
@@ -127,9 +127,9 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Mane Aranga",
 		},
 	)
-	
+
 	// Variable date holidays
-	
+
 	// Queen's Birthday - first Monday in June
 	queensBirthday := NthWeekdayOfMonth(year, 6, time.Monday, 1)
 	holidays[queensBirthday] = nz.CreateHoliday(
@@ -141,7 +141,7 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Te Rā Whānau o te Kuini",
 		},
 	)
-	
+
 	// Labour Day - fourth Monday in October
 	labourDay := NthWeekdayOfMonth(year, 10, time.Monday, 4)
 	holidays[labourDay] = nz.CreateHoliday(
@@ -153,7 +153,7 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"mi": "Te Rā Whakanui i nga Kaimahi",
 		},
 	)
-	
+
 	// Matariki - Māori New Year (varies each year)
 	matariki := nz.getMatarikiDate(year)
 	if !matariki.IsZero() {
@@ -167,14 +167,14 @@ func (nz *NZProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			},
 		)
 	}
-	
+
 	return holidays
 }
 
 // GetRegionalHolidays returns region-specific holidays (provincial anniversaries)
 func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	for _, region := range regions {
 		switch region {
 		case "AUK": // Auckland Anniversary
@@ -188,7 +188,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Tāmaki-makau-rau",
 				},
 			)
-			
+
 		case "WGN": // Wellington Anniversary
 			wellingtonDay := nz.getWellingtonAnniversary(year)
 			holidays[wellingtonDay] = nz.CreateHoliday(
@@ -200,7 +200,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Te Whanganui-a-Tara",
 				},
 			)
-			
+
 		case "CAN": // Canterbury Anniversary
 			canterburyDay := nz.getCanterburyAnniversary(year)
 			holidays[canterburyDay] = nz.CreateHoliday(
@@ -212,7 +212,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Waitaha",
 				},
 			)
-			
+
 		case "OTA": // Otago Anniversary
 			otagoDay := nz.getOtagoAnniversary(year)
 			holidays[otagoDay] = nz.CreateHoliday(
@@ -224,7 +224,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Ōtākou",
 				},
 			)
-			
+
 		case "STL": // Southland Anniversary
 			southlandDay := nz.getSouthlandAnniversary(year)
 			holidays[southlandDay] = nz.CreateHoliday(
@@ -236,7 +236,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Murihiku",
 				},
 			)
-			
+
 		case "WKO": // Waikato Anniversary
 			waikatoDay := nz.getWaikatoAnniversary(year)
 			holidays[waikatoDay] = nz.CreateHoliday(
@@ -248,7 +248,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Waikato",
 				},
 			)
-			
+
 		case "HKB": // Hawke's Bay Anniversary
 			hawkesBayDay := nz.getHawkesBayAnniversary(year)
 			holidays[hawkesBayDay] = nz.CreateHoliday(
@@ -260,7 +260,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Te Matau-a-Māui",
 				},
 			)
-			
+
 		case "TKI": // Taranaki Anniversary
 			taranakiDay := nz.getTaranakiAnniversary(year)
 			holidays[taranakiDay] = nz.CreateHoliday(
@@ -272,7 +272,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Taranaki",
 				},
 			)
-			
+
 		case "NSN", "MBH", "TAS": // Nelson, Marlborough, Tasman Anniversary
 			nelsonDay := nz.getNelsonAnniversary(year)
 			holidays[nelsonDay] = nz.CreateHoliday(
@@ -284,7 +284,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Whakatū",
 				},
 			)
-			
+
 		case "WTC": // West Coast Anniversary
 			westCoastDay := nz.getWestCoastAnniversary(year)
 			holidays[westCoastDay] = nz.CreateHoliday(
@@ -296,7 +296,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"mi": "Te Rā Whakamaumahara o Te Tai Poutini",
 				},
 			)
-			
+
 		case "CIT": // Chatham Islands Anniversary
 			chathamDay := nz.getChathamAnniversary(year)
 			holidays[chathamDay] = nz.CreateHoliday(
@@ -310,7 +310,7 @@ func (nz *NZProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 			)
 		}
 	}
-	
+
 	return holidays
 }
 
@@ -417,11 +417,11 @@ func (nz *NZProvider) getMatarikiDate(year int) time.Time {
 		2029: time.Date(2029, 7, 6, 0, 0, 0, 0, time.UTC),
 		2030: time.Date(2030, 6, 21, 0, 0, 0, 0, time.UTC),
 	}
-	
+
 	if date, exists := matarikiDates[year]; exists {
 		return date
 	}
-	
+
 	// For years not in our table, return zero time (no Matariki holiday)
 	return time.Time{}
 }

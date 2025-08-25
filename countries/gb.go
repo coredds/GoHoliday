@@ -16,14 +16,14 @@ func NewGBProvider() *GBProvider {
 		"ENG", "SCT", "WLS", "NIR", // England, Scotland, Wales, Northern Ireland
 	}
 	base.categories = []string{"public", "bank", "government"}
-	
+
 	return &GBProvider{BaseProvider: base}
 }
 
 // LoadHolidays loads all UK holidays for a given year
 func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Fixed date holidays
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = gb.CreateHoliday(
 		"New Year's Day",
@@ -33,7 +33,7 @@ func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "New Year's Day",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = gb.CreateHoliday(
 		"Christmas Day",
 		time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC),
@@ -42,7 +42,7 @@ func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Christmas Day",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)] = gb.CreateHoliday(
 		"Boxing Day",
 		time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC),
@@ -51,10 +51,10 @@ func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Boxing Day",
 		},
 	)
-	
+
 	// Easter-based holidays
 	easter := EasterSunday(year)
-	
+
 	// Good Friday
 	goodFriday := easter.AddDate(0, 0, -2)
 	holidays[goodFriday] = gb.CreateHoliday(
@@ -65,7 +65,7 @@ func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Good Friday",
 		},
 	)
-	
+
 	// Easter Monday
 	easterMonday := easter.AddDate(0, 0, 1)
 	holidays[easterMonday] = gb.CreateHoliday(
@@ -76,9 +76,9 @@ func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Easter Monday",
 		},
 	)
-	
+
 	// Variable date holidays
-	
+
 	// Early May Bank Holiday - 1st Monday in May
 	earlyMayBankHoliday := NthWeekdayOfMonth(year, 5, time.Monday, 1)
 	holidays[earlyMayBankHoliday] = gb.CreateHoliday(
@@ -89,7 +89,7 @@ func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Early May Bank Holiday",
 		},
 	)
-	
+
 	// Spring Bank Holiday - Last Monday in May
 	springBankHoliday := NthWeekdayOfMonth(year, 5, time.Monday, -1)
 	holidays[springBankHoliday] = gb.CreateHoliday(
@@ -100,7 +100,7 @@ func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Spring Bank Holiday",
 		},
 	)
-	
+
 	// Summer Bank Holiday - Last Monday in August
 	summerBankHoliday := NthWeekdayOfMonth(year, 8, time.Monday, -1)
 	holidays[summerBankHoliday] = gb.CreateHoliday(
@@ -111,10 +111,10 @@ func (gb *GBProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Summer Bank Holiday",
 		},
 	)
-	
+
 	// Special holidays for specific years
 	gb.addSpecialHolidays(year, holidays)
-	
+
 	return holidays
 }
 
@@ -149,7 +149,7 @@ func (gb *GBProvider) addSpecialHolidays(year int, holidays map[time.Time]*Holid
 // GetRegionalHolidays returns region-specific holidays
 func (gb *GBProvider) GetRegionalHolidays(year int, subdivisions []string) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	for _, region := range subdivisions {
 		switch region {
 		case "SCT": // Scotland
@@ -163,7 +163,7 @@ func (gb *GBProvider) GetRegionalHolidays(year int, subdivisions []string) map[t
 					"en": "St. Andrew's Day",
 				},
 			)
-			
+
 		case "WLS": // Wales
 			// St. David's Day - March 1
 			stDavidsDay := time.Date(year, 3, 1, 0, 0, 0, 0, time.UTC)
@@ -175,7 +175,7 @@ func (gb *GBProvider) GetRegionalHolidays(year int, subdivisions []string) map[t
 					"en": "St. David's Day",
 				},
 			)
-			
+
 		case "NIR": // Northern Ireland
 			// St. Patrick's Day - March 17
 			stPatricksDay := time.Date(year, 3, 17, 0, 0, 0, 0, time.UTC)
@@ -187,7 +187,7 @@ func (gb *GBProvider) GetRegionalHolidays(year int, subdivisions []string) map[t
 					"en": "St. Patrick's Day",
 				},
 			)
-			
+
 			// Battle of the Boyne - July 12
 			battleOfBoyne := time.Date(year, 7, 12, 0, 0, 0, 0, time.UTC)
 			holidays[battleOfBoyne] = gb.CreateHoliday(
@@ -200,6 +200,6 @@ func (gb *GBProvider) GetRegionalHolidays(year int, subdivisions []string) map[t
 			)
 		}
 	}
-	
+
 	return holidays
 }

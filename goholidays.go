@@ -7,29 +7,32 @@ import (
 	"time"
 )
 
+// Version represents the current version of the GoHoliday library
+const Version = "0.1.2"
+
 // HolidayCategory represents different types of holidays
 type HolidayCategory string
 
 const (
-	CategoryPublic     HolidayCategory = "public"
-	CategoryBank       HolidayCategory = "bank"
-	CategorySchool     HolidayCategory = "school"
-	CategoryGovernment HolidayCategory = "government"
-	CategoryReligious  HolidayCategory = "religious"
-	CategoryOptional   HolidayCategory = "optional"
-	CategoryHalfDay    HolidayCategory = "half_day"
+	CategoryPublic      HolidayCategory = "public"
+	CategoryBank        HolidayCategory = "bank"
+	CategorySchool      HolidayCategory = "school"
+	CategoryGovernment  HolidayCategory = "government"
+	CategoryReligious   HolidayCategory = "religious"
+	CategoryOptional    HolidayCategory = "optional"
+	CategoryHalfDay     HolidayCategory = "half_day"
 	CategoryArmedForces HolidayCategory = "armed_forces"
-	CategoryWorkday    HolidayCategory = "workday"
+	CategoryWorkday     HolidayCategory = "workday"
 )
 
 // Holiday represents a single holiday with its properties
 type Holiday struct {
-	Name        string            `json:"name"`
-	Date        time.Time         `json:"date"`
-	Category    HolidayCategory   `json:"category"`
-	Observed    *time.Time        `json:"observed,omitempty"`
-	Languages   map[string]string `json:"languages,omitempty"`
-	IsObserved  bool              `json:"is_observed"`
+	Name       string            `json:"name"`
+	Date       time.Time         `json:"date"`
+	Category   HolidayCategory   `json:"category"`
+	Observed   *time.Time        `json:"observed,omitempty"`
+	Languages  map[string]string `json:"languages,omitempty"`
+	IsObserved bool              `json:"is_observed"`
 }
 
 // Country represents a country's holiday provider
@@ -99,7 +102,7 @@ func (c *Country) HolidaysForYear(year int) map[time.Time]*Holiday {
 	if holidays, exists := c.years[year]; exists {
 		return holidays
 	}
-	
+
 	c.loadYear(year)
 	return c.years[year]
 }
@@ -107,10 +110,10 @@ func (c *Country) HolidaysForYear(year int) map[time.Time]*Holiday {
 // HolidaysForDateRange returns all holidays within a date range
 func (c *Country) HolidaysForDateRange(start, end time.Time) map[time.Time]*Holiday {
 	result := make(map[time.Time]*Holiday)
-	
+
 	startYear := start.Year()
 	endYear := end.Year()
-	
+
 	for year := startYear; year <= endYear; year++ {
 		yearHolidays := c.HolidaysForYear(year)
 		for date, holiday := range yearHolidays {
@@ -119,7 +122,7 @@ func (c *Country) HolidaysForDateRange(start, end time.Time) map[time.Time]*Holi
 			}
 		}
 	}
-	
+
 	return result
 }
 
@@ -148,7 +151,7 @@ func (c *Country) loadYear(year int) {
 	if c.years[year] == nil {
 		c.years[year] = make(map[time.Time]*Holiday)
 	}
-	
+
 	// TODO: Implement actual holiday loading logic
 	// This will be replaced with country-specific holiday calculations
 	c.loadCountryHolidays(year)
@@ -176,6 +179,8 @@ func (c *Country) loadCountryHolidays(year int) {
 		c.loadAUHolidays(year)
 	case "NZ":
 		c.loadNZHolidays(year)
+	case "JP":
+		c.loadJPHolidays(year)
 	// Add more countries as needed
 	default:
 		// Load from generic holiday data or return empty
@@ -185,7 +190,7 @@ func (c *Country) loadCountryHolidays(year int) {
 // Placeholder implementations for specific countries
 func (c *Country) loadUSHolidays(year int) {
 	holidays := c.years[year]
-	
+
 	// New Year's Day
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "New Year's Day",
@@ -196,7 +201,7 @@ func (c *Country) loadUSHolidays(year int) {
 			"es": "Año Nuevo",
 		},
 	}
-	
+
 	// Independence Day
 	holidays[time.Date(year, 7, 4, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Independence Day",
@@ -207,7 +212,7 @@ func (c *Country) loadUSHolidays(year int) {
 			"es": "Día de la Independencia",
 		},
 	}
-	
+
 	// Christmas Day
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Christmas Day",
@@ -222,7 +227,7 @@ func (c *Country) loadUSHolidays(year int) {
 
 func (c *Country) loadGBHolidays(year int) {
 	holidays := c.years[year]
-	
+
 	// New Year's Day
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "New Year's Day",
@@ -232,7 +237,7 @@ func (c *Country) loadGBHolidays(year int) {
 			"en": "New Year's Day",
 		},
 	}
-	
+
 	// Christmas Day
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Christmas Day",
@@ -246,7 +251,7 @@ func (c *Country) loadGBHolidays(year int) {
 
 func (c *Country) loadCAHolidays(year int) {
 	holidays := c.years[year]
-	
+
 	// New Year's Day
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "New Year's Day",
@@ -257,7 +262,7 @@ func (c *Country) loadCAHolidays(year int) {
 			"fr": "Jour de l'An",
 		},
 	}
-	
+
 	// Canada Day
 	holidays[time.Date(year, 7, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Canada Day",
@@ -268,7 +273,7 @@ func (c *Country) loadCAHolidays(year int) {
 			"fr": "Fête du Canada",
 		},
 	}
-	
+
 	// Christmas Day
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Christmas Day",
@@ -279,7 +284,7 @@ func (c *Country) loadCAHolidays(year int) {
 			"fr": "Noël",
 		},
 	}
-	
+
 	// Thanksgiving Day - 2nd Monday in October
 	thanksgiving := c.getNthWeekdayOfMonth(year, 10, time.Monday, 2)
 	holidays[thanksgiving] = &Holiday{
@@ -295,7 +300,7 @@ func (c *Country) loadCAHolidays(year int) {
 
 func (c *Country) loadAUHolidays(year int) {
 	holidays := c.years[year]
-	
+
 	// New Year's Day
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "New Year's Day",
@@ -305,7 +310,7 @@ func (c *Country) loadAUHolidays(year int) {
 			"en": "New Year's Day",
 		},
 	}
-	
+
 	// Australia Day
 	holidays[time.Date(year, 1, 26, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Australia Day",
@@ -315,7 +320,7 @@ func (c *Country) loadAUHolidays(year int) {
 			"en": "Australia Day",
 		},
 	}
-	
+
 	// ANZAC Day
 	holidays[time.Date(year, 4, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "ANZAC Day",
@@ -325,7 +330,7 @@ func (c *Country) loadAUHolidays(year int) {
 			"en": "ANZAC Day",
 		},
 	}
-	
+
 	// Queen's Birthday - 2nd Monday in June (most states)
 	queensBirthday := c.getNthWeekdayOfMonth(year, 6, time.Monday, 2)
 	holidays[queensBirthday] = &Holiday{
@@ -336,7 +341,7 @@ func (c *Country) loadAUHolidays(year int) {
 			"en": "Queen's Birthday",
 		},
 	}
-	
+
 	// Labour Day - 1st Monday in October (most states)
 	labourDay := c.getNthWeekdayOfMonth(year, 10, time.Monday, 1)
 	holidays[labourDay] = &Holiday{
@@ -347,7 +352,7 @@ func (c *Country) loadAUHolidays(year int) {
 			"en": "Labour Day",
 		},
 	}
-	
+
 	// Christmas Day
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Christmas Day",
@@ -357,7 +362,7 @@ func (c *Country) loadAUHolidays(year int) {
 			"en": "Christmas Day",
 		},
 	}
-	
+
 	// Boxing Day
 	holidays[time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Boxing Day",
@@ -371,7 +376,7 @@ func (c *Country) loadAUHolidays(year int) {
 
 func (c *Country) loadNZHolidays(year int) {
 	holidays := c.years[year]
-	
+
 	// New Year's Day
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "New Year's Day",
@@ -382,7 +387,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Te Rā Tau Hou",
 		},
 	}
-	
+
 	// Day after New Year's Day
 	holidays[time.Date(year, 1, 2, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Day after New Year's Day",
@@ -393,7 +398,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Te Rā i muri i te Tau Hou",
 		},
 	}
-	
+
 	// Waitangi Day
 	holidays[time.Date(year, 2, 6, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Waitangi Day",
@@ -404,7 +409,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Te Rā o Waitangi",
 		},
 	}
-	
+
 	// Good Friday (Easter-based)
 	easter := c.easterSunday(year)
 	goodFriday := easter.AddDate(0, 0, -2)
@@ -417,7 +422,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Rārā Pai",
 		},
 	}
-	
+
 	// Easter Monday
 	easterMonday := easter.AddDate(0, 0, 1)
 	holidays[easterMonday] = &Holiday{
@@ -429,7 +434,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Rā Aranga Rērā",
 		},
 	}
-	
+
 	// ANZAC Day
 	holidays[time.Date(year, 4, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "ANZAC Day",
@@ -440,7 +445,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Te Rā o nga Hoia",
 		},
 	}
-	
+
 	// Queen's Birthday - First Monday in June
 	queensBirthday := c.getNthWeekdayOfMonth(year, 6, time.Monday, 1)
 	holidays[queensBirthday] = &Holiday{
@@ -452,7 +457,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Te Rā Whānau o te Kuini",
 		},
 	}
-	
+
 	// Matariki - Known astronomical dates for certain years
 	matarikiDates := map[int]time.Time{
 		2022: time.Date(2022, 6, 24, 0, 0, 0, 0, time.UTC),
@@ -465,7 +470,7 @@ func (c *Country) loadNZHolidays(year int) {
 		2029: time.Date(2029, 7, 6, 0, 0, 0, 0, time.UTC),
 		2030: time.Date(2030, 6, 21, 0, 0, 0, 0, time.UTC),
 	}
-	
+
 	if matarikiDate, exists := matarikiDates[year]; exists {
 		holidays[matarikiDate] = &Holiday{
 			Name:     "Matariki",
@@ -477,7 +482,7 @@ func (c *Country) loadNZHolidays(year int) {
 			},
 		}
 	}
-	
+
 	// Labour Day - Fourth Monday in October
 	labourDay := c.getNthWeekdayOfMonth(year, 10, time.Monday, 4)
 	holidays[labourDay] = &Holiday{
@@ -489,7 +494,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Te Rā Whakatōhea",
 		},
 	}
-	
+
 	// Christmas Day
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Christmas Day",
@@ -500,7 +505,7 @@ func (c *Country) loadNZHolidays(year int) {
 			"mi": "Te Rā Kirihimete",
 		},
 	}
-	
+
 	// Boxing Day
 	holidays[time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Boxing Day",
@@ -513,6 +518,133 @@ func (c *Country) loadNZHolidays(year int) {
 	}
 }
 
+func (c *Country) loadJPHolidays(year int) {
+	holidays := c.years[year]
+
+	// New Year's Day (元日, Ganjitsu)
+	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "New Year's Day",
+		Date:     time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "New Year's Day",
+			"ja": "元日",
+		},
+	}
+
+	// Coming of Age Day (成人の日, Seijin no Hi) - Second Monday of January
+	comingOfAge := c.getNthWeekdayOfMonth(year, 1, time.Monday, 2)
+	holidays[comingOfAge] = &Holiday{
+		Name:     "Coming of Age Day",
+		Date:     comingOfAge,
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Coming of Age Day",
+			"ja": "成人の日",
+		},
+	}
+
+	// National Foundation Day (建国記念の日, Kenkoku Kinen no Hi)
+	holidays[time.Date(year, 2, 11, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "National Foundation Day",
+		Date:     time.Date(year, 2, 11, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "National Foundation Day",
+			"ja": "建国記念の日",
+		},
+	}
+
+	// Emperor's Birthday (天皇誕生日, Tennō Tanjōbi)
+	var emperorBirthday time.Time
+	if year >= 2020 {
+		emperorBirthday = time.Date(year, 2, 23, 0, 0, 0, 0, time.UTC) // Emperor Naruhito
+	} else {
+		emperorBirthday = time.Date(year, 12, 23, 0, 0, 0, 0, time.UTC) // Emperor Akihito
+	}
+	holidays[emperorBirthday] = &Holiday{
+		Name:     "Emperor's Birthday",
+		Date:     emperorBirthday,
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Emperor's Birthday",
+			"ja": "天皇誕生日",
+		},
+	}
+
+	// Constitution Memorial Day (憲法記念日, Kenpō Kinenbi)
+	holidays[time.Date(year, 5, 3, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Constitution Memorial Day",
+		Date:     time.Date(year, 5, 3, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Constitution Memorial Day",
+			"ja": "憲法記念日",
+		},
+	}
+
+	// Greenery Day (みどりの日, Midori no Hi)
+	holidays[time.Date(year, 5, 4, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Greenery Day",
+		Date:     time.Date(year, 5, 4, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Greenery Day",
+			"ja": "みどりの日",
+		},
+	}
+
+	// Children's Day (こどもの日, Kodomo no Hi)
+	holidays[time.Date(year, 5, 5, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Children's Day",
+		Date:     time.Date(year, 5, 5, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Children's Day",
+			"ja": "こどもの日",
+		},
+	}
+
+	// Marine Day (海の日, Umi no Hi) - Third Monday of July
+	marine := c.getNthWeekdayOfMonth(year, 7, time.Monday, 3)
+	holidays[marine] = &Holiday{
+		Name:     "Marine Day",
+		Date:     marine,
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Marine Day",
+			"ja": "海の日",
+		},
+	}
+
+	// Sports Day (スポーツの日, Supōtsu no Hi) - Second Monday of October
+	sports := c.getNthWeekdayOfMonth(year, 10, time.Monday, 2)
+	sportsName := "Sports Day"
+	if year < 2020 {
+		sportsName = "Health and Sports Day"
+	}
+	holidays[sports] = &Holiday{
+		Name:     sportsName,
+		Date:     sports,
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": sportsName,
+			"ja": "スポーツの日",
+		},
+	}
+
+	// Culture Day (文化の日, Bunka no Hi)
+	holidays[time.Date(year, 11, 3, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Culture Day",
+		Date:     time.Date(year, 11, 3, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Culture Day",
+			"ja": "文化の日",
+		},
+	}
+}
+
 // getNthWeekdayOfMonth is a helper method for calculating variable holidays
 func (c *Country) getNthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int) time.Time {
 	if n > 0 {
@@ -520,7 +652,7 @@ func (c *Country) getNthWeekdayOfMonth(year int, month time.Month, weekday time.
 		firstDay := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 		daysToWeekday := (int(weekday) - int(firstDay.Weekday()) + 7) % 7
 		firstOccurrence := firstDay.AddDate(0, 0, daysToWeekday)
-		
+
 		// Add weeks to get the nth occurrence
 		return firstOccurrence.AddDate(0, 0, (n-1)*7)
 	} else if n == -1 {
@@ -529,7 +661,7 @@ func (c *Country) getNthWeekdayOfMonth(year int, month time.Month, weekday time.
 		daysBack := (int(lastDay.Weekday()) - int(weekday) + 7) % 7
 		return lastDay.AddDate(0, 0, -daysBack)
 	}
-	
+
 	panic("Invalid n value for getNthWeekdayOfMonth")
 }
 
@@ -550,6 +682,6 @@ func (c *Country) easterSunday(year int) time.Time {
 	m := (a + 11*h + 22*l) / 451
 	n := (h + l - 7*m + 114) / 31
 	p := (h + l - 7*m + 114) % 31
-	
+
 	return time.Date(year, time.Month(n), p+1, 0, 0, 0, 0, time.UTC)
 }

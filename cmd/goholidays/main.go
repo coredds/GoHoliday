@@ -29,7 +29,7 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Println("GoHolidays CLI v1.0.0")
+		fmt.Printf("GoHolidays CLI v%s\n", goholidays.Version)
 		fmt.Println("A Go library for comprehensive holiday data")
 		return
 	}
@@ -77,11 +77,11 @@ func checkSpecificDate(country *goholidays.Country, dateStr, format string, show
 	}
 
 	holiday, isHoliday := country.IsHoliday(date)
-	
+
 	switch format {
 	case "json":
 		result := map[string]interface{}{
-			"date":      dateStr,
+			"date":       dateStr,
 			"is_holiday": isHoliday,
 		}
 		if isHoliday {
@@ -97,7 +97,7 @@ func checkSpecificDate(country *goholidays.Country, dateStr, format string, show
 		} else {
 			fmt.Printf("%s is not a holiday\n", dateStr)
 		}
-		
+
 		if showBusiness {
 			calc := goholidays.NewBusinessDayCalculator(country)
 			if calc.IsBusinessDay(date) {
@@ -129,17 +129,17 @@ func listHolidaysForYear(country *goholidays.Country, year int, format string) {
 			if holiday.IsObserved && holiday.Observed != nil {
 				observed = holiday.Observed.Format("2006-01-02")
 			}
-			fmt.Printf("%s,%s,%s,%s\n", 
-				date.Format("2006-01-02"), 
-				holiday.Name, 
-				holiday.Category, 
+			fmt.Printf("%s,%s,%s,%s\n",
+				date.Format("2006-01-02"),
+				holiday.Name,
+				holiday.Category,
 				observed)
 		}
 	default:
 		fmt.Printf("Holidays for %s in %d:\n\n", country.GetCountryCode(), year)
 		fmt.Printf("%-12s %-30s %-12s %-12s\n", "Date", "Holiday", "Category", "Observed")
 		fmt.Println(strings.Repeat("-", 70))
-		
+
 		// Convert map to slice for sorting
 		type holidayDate struct {
 			date    time.Time
@@ -149,7 +149,7 @@ func listHolidaysForYear(country *goholidays.Country, year int, format string) {
 		for date, holiday := range holidays {
 			sortedHolidays = append(sortedHolidays, holidayDate{date, holiday})
 		}
-		
+
 		// Simple sort by date
 		for i := 0; i < len(sortedHolidays); i++ {
 			for j := i + 1; j < len(sortedHolidays); j++ {
@@ -158,7 +158,7 @@ func listHolidaysForYear(country *goholidays.Country, year int, format string) {
 				}
 			}
 		}
-		
+
 		for _, hd := range sortedHolidays {
 			observed := ""
 			if hd.holiday.IsObserved && hd.holiday.Observed != nil {

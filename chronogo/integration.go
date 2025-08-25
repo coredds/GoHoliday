@@ -1,265 +1,222 @@
 package chronogo
 
 import (
+	"sync"
 	"time"
 
-	"github.com/coredds/GoHoliday/config"
 	"github.com/coredds/GoHoliday/countries"
 )
 
-// GoHolidaysChecker implements ChronoGo's HolidayChecker interface
-// using the comprehensive GoHolidays system with configuration support
-type GoHolidaysChecker struct {
-	holidayManager *config.HolidayManager
-	countries      []string
-	subdivisions   []string
-	categories     []string
-	includeRegional bool
-	
-	// Cache for performance
-	holidayCache map[int]map[time.Time]bool // year -> date -> isHoliday
+// HolidayChecker provides the minimal interface ChronoGo needs
+type HolidayChecker interface {
+	IsHoliday(date time.Time) bool
+	GetHolidayName(date time.Time) string
+	AreHolidays(dates []time.Time) []bool
 }
 
-// ChronoGoHolidayChecker interface matches ChronoGo's expected interface
-// This ensures we implement exactly what ChronoGo expects
-type ChronoGoHolidayChecker interface {
-	IsHoliday(dt ChronoGoDateTime) bool
+// FastCountryChecker - optimized for ChronoGo's business day loops
+// Provides O(1) holiday lookups with intelligent caching
+type FastCountryChecker struct {
+	countryCode string
+	provider    countries.HolidayProvider
+	yearCache   map[int]map[time.Time]*countries.Holiday
+	mutex       sync.RWMutex
 }
 
-// ChronoGoDateTime represents the interface that ChronoGo DateTime should satisfy
-// We'll accept anything that can give us Year(), Month(), Day()
-type ChronoGoDateTime interface {
-	Year() int
-	Month() time.Month
-	Day() int
-}
+// Checker creates an optimized holiday checker for a specific country
+func Checker(countryCode string) *FastCountryChecker {
+	var provider countries.HolidayProvider
 
-// NewGoHolidaysChecker creates a new ChronoGo-compatible holiday checker
-func NewGoHolidaysChecker() *GoHolidaysChecker {
-	return &GoHolidaysChecker{
-		holidayManager: config.NewHolidayManager(),
-		countries:      []string{"US"}, // Default to US
-		categories:     []string{"federal", "public", "bank", "observance"},
-		includeRegional: false,
-		holidayCache:   make(map[int]map[time.Time]bool),
+	switch countryCode {
+	case "US":
+		provider = countries.NewUSProvider()
+	case "CA":
+		provider = countries.NewCAProvider()
+	case "GB":
+		provider = countries.NewGBProvider()
+	case "AU":
+		provider = countries.NewAUProvider()
+	case "NZ":
+		provider = countries.NewNZProvider()
+	case "DE":
+		provider = countries.NewDEProvider()
+	case "FR":
+		provider = countries.NewFRProvider()
+	case "JP":
+		provider = countries.NewJPProvider()
+	default:
+		// Fallback to US if country not supported
+		provider = countries.NewUSProvider()
+	}
+
+	return &FastCountryChecker{
+		countryCode: countryCode,
+		provider:    provider,
+		yearCache:   make(map[int]map[time.Time]*countries.Holiday),
 	}
 }
 
-// WithCountries sets the countries to check for holidays
-func (ghc *GoHolidaysChecker) WithCountries(countries ...string) *GoHolidaysChecker {
-	ghc.countries = countries
-	ghc.clearCache()
-	return ghc
-}
+// IsHoliday performs fast O(1) holiday lookup optimized for business day calculations
+func (f *FastCountryChecker) IsHoliday(date time.Time) bool {
+	// Normalize date to UTC midnight for consistent lookups
+	normalizedDate := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
+	year := normalizedDate.Year()
 
-// WithSubdivisions enables regional holidays for specific subdivisions
-func (ghc *GoHolidaysChecker) WithSubdivisions(subdivisions ...string) *GoHolidaysChecker {
-	ghc.subdivisions = subdivisions
-	ghc.includeRegional = len(subdivisions) > 0
-	ghc.clearCache()
-	return ghc
-}
-
-// WithCategories sets which holiday categories to consider
-func (ghc *GoHolidaysChecker) WithCategories(categories ...string) *GoHolidaysChecker {
-	ghc.categories = categories
-	ghc.clearCache()
-	return ghc
-}
-
-// WithConfiguration loads holidays using a specific configuration file
-func (ghc *GoHolidaysChecker) WithConfiguration(configPath string) (*GoHolidaysChecker, error) {
-	cm := config.NewConfigManager()
-	_, err := cm.LoadConfigFromFile(configPath)
-	if err != nil {
-		return nil, err
+	// Check cache first (read lock)
+	f.mutex.RLock()
+	if yearHolidays, exists := f.yearCache[year]; exists {
+		_, isHoliday := yearHolidays[normalizedDate]
+		f.mutex.RUnlock()
+		return isHoliday
 	}
-	
-	ghc.holidayManager = config.NewHolidayManager()
-	ghc.clearCache()
-	return ghc, nil
-}
+	f.mutex.RUnlock()
 
-// IsHoliday implements ChronoGo's HolidayChecker interface
-func (ghc *GoHolidaysChecker) IsHoliday(dt ChronoGoDateTime) bool {
-	year := dt.Year()
-	date := time.Date(year, dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)
-	
-	// Check cache first
-	if yearCache, exists := ghc.holidayCache[year]; exists {
-		if isHoliday, cached := yearCache[date]; cached {
-			return isHoliday
-		}
-	}
-	
-	// Load holidays for this year if not cached
-	isHoliday := ghc.checkHoliday(date)
-	
-	// Cache the result
-	if ghc.holidayCache[year] == nil {
-		ghc.holidayCache[year] = make(map[time.Time]bool)
-	}
-	ghc.holidayCache[year][date] = isHoliday
-	
+	// Cache miss - load year data (write lock)
+	f.loadYearData(year)
+
+	// Check again after loading
+	f.mutex.RLock()
+	yearHolidays := f.yearCache[year]
+	_, isHoliday := yearHolidays[normalizedDate]
+	f.mutex.RUnlock()
+
 	return isHoliday
 }
 
-// checkHoliday does the actual holiday checking across all configured countries
-func (ghc *GoHolidaysChecker) checkHoliday(date time.Time) bool {
-	for _, countryCode := range ghc.countries {
-		var holidays map[time.Time]*countries.Holiday
-		var err error
-		
-		// Get holidays with or without regional support
-		if ghc.includeRegional && len(ghc.subdivisions) > 0 {
-			holidays, err = ghc.holidayManager.GetHolidaysWithSubdivisions(
-				countryCode, date.Year(), ghc.subdivisions)
-		} else {
-			holidays, err = ghc.holidayManager.GetHolidays(countryCode, date.Year())
-		}
-		
-		if err != nil {
-			continue // Skip this country if there's an error
-		}
-		
-		// Check if the date matches any holiday
-		for holidayDate, holiday := range holidays {
-			if ghc.datesMatch(date, holidayDate) && ghc.categoryMatches(holiday.Category) {
-				return true
+// GetHolidayName returns the name of the holiday on the given date, empty string if not a holiday
+func (f *FastCountryChecker) GetHolidayName(date time.Time) string {
+	// Normalize date to UTC midnight
+	normalizedDate := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
+	year := normalizedDate.Year()
+
+	// Ensure year data is loaded
+	f.mutex.RLock()
+	yearHolidays, exists := f.yearCache[year]
+	f.mutex.RUnlock()
+
+	if !exists {
+		f.loadYearData(year)
+		f.mutex.RLock()
+		yearHolidays = f.yearCache[year]
+		f.mutex.RUnlock()
+	}
+
+	if holiday, isHoliday := yearHolidays[normalizedDate]; isHoliday {
+		return holiday.Name
+	}
+
+	return ""
+}
+
+// AreHolidays performs batch holiday checking for efficient range operations
+// Optimized for ChronoGo's bulk date processing
+func (f *FastCountryChecker) AreHolidays(dates []time.Time) []bool {
+	results := make([]bool, len(dates))
+
+	// Group dates by year for efficient batch loading
+	yearGroups := make(map[int][]int) // year -> slice of indices
+	for i, date := range dates {
+		year := date.Year()
+		yearGroups[year] = append(yearGroups[year], i)
+	}
+
+	// Pre-load all required years
+	for year := range yearGroups {
+		f.ensureYearLoaded(year)
+	}
+
+	// Process all dates with cached data
+	f.mutex.RLock()
+	for i, date := range dates {
+		normalizedDate := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
+		yearHolidays := f.yearCache[normalizedDate.Year()]
+		_, isHoliday := yearHolidays[normalizedDate]
+		results[i] = isHoliday
+	}
+	f.mutex.RUnlock()
+
+	return results
+}
+
+// GetHolidaysInRange returns all holidays in the specified date range
+// Useful for ChronoGo's calendar operations
+func (f *FastCountryChecker) GetHolidaysInRange(start, end time.Time) map[time.Time]string {
+	holidays := make(map[time.Time]string)
+
+	// Determine year range
+	startYear := start.Year()
+	endYear := end.Year()
+
+	// Pre-load all years in range
+	for year := startYear; year <= endYear; year++ {
+		f.ensureYearLoaded(year)
+	}
+
+	// Collect holidays in range
+	f.mutex.RLock()
+	for year := startYear; year <= endYear; year++ {
+		yearHolidays := f.yearCache[year]
+		for date, holiday := range yearHolidays {
+			if (date.Equal(start) || date.After(start)) && (date.Equal(end) || date.Before(end)) {
+				holidays[date] = holiday.Name
 			}
 		}
 	}
-	
-	return false
+	f.mutex.RUnlock()
+
+	return holidays
 }
 
-// datesMatch compares two dates ignoring time components
-func (ghc *GoHolidaysChecker) datesMatch(date1, date2 time.Time) bool {
-	return date1.Year() == date2.Year() &&
-		   date1.Month() == date2.Month() &&
-		   date1.Day() == date2.Day()
-}
+// CountHolidaysInRange counts holidays in a date range without allocating holiday data
+// Optimized for ChronoGo's business day counting
+func (f *FastCountryChecker) CountHolidaysInRange(start, end time.Time) int {
+	count := 0
 
-// categoryMatches checks if the holiday category is in our accepted categories
-func (ghc *GoHolidaysChecker) categoryMatches(category string) bool {
-	if len(ghc.categories) == 0 {
-		return true // Accept all categories if none specified
-	}
-	
-	for _, acceptedCategory := range ghc.categories {
-		if category == acceptedCategory {
-			return true
+	// Iterate through range checking each date
+	for d := start; !d.After(end); d = d.AddDate(0, 0, 1) {
+		if f.IsHoliday(d) {
+			count++
 		}
 	}
-	
-	return false
+
+	return count
 }
 
-// clearCache clears the holiday cache when configuration changes
-func (ghc *GoHolidaysChecker) clearCache() {
-	ghc.holidayCache = make(map[int]map[time.Time]bool)
+// GetCountryCode returns the country code this checker is configured for
+func (f *FastCountryChecker) GetCountryCode() string {
+	return f.countryCode
 }
 
-// GetHolidays returns all holidays for a given year (ChronoGo compatibility)
-// This matches the interface that ChronoGo's DefaultHolidayChecker provides
-func (ghc *GoHolidaysChecker) GetHolidays(year int) []HolidayInfo {
-	var allHolidays []HolidayInfo
-	
-	for _, countryCode := range ghc.countries {
-		var holidays map[time.Time]*countries.Holiday
-		var err error
-		
-		if ghc.includeRegional && len(ghc.subdivisions) > 0 {
-			holidays, err = ghc.holidayManager.GetHolidaysWithSubdivisions(
-				countryCode, year, ghc.subdivisions)
-		} else {
-			holidays, err = ghc.holidayManager.GetHolidays(countryCode, year)
-		}
-		
-		if err != nil {
-			continue
-		}
-		
-		for date, holiday := range holidays {
-			if ghc.categoryMatches(holiday.Category) {
-				allHolidays = append(allHolidays, HolidayInfo{
-					Name:     holiday.Name,
-					Date:     date,
-					Country:  countryCode,
-					Category: holiday.Category,
-				})
-			}
-		}
+// ClearCache clears the holiday cache to free memory
+// Useful for long-running applications
+func (f *FastCountryChecker) ClearCache() {
+	f.mutex.Lock()
+	f.yearCache = make(map[int]map[time.Time]*countries.Holiday)
+	f.mutex.Unlock()
+}
+
+// loadYearData loads holiday data for a specific year (internal method)
+func (f *FastCountryChecker) loadYearData(year int) {
+	f.mutex.Lock()
+	defer f.mutex.Unlock()
+
+	// Double-check after acquiring write lock
+	if _, exists := f.yearCache[year]; exists {
+		return
 	}
-	
-	return allHolidays
+
+	// Load holidays for the year
+	holidays := f.provider.LoadHolidays(year)
+	f.yearCache[year] = holidays
 }
 
-// HolidayInfo provides detailed information about a holiday
-type HolidayInfo struct {
-	Name     string
-	Date     time.Time
-	Country  string
-	Category string
-}
+// ensureYearLoaded ensures year data is loaded (internal method)
+func (f *FastCountryChecker) ensureYearLoaded(year int) {
+	f.mutex.RLock()
+	_, exists := f.yearCache[year]
+	f.mutex.RUnlock()
 
-// GetSupportedCountries returns the list of countries supported by GoHolidays
-func (ghc *GoHolidaysChecker) GetSupportedCountries() []string {
-	return ghc.holidayManager.GetSupportedCountries()
-}
-
-// GetCountryInfo returns detailed information about a country's holiday configuration
-func (ghc *GoHolidaysChecker) GetCountryInfo(countryCode string) (map[string]interface{}, error) {
-	return ghc.holidayManager.GetCountryInfo(countryCode)
-}
-
-// AddCustomHoliday allows adding custom holidays at runtime
-// This provides compatibility with ChronoGo's AddHoliday functionality
-func (ghc *GoHolidaysChecker) AddCustomHoliday(name string, date time.Time) {
-	// This would require extending our configuration system to support runtime additions
-	// For now, this is a placeholder that shows the interface
-	// Users should use the configuration system for custom holidays
-}
-
-// PreloadYear pre-loads and caches all holidays for a specific year
-// This can improve performance when doing many holiday checks for the same year
-func (ghc *GoHolidaysChecker) PreloadYear(year int) error {
-	date := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
-	
-	// Check one date to trigger loading of all holidays for the year
-	ghc.IsHoliday(&dateTimeWrapper{date})
-	
-	return nil
-}
-
-// dateTimeWrapper wraps a time.Time to implement ChronoGoDateTime
-type dateTimeWrapper struct {
-	time.Time
-}
-
-func (dtw *dateTimeWrapper) Year() int        { return dtw.Time.Year() }
-func (dtw *dateTimeWrapper) Month() time.Month { return dtw.Time.Month() }
-func (dtw *dateTimeWrapper) Day() int         { return dtw.Time.Day() }
-
-// CreateDefaultUSChecker creates a GoHolidays checker configured for US federal holidays
-// This provides a drop-in replacement for ChronoGo's NewUSHolidayChecker()
-func CreateDefaultUSChecker() *GoHolidaysChecker {
-	return NewGoHolidaysChecker().
-		WithCountries("US").
-		WithCategories("federal", "public")
-}
-
-// CreateMultiCountryChecker creates a checker for multiple countries
-func CreateMultiCountryChecker(countries ...string) *GoHolidaysChecker {
-	return NewGoHolidaysChecker().
-		WithCountries(countries...).
-		WithCategories("federal", "public", "bank")
-}
-
-// CreateRegionalChecker creates a checker with regional holiday support
-func CreateRegionalChecker(country string, subdivisions ...string) *GoHolidaysChecker {
-	return NewGoHolidaysChecker().
-		WithCountries(country).
-		WithSubdivisions(subdivisions...).
-		WithCategories("federal", "public", "regional", "state")
+	if !exists {
+		f.loadYearData(year)
+	}
 }

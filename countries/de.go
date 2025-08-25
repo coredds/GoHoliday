@@ -14,21 +14,21 @@ func NewDEProvider() *DEProvider {
 	base := NewBaseProvider("DE")
 	base.subdivisions = []string{
 		"BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH",
-		// Baden-Württemberg, Bayern, Berlin, Brandenburg, Bremen, Hamburg, Hessen, 
-		// Mecklenburg-Vorpommern, Niedersachsen, Nordrhein-Westfalen, Rheinland-Pfalz, 
+		// Baden-Württemberg, Bayern, Berlin, Brandenburg, Bremen, Hamburg, Hessen,
+		// Mecklenburg-Vorpommern, Niedersachsen, Nordrhein-Westfalen, Rheinland-Pfalz,
 		// Saarland, Sachsen, Sachsen-Anhalt, Schleswig-Holstein, Thüringen
 	}
 	base.categories = []string{"public", "religious", "regional"}
-	
+
 	return &DEProvider{BaseProvider: base}
 }
 
 // LoadHolidays loads all German holidays for a given year
 func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Fixed date holidays
-	
+
 	// New Year's Day - January 1
 	newYear := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
 	holidays[newYear] = de.CreateHoliday(
@@ -40,7 +40,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "New Year's Day",
 		},
 	)
-	
+
 	// Epiphany - January 6 (BW, BY, ST)
 	epiphany := time.Date(year, 1, 6, 0, 0, 0, 0, time.UTC)
 	holidays[epiphany] = de.CreateHoliday(
@@ -52,7 +52,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Epiphany",
 		},
 	)
-	
+
 	// Labour Day - May 1
 	labourDay := time.Date(year, 5, 1, 0, 0, 0, 0, time.UTC)
 	holidays[labourDay] = de.CreateHoliday(
@@ -64,7 +64,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Labour Day",
 		},
 	)
-	
+
 	// German Unity Day - October 3 (since 1990)
 	if year >= 1990 {
 		unityDay := time.Date(year, 10, 3, 0, 0, 0, 0, time.UTC)
@@ -78,7 +78,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			},
 		)
 	}
-	
+
 	// All Saints' Day - November 1 (BW, BY, NW, RP, SL)
 	allSaints := time.Date(year, 11, 1, 0, 0, 0, 0, time.UTC)
 	holidays[allSaints] = de.CreateHoliday(
@@ -90,7 +90,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "All Saints' Day",
 		},
 	)
-	
+
 	// Christmas Eve - December 24
 	christmasEve := time.Date(year, 12, 24, 0, 0, 0, 0, time.UTC)
 	holidays[christmasEve] = de.CreateHoliday(
@@ -102,7 +102,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Christmas Eve",
 		},
 	)
-	
+
 	// Christmas Day - December 25
 	christmas := time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)
 	holidays[christmas] = de.CreateHoliday(
@@ -114,7 +114,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Christmas Day",
 		},
 	)
-	
+
 	// Boxing Day - December 26
 	boxingDay := time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)
 	holidays[boxingDay] = de.CreateHoliday(
@@ -126,7 +126,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Boxing Day",
 		},
 	)
-	
+
 	// New Year's Eve - December 31
 	newYearEve := time.Date(year, 12, 31, 0, 0, 0, 0, time.UTC)
 	holidays[newYearEve] = de.CreateHoliday(
@@ -138,10 +138,10 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "New Year's Eve",
 		},
 	)
-	
+
 	// Easter-based holidays
 	easter := EasterSunday(year)
-	
+
 	// Good Friday
 	goodFriday := easter.AddDate(0, 0, -2)
 	holidays[goodFriday] = de.CreateHoliday(
@@ -153,7 +153,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Good Friday",
 		},
 	)
-	
+
 	// Easter Sunday
 	holidays[easter] = de.CreateHoliday(
 		"Ostersonntag",
@@ -164,7 +164,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Easter Sunday",
 		},
 	)
-	
+
 	// Easter Monday
 	easterMonday := easter.AddDate(0, 0, 1)
 	holidays[easterMonday] = de.CreateHoliday(
@@ -176,7 +176,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Easter Monday",
 		},
 	)
-	
+
 	// Ascension Day (39 days after Easter)
 	ascension := easter.AddDate(0, 0, 39)
 	holidays[ascension] = de.CreateHoliday(
@@ -188,7 +188,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Ascension Day",
 		},
 	)
-	
+
 	// Whit Sunday (49 days after Easter)
 	whitSunday := easter.AddDate(0, 0, 49)
 	holidays[whitSunday] = de.CreateHoliday(
@@ -200,7 +200,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Whit Sunday",
 		},
 	)
-	
+
 	// Whit Monday (50 days after Easter)
 	whitMonday := easter.AddDate(0, 0, 50)
 	holidays[whitMonday] = de.CreateHoliday(
@@ -212,7 +212,7 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Whit Monday",
 		},
 	)
-	
+
 	// Corpus Christi (60 days after Easter)
 	corpusChristi := easter.AddDate(0, 0, 60)
 	holidays[corpusChristi] = de.CreateHoliday(
@@ -224,14 +224,14 @@ func (de *DEProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Corpus Christi",
 		},
 	)
-	
+
 	return holidays
 }
 
 // GetRegionalHolidays returns state-specific holidays
 func (de *DEProvider) GetRegionalHolidays(year int, states []string) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	for _, state := range states {
 		switch state {
 		case "BY": // Bavaria
@@ -247,7 +247,7 @@ func (de *DEProvider) GetRegionalHolidays(year int, states []string) map[time.Ti
 				},
 			)
 		}
-		
+
 		// Reformation Day for Protestant states
 		if state == "SN" || state == "ST" || state == "TH" || state == "BB" || state == "MV" {
 			reformation := time.Date(year, 10, 31, 0, 0, 0, 0, time.UTC)
@@ -261,7 +261,7 @@ func (de *DEProvider) GetRegionalHolidays(year int, states []string) map[time.Ti
 				},
 			)
 		}
-		
+
 		// Repentance and Prayer Day for Protestant states (only SN still observes it)
 		if state == "SN" {
 			repentance := de.getRepentanceDay(year)
@@ -276,7 +276,7 @@ func (de *DEProvider) GetRegionalHolidays(year int, states []string) map[time.Ti
 			)
 		}
 	}
-	
+
 	return holidays
 }
 
@@ -284,20 +284,20 @@ func (de *DEProvider) GetRegionalHolidays(year int, states []string) map[time.Ti
 // It's the Wednesday before November 23
 func (de *DEProvider) getRepentanceDay(year int) time.Time {
 	nov23 := time.Date(year, 11, 23, 0, 0, 0, 0, time.UTC)
-	
+
 	// Find the Wednesday before November 23
 	daysBack := int(nov23.Weekday()) - int(time.Wednesday)
 	if daysBack <= 0 {
 		daysBack += 7
 	}
-	
+
 	return nov23.AddDate(0, 0, -daysBack)
 }
 
 // GetSpecialObservances returns non-public observances
 func (de *DEProvider) GetSpecialObservances(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Carnival Monday (48 days before Easter)
 	easter := EasterSunday(year)
 	carnivalMonday := easter.AddDate(0, 0, -48)
@@ -310,7 +310,7 @@ func (de *DEProvider) GetSpecialObservances(year int) map[time.Time]*Holiday {
 			"en": "Carnival Monday",
 		},
 	)
-	
+
 	// Shrove Tuesday (47 days before Easter)
 	shroveTuesday := easter.AddDate(0, 0, -47)
 	holidays[shroveTuesday] = de.CreateHoliday(
@@ -322,7 +322,7 @@ func (de *DEProvider) GetSpecialObservances(year int) map[time.Time]*Holiday {
 			"en": "Shrove Tuesday",
 		},
 	)
-	
+
 	// Ash Wednesday (46 days before Easter)
 	ashWednesday := easter.AddDate(0, 0, -46)
 	holidays[ashWednesday] = de.CreateHoliday(
@@ -334,7 +334,7 @@ func (de *DEProvider) GetSpecialObservances(year int) map[time.Time]*Holiday {
 			"en": "Ash Wednesday",
 		},
 	)
-	
+
 	// World War II Remembrance - May 8
 	if year >= 1945 {
 		remembrance := time.Date(year, 5, 8, 0, 0, 0, 0, time.UTC)
@@ -348,6 +348,6 @@ func (de *DEProvider) GetSpecialObservances(year int) map[time.Time]*Holiday {
 			},
 		)
 	}
-	
+
 	return holidays
 }

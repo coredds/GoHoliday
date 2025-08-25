@@ -258,13 +258,13 @@ func TestDEProvider_RepentanceDay(t *testing.T) {
 	for _, tc := range testCases {
 		calculated := provider.getRepentanceDay(tc.year)
 		if !calculated.Equal(tc.expectedDate) {
-			t.Errorf("Year %d: Expected Repentance Day %v, got %v", 
+			t.Errorf("Year %d: Expected Repentance Day %v, got %v",
 				tc.year, tc.expectedDate, calculated)
 		}
-		
+
 		// Verify it's a Wednesday
 		if calculated.Weekday() != time.Wednesday {
-			t.Errorf("Year %d: Repentance Day should be a Wednesday, got %v", 
+			t.Errorf("Year %d: Repentance Day should be a Wednesday, got %v",
 				tc.year, calculated.Weekday())
 		}
 	}

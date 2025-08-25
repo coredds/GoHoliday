@@ -15,13 +15,13 @@ type HolidayProvider interface {
 
 // Holiday represents a holiday with all its properties
 type Holiday struct {
-	Name        string            `json:"name"`
-	Date        time.Time         `json:"date"`
-	Category    string            `json:"category"`
-	Observed    *time.Time        `json:"observed,omitempty"`
-	Languages   map[string]string `json:"languages,omitempty"`
-	IsObserved  bool              `json:"is_observed"`
-	Subdivisions []string         `json:"subdivisions,omitempty"`
+	Name         string            `json:"name"`
+	Date         time.Time         `json:"date"`
+	Category     string            `json:"category"`
+	Observed     *time.Time        `json:"observed,omitempty"`
+	Languages    map[string]string `json:"languages,omitempty"`
+	IsObserved   bool              `json:"is_observed"`
+	Subdivisions []string          `json:"subdivisions,omitempty"`
 }
 
 // BaseProvider provides common functionality for holiday providers
@@ -62,10 +62,10 @@ func (bp *BaseProvider) CalculateObservedDate(date time.Time) *time.Time {
 	if !bp.observedShift {
 		return nil
 	}
-	
+
 	weekday := date.Weekday()
 	var observed time.Time
-	
+
 	switch weekday {
 	case time.Saturday:
 		observed = date.AddDate(0, 0, -1) // Friday
@@ -74,7 +74,7 @@ func (bp *BaseProvider) CalculateObservedDate(date time.Time) *time.Time {
 	default:
 		return nil // No shift needed
 	}
-	
+
 	return &observed
 }
 
@@ -86,12 +86,12 @@ func (bp *BaseProvider) CreateHoliday(name string, date time.Time, category stri
 		Category:  category,
 		Languages: languages,
 	}
-	
+
 	if observed := bp.CalculateObservedDate(date); observed != nil {
 		holiday.Observed = observed
 		holiday.IsObserved = true
 	}
-	
+
 	return holiday
 }
 
@@ -112,7 +112,7 @@ func EasterSunday(year int) time.Time {
 	m := (a + 11*h + 22*l) / 451
 	month := (h + l - 7*m + 114) / 31
 	day := ((h + l - 7*m + 114) % 31) + 1
-	
+
 	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 }
 
@@ -136,7 +136,7 @@ func NthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int) 
 		firstDay := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 		daysToWeekday := (int(weekday) - int(firstDay.Weekday()) + 7) % 7
 		firstOccurrence := firstDay.AddDate(0, 0, daysToWeekday)
-		
+
 		// Add weeks to get the nth occurrence
 		return firstOccurrence.AddDate(0, 0, (n-1)*7)
 	} else if n == -1 {
@@ -145,6 +145,6 @@ func NthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int) 
 		daysBack := (int(lastDay.Weekday()) - int(weekday) + 7) % 7
 		return lastDay.AddDate(0, 0, -daysBack)
 	}
-	
+
 	panic("Invalid n value for NthWeekdayOfMonth")
 }

@@ -267,7 +267,7 @@ func (hm *HolidayManager) applyOutputFormatting(holidays map[time.Time]*countrie
 	// Note: We don't apply timezone conversion to holiday dates as they should remain
 	// as calendar dates (midnight UTC) to avoid changing the actual holiday date.
 	// Timezone conversion should only be applied when displaying times, not dates.
-	
+
 	return holidays
 }
 

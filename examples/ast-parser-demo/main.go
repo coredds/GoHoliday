@@ -49,7 +49,7 @@ class NewZealand(HolidayBase):
 		if call.Date != nil {
 			dateExpr = fmt.Sprintf("Type: %v", call.Date.Type)
 		}
-		fmt.Printf("   %d. %s (Method: %s, Date: %s)\n", 
+		fmt.Printf("   %d. %s (Method: %s, Date: %s)\n",
 			i+1, call.Name, call.Method, dateExpr)
 	}
 
@@ -70,7 +70,7 @@ class NewZealand(HolidayBase):
 
 	// Show performance info
 	fmt.Printf("\n4. Performance: Found %d holidays\n", len(definitions))
-	
+
 	fmt.Println("\n✅ AST Parser successfully enhanced the sync system!")
 	fmt.Println("   • Replaced basic regex with sophisticated AST parsing")
 	fmt.Println("   • Accurately handles strings with apostrophes")

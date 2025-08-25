@@ -32,17 +32,17 @@ class TestCountry(HolidayBase):
 	if err != nil {
 		t.Fatalf("Parse() failed: %v", err)
 	}
-	
+
 	if len(holidayCalls) == 0 {
 		t.Error("Expected to find holiday calls, got none")
 	}
-	
+
 	// Check for specific holidays
 	found := make(map[string]bool)
 	for _, call := range holidayCalls {
 		found[call.Name] = true
 	}
-	
+
 	expectedHolidays := []string{"New Year's Day", "Good Friday", "Easter Monday", "Independence Day"}
 	for _, expected := range expectedHolidays {
 		if !found[expected] {
@@ -53,7 +53,7 @@ class TestCountry(HolidayBase):
 
 func TestPythonASTParser_TokenizeBasicContent(t *testing.T) {
 	parser := NewPythonASTParser("")
-	
+
 	testCases := []struct {
 		name     string
 		content  string
@@ -85,12 +85,12 @@ func TestPythonASTParser_TokenizeBasicContent(t *testing.T) {
 			expected: []TokenType{TokenNumber},
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			parser.tokens = []Token{} // Reset tokens
 			parser.tokenizeContent(tc.content, 1, 0)
-			
+
 			if len(parser.tokens) != len(tc.expected) {
 				t.Errorf("Expected %d tokens, got %d", len(tc.expected), len(parser.tokens))
 				for i, token := range parser.tokens {
@@ -98,10 +98,10 @@ func TestPythonASTParser_TokenizeBasicContent(t *testing.T) {
 				}
 				return
 			}
-			
+
 			for i, expected := range tc.expected {
 				if parser.tokens[i].Type != expected {
-					t.Errorf("Token %d: expected type %v, got %v (value: %s)", 
+					t.Errorf("Token %d: expected type %v, got %v (value: %s)",
 						i, expected, parser.tokens[i].Type, parser.tokens[i].Value)
 				}
 			}
@@ -111,14 +111,14 @@ func TestPythonASTParser_TokenizeBasicContent(t *testing.T) {
 
 func TestPythonASTParser_ExtractDateExpression(t *testing.T) {
 	parser := NewPythonASTParser("")
-	
+
 	testCases := []struct {
-		name           string
-		line           string
-		expectedType   DateType
-		expectedMonth  interface{}
-		expectedDay    interface{}
-		expectedCalc   string
+		name          string
+		line          string
+		expectedType  DateType
+		expectedMonth interface{}
+		expectedDay   interface{}
+		expectedCalc  string
 	}{
 		{
 			name:          "fixed date with month constant",
@@ -153,26 +153,26 @@ func TestPythonASTParser_ExtractDateExpression(t *testing.T) {
 			expectedCalc: "easter(year) - timedelta(days=2)",
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			dateExpr, err := parser.extractDateExpression(tc.line)
 			if err != nil {
 				t.Fatalf("extractDateExpression() failed: %v", err)
 			}
-			
+
 			if dateExpr.Type != tc.expectedType {
 				t.Errorf("Expected type %v, got %v", tc.expectedType, dateExpr.Type)
 			}
-			
+
 			if tc.expectedMonth != nil && dateExpr.Month != tc.expectedMonth {
 				t.Errorf("Expected month %v, got %v", tc.expectedMonth, dateExpr.Month)
 			}
-			
+
 			if tc.expectedDay != nil && dateExpr.Day != tc.expectedDay {
 				t.Errorf("Expected day %v, got %v", tc.expectedDay, dateExpr.Day)
 			}
-			
+
 			if tc.expectedCalc != "" && dateExpr.Calculation != tc.expectedCalc {
 				t.Errorf("Expected calculation %s, got %s", tc.expectedCalc, dateExpr.Calculation)
 			}
@@ -182,7 +182,7 @@ func TestPythonASTParser_ExtractDateExpression(t *testing.T) {
 
 func TestPythonASTParser_ParseHolidayCall(t *testing.T) {
 	parser := NewPythonASTParser("")
-	
+
 	testCases := []struct {
 		name           string
 		line           string
@@ -219,22 +219,22 @@ func TestPythonASTParser_ParseHolidayCall(t *testing.T) {
 			expectedType:   DateCalculated,
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			holidayCall, err := parser.parseHolidayCall(tc.line, 1)
 			if err != nil {
 				t.Fatalf("parseHolidayCall() failed: %v", err)
 			}
-			
+
 			if holidayCall.Method != tc.expectedMethod {
 				t.Errorf("Expected method %s, got %s", tc.expectedMethod, holidayCall.Method)
 			}
-			
+
 			if holidayCall.Name != tc.expectedName {
 				t.Errorf("Expected name %s, got %s", tc.expectedName, holidayCall.Name)
 			}
-			
+
 			if holidayCall.Date != nil && holidayCall.Date.Type != tc.expectedType {
 				t.Errorf("Expected date type %v, got %v", tc.expectedType, holidayCall.Date.Type)
 			}
@@ -244,7 +244,7 @@ func TestPythonASTParser_ParseHolidayCall(t *testing.T) {
 
 func TestPythonASTParser_ConvertToHolidayDefinitions(t *testing.T) {
 	parser := NewPythonASTParser("")
-	
+
 	holidayCalls := []HolidayCall{
 		{
 			Method: "_add_holiday",
@@ -276,9 +276,9 @@ func TestPythonASTParser_ConvertToHolidayDefinitions(t *testing.T) {
 			Line: 20,
 		},
 	}
-	
+
 	definitions := parser.ConvertToHolidayDefinitions(holidayCalls)
-	
+
 	// Test New Year's Day
 	if def, exists := definitions["new_year's_day"]; !exists {
 		t.Error("Expected 'new_year's_day' definition not found")
@@ -296,7 +296,7 @@ func TestPythonASTParser_ConvertToHolidayDefinitions(t *testing.T) {
 			t.Errorf("Expected day 1, got %d", def.Day)
 		}
 	}
-	
+
 	// Test Good Friday
 	if def, exists := definitions["good_friday"]; !exists {
 		t.Error("Expected 'good_friday' definition not found")
@@ -311,7 +311,7 @@ func TestPythonASTParser_ConvertToHolidayDefinitions(t *testing.T) {
 			t.Errorf("Expected easter offset -2, got %d", def.EasterOffset)
 		}
 	}
-	
+
 	// Test Labor Day
 	if def, exists := definitions["labor_day"]; !exists {
 		t.Error("Expected 'labor_day' definition not found")
@@ -327,7 +327,7 @@ func TestPythonASTParser_ConvertToHolidayDefinitions(t *testing.T) {
 
 func TestPythonASTParser_ConvertMonthName(t *testing.T) {
 	parser := NewPythonASTParser("")
-	
+
 	testCases := []struct {
 		input    string
 		expected int
@@ -348,7 +348,7 @@ func TestPythonASTParser_ConvertMonthName(t *testing.T) {
 		{"12", 12},
 		{"INVALID", 1}, // Should default to 1
 	}
-	
+
 	for _, tc := range testCases {
 		result := parser.convertMonthName(tc.input)
 		if result != tc.expected {
@@ -359,7 +359,7 @@ func TestPythonASTParser_ConvertMonthName(t *testing.T) {
 
 func TestPythonASTParser_ExtractEasterOffset(t *testing.T) {
 	parser := NewPythonASTParser("")
-	
+
 	testCases := []struct {
 		calculation string
 		expected    int
@@ -371,7 +371,7 @@ func TestPythonASTParser_ExtractEasterOffset(t *testing.T) {
 		{"easter(year) - timedelta(days=100)", -100},
 		{"complex calculation", 0}, // Should default to 0
 	}
-	
+
 	for _, tc := range testCases {
 		result := parser.extractEasterOffset(tc.calculation)
 		if result != tc.expected {
@@ -441,41 +441,41 @@ class UnitedStates(HolidayBase):
 	if err != nil {
 		t.Fatalf("Parse() failed: %v", err)
 	}
-	
+
 	if len(holidayCalls) < 5 {
 		t.Errorf("Expected at least 5 holiday calls, got %d", len(holidayCalls))
 	}
-	
+
 	// Convert to definitions
 	definitions := parser.ConvertToHolidayDefinitions(holidayCalls)
-	
+
 	// Check specific holidays
 	expectedHolidays := map[string]struct {
 		calculation string
 		month       int
 		day         int
 	}{
-		"new_year's_day":    {"fixed", 1, 1},
-		"independence_day":  {"fixed", 7, 4},
-		"christmas_day":     {"fixed", 12, 25},
-		"good_friday":       {"easter_based", 0, 0},
-		"easter_monday":     {"easter_based", 0, 0},
+		"new_year's_day":   {"fixed", 1, 1},
+		"independence_day": {"fixed", 7, 4},
+		"christmas_day":    {"fixed", 12, 25},
+		"good_friday":      {"easter_based", 0, 0},
+		"easter_monday":    {"easter_based", 0, 0},
 	}
-	
+
 	for key, expected := range expectedHolidays {
 		if def, exists := definitions[key]; !exists {
 			t.Errorf("Expected holiday '%s' not found", key)
 		} else {
 			if def.Calculation != expected.calculation {
-				t.Errorf("Holiday '%s': expected calculation '%s', got '%s'", 
+				t.Errorf("Holiday '%s': expected calculation '%s', got '%s'",
 					key, expected.calculation, def.Calculation)
 			}
 			if expected.month > 0 && def.Month != expected.month {
-				t.Errorf("Holiday '%s': expected month %d, got %d", 
+				t.Errorf("Holiday '%s': expected month %d, got %d",
 					key, expected.month, def.Month)
 			}
 			if expected.day > 0 && def.Day != expected.day {
-				t.Errorf("Holiday '%s': expected day %d, got %d", 
+				t.Errorf("Holiday '%s': expected day %d, got %d",
 					key, expected.day, def.Day)
 			}
 		}
@@ -487,7 +487,7 @@ func TestPythonASTParser_PerformanceComparison(t *testing.T) {
 	var builder strings.Builder
 	builder.WriteString("class TestCountry(HolidayBase):\n")
 	builder.WriteString("    def _populate(self, year):\n")
-	
+
 	// Add many holiday definitions
 	months := []string{"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"}
 	for i := 0; i < 100; i++ {
@@ -495,21 +495,21 @@ func TestPythonASTParser_PerformanceComparison(t *testing.T) {
 		day := (i % 28) + 1
 		builder.WriteString(fmt.Sprintf(`        self._add_holiday("Holiday %d", date(year, %s, %d))`+"\n", i, month, day))
 	}
-	
+
 	source := builder.String()
-	
+
 	// Test our AST parser
 	parser := NewPythonASTParser(source)
 	start := time.Now()
 	holidayCalls, err := parser.Parse()
 	astDuration := time.Since(start)
-	
+
 	if err != nil {
 		t.Fatalf("AST Parser failed: %v", err)
 	}
-	
+
 	t.Logf("AST Parser: Found %d holidays in %v", len(holidayCalls), astDuration)
-	
+
 	// The AST parser should find significantly more holidays than the old regex method
 	if len(holidayCalls) < 50 {
 		t.Errorf("Expected to find at least 50 holidays, got %d", len(holidayCalls))
@@ -537,7 +537,7 @@ class TestCountry(HolidayBase):
 
 func BenchmarkPythonASTParser_ConvertToDefinitions(b *testing.B) {
 	parser := NewPythonASTParser("")
-	
+
 	holidayCalls := []HolidayCall{
 		{
 			Method: "_add_holiday",
@@ -557,7 +557,7 @@ func BenchmarkPythonASTParser_ConvertToDefinitions(b *testing.B) {
 			},
 		},
 	}
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = parser.ConvertToHolidayDefinitions(holidayCalls)

@@ -23,14 +23,14 @@ func NewAUProvider() *AUProvider {
 		"ACT", // Australian Capital Territory
 	}
 	base.categories = []string{"public", "bank", "government"}
-	
+
 	return &AUProvider{BaseProvider: base}
 }
 
 // LoadHolidays loads all Australian holidays for a given year
 func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Fixed date holidays
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = au.CreateHoliday(
 		"New Year's Day",
@@ -40,7 +40,7 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "New Year's Day",
 		},
 	)
-	
+
 	holidays[time.Date(year, 1, 26, 0, 0, 0, 0, time.UTC)] = au.CreateHoliday(
 		"Australia Day",
 		time.Date(year, 1, 26, 0, 0, 0, 0, time.UTC),
@@ -49,7 +49,7 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Australia Day",
 		},
 	)
-	
+
 	holidays[time.Date(year, 4, 25, 0, 0, 0, 0, time.UTC)] = au.CreateHoliday(
 		"ANZAC Day",
 		time.Date(year, 4, 25, 0, 0, 0, 0, time.UTC),
@@ -58,7 +58,7 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "ANZAC Day",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = au.CreateHoliday(
 		"Christmas Day",
 		time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC),
@@ -67,7 +67,7 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Christmas Day",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)] = au.CreateHoliday(
 		"Boxing Day",
 		time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC),
@@ -76,10 +76,10 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Boxing Day",
 		},
 	)
-	
+
 	// Easter-based holidays
 	easter := EasterSunday(year)
-	
+
 	// Good Friday
 	goodFriday := easter.AddDate(0, 0, -2)
 	holidays[goodFriday] = au.CreateHoliday(
@@ -90,7 +90,7 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Good Friday",
 		},
 	)
-	
+
 	// Easter Saturday
 	easterSaturday := easter.AddDate(0, 0, -1)
 	holidays[easterSaturday] = au.CreateHoliday(
@@ -101,7 +101,7 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Easter Saturday",
 		},
 	)
-	
+
 	// Easter Monday
 	easterMonday := easter.AddDate(0, 0, 1)
 	holidays[easterMonday] = au.CreateHoliday(
@@ -112,9 +112,9 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Easter Monday",
 		},
 	)
-	
+
 	// Variable date holidays (most states)
-	
+
 	// Queen's Birthday - 2nd Monday in June (most states)
 	queensBirthday := NthWeekdayOfMonth(year, 6, time.Monday, 2)
 	holidays[queensBirthday] = au.CreateHoliday(
@@ -125,7 +125,7 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Queen's Birthday",
 		},
 	)
-	
+
 	// Labour Day - 1st Monday in October (most states)
 	labourDay := NthWeekdayOfMonth(year, 10, time.Monday, 1)
 	holidays[labourDay] = au.CreateHoliday(
@@ -136,14 +136,14 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Labour Day",
 		},
 	)
-	
+
 	return holidays
 }
 
 // GetStateHolidays returns state-specific holidays
 func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	for _, state := range states {
 		switch state {
 		case "VIC": // Victoria
@@ -157,7 +157,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Melbourne Cup Day",
 				},
 			)
-			
+
 			// Labour Day - 2nd Monday in March (different from other states)
 			labourDayVic := NthWeekdayOfMonth(year, 3, time.Monday, 2)
 			holidays[labourDayVic] = au.CreateHoliday(
@@ -168,7 +168,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Labour Day",
 				},
 			)
-			
+
 		case "WA": // Western Australia
 			// Western Australia Day - 1st Monday in June
 			waDay := NthWeekdayOfMonth(year, 6, time.Monday, 1)
@@ -180,7 +180,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Western Australia Day",
 				},
 			)
-			
+
 			// Labour Day - 1st Monday in March
 			labourDayWA := NthWeekdayOfMonth(year, 3, time.Monday, 1)
 			holidays[labourDayWA] = au.CreateHoliday(
@@ -191,7 +191,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Labour Day",
 				},
 			)
-			
+
 		case "QLD": // Queensland
 			// Labour Day - 1st Monday in May
 			labourDayQLD := NthWeekdayOfMonth(year, 5, time.Monday, 1)
@@ -203,7 +203,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Labour Day",
 				},
 			)
-			
+
 			// Queen's Birthday - 1st Monday in October (different from other states)
 			queensBirthdayQLD := NthWeekdayOfMonth(year, 10, time.Monday, 1)
 			holidays[queensBirthdayQLD] = au.CreateHoliday(
@@ -214,7 +214,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Queen's Birthday",
 				},
 			)
-			
+
 		case "SA": // South Australia
 			// Adelaide Cup Day - 2nd Monday in March
 			adelaideCup := NthWeekdayOfMonth(year, 3, time.Monday, 2)
@@ -226,7 +226,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Adelaide Cup Day",
 				},
 			)
-			
+
 			// Labour Day - 1st Monday in October
 			labourDaySA := NthWeekdayOfMonth(year, 10, time.Monday, 1)
 			holidays[labourDaySA] = au.CreateHoliday(
@@ -237,7 +237,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Labour Day",
 				},
 			)
-			
+
 		case "TAS": // Tasmania
 			// Eight Hours Day - 2nd Monday in March
 			eightHoursDay := NthWeekdayOfMonth(year, 3, time.Monday, 2)
@@ -249,7 +249,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "Eight Hours Day",
 				},
 			)
-			
+
 		case "NT": // Northern Territory
 			// May Day - 1st Monday in May
 			mayDay := NthWeekdayOfMonth(year, 5, time.Monday, 1)
@@ -261,7 +261,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 					"en": "May Day",
 				},
 			)
-			
+
 			// Picnic Day - 1st Monday in August
 			picnicDay := NthWeekdayOfMonth(year, 8, time.Monday, 1)
 			holidays[picnicDay] = au.CreateHoliday(
@@ -274,7 +274,7 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 			)
 		}
 	}
-	
+
 	return holidays
 }
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/coredds/GoHoliday/chronogo"
@@ -14,164 +13,154 @@ func main() {
 
 	// Example 1: Basic Holiday Checking
 	fmt.Println("\n1. Basic Holiday Checking:")
-	checker := chronogo.NewGoHolidaysChecker().WithCountries("US")
-	
+	checker := chronogo.Checker("US")
+
 	testDates := []struct {
 		name string
-		date *mockDateTime
+		date time.Time
 	}{
-		{"New Year's Day 2024", &mockDateTime{2024, time.January, 1}},
-		{"Regular Day", &mockDateTime{2024, time.March, 15}},
-		{"Independence Day 2024", &mockDateTime{2024, time.July, 4}},
-		{"Christmas Day 2024", &mockDateTime{2024, time.December, 25}},
+		{"New Year's Day 2024", time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)},
+		{"Regular Day", time.Date(2024, time.March, 15, 0, 0, 0, 0, time.UTC)},
+		{"Independence Day 2024", time.Date(2024, time.July, 4, 0, 0, 0, 0, time.UTC)},
+		{"Christmas Day 2024", time.Date(2024, time.December, 25, 0, 0, 0, 0, time.UTC)},
 	}
 
 	for _, test := range testDates {
 		isHoliday := checker.IsHoliday(test.date)
-		status := "❌ Regular Day"
-		if isHoliday {
-			status = "🎉 Holiday"
+		holidayName := checker.GetHolidayName(test.date)
+		fmt.Printf("  %-25s: %v", test.name, isHoliday)
+		if holidayName != "" {
+			fmt.Printf(" (%s)", holidayName)
 		}
-		fmt.Printf("   %s: %s\n", test.name, status)
+		fmt.Println()
 	}
 
-	// Example 2: Multi-Country Support
-	fmt.Println("\n2. Multi-Country Holiday Support:")
-	multiChecker := chronogo.CreateMultiCountryChecker("US", "CA", "GB")
-	
-	internationalDates := []struct {
+	// Example 2: Multi-Country Comparison
+	fmt.Println("\n2. Multi-Country Holiday Comparison:")
+	countries := []string{"US", "CA", "GB"}
+	checkers := make(map[string]*chronogo.FastCountryChecker)
+
+	for _, country := range countries {
+		checkers[country] = chronogo.Checker(country)
+	}
+
+	comparisonDates := []struct {
 		name string
-		date *mockDateTime
+		date time.Time
 	}{
-		{"US Independence Day", &mockDateTime{2024, time.July, 4}},
-		{"Canada Day", &mockDateTime{2024, time.July, 1}},
-		{"UK Boxing Day", &mockDateTime{2024, time.December, 26}},
+		{"Canada Day", time.Date(2024, time.July, 1, 0, 0, 0, 0, time.UTC)},
+		{"Independence Day", time.Date(2024, time.July, 4, 0, 0, 0, 0, time.UTC)},
+		{"Christmas Day", time.Date(2024, time.December, 25, 0, 0, 0, 0, time.UTC)},
 	}
 
-	for _, test := range internationalDates {
-		isHoliday := multiChecker.IsHoliday(test.date)
-		status := "❌ Not a holiday"
-		if isHoliday {
-			status = "🎉 Holiday"
+	for _, test := range comparisonDates {
+		fmt.Printf("  %-20s:", test.name)
+		for _, country := range countries {
+			isHoliday := checkers[country].IsHoliday(test.date)
+			fmt.Printf(" %s=%v", country, isHoliday)
 		}
-		fmt.Printf("   %s: %s\n", test.name, status)
+		fmt.Println()
 	}
 
-	// Example 3: Regional Holiday Support
-	fmt.Println("\n3. Regional Holiday Support:")
-	regionalChecker := chronogo.CreateRegionalChecker("US", "CA") // California
-	
-	fmt.Printf("   Regional holidays for US (California) enabled\n")
-	
-	baseHolidays := checker.GetHolidays(2024)
-	regionalHolidays := regionalChecker.GetHolidays(2024)
-	
-	fmt.Printf("   Base US holidays: %d\n", len(baseHolidays))
-	fmt.Printf("   With CA regional: %d\n", len(regionalHolidays))
-	fmt.Printf("   Additional regional holidays: %d\n", len(regionalHolidays)-len(baseHolidays))
-
-	// Example 4: Holiday Category Filtering
-	fmt.Println("\n4. Holiday Category Filtering:")
-	
-	federalOnly := chronogo.NewGoHolidaysChecker().
-		WithCountries("US").
-		WithCategories("federal")
-	
-	allCategories := chronogo.NewGoHolidaysChecker().
-		WithCountries("US").
-		WithCategories("federal", "observance", "state")
-
-	federalHolidays := federalOnly.GetHolidays(2024)
-	allHolidays := allCategories.GetHolidays(2024)
-	
-	fmt.Printf("   Federal holidays only: %d\n", len(federalHolidays))
-	fmt.Printf("   All categories: %d\n", len(allHolidays))
-
-	// Example 5: Configuration-Driven Setup
-	fmt.Println("\n5. Configuration System Integration:")
-	
-	// This would load holidays from your configuration files
-	fmt.Printf("   ✓ YAML-based configuration support\n")
-	fmt.Printf("   ✓ Environment-specific settings (dev/prod)\n")
-	fmt.Printf("   ✓ Custom holiday definitions\n")
-	fmt.Printf("   ✓ Country-specific overrides\n")
-
-	// Example 6: Performance with Caching
-	fmt.Println("\n6. Performance Optimization:")
-	
-	cachedChecker := chronogo.NewGoHolidaysChecker().WithCountries("US")
-	
-	// Preload holidays for better performance
-	err := cachedChecker.PreloadYear(2024)
-	if err != nil {
-		log.Printf("Warning: Could not preload holidays: %v", err)
+	// Example 3: Batch Holiday Processing
+	fmt.Println("\n3. Batch Holiday Processing:")
+	batchDates := []time.Time{
+		time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),   // New Year's
+		time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC),  // MLK Day
+		time.Date(2024, 2, 19, 0, 0, 0, 0, time.UTC),  // Presidents Day
+		time.Date(2024, 5, 27, 0, 0, 0, 0, time.UTC),  // Memorial Day
+		time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),   // Independence Day
+		time.Date(2024, 9, 2, 0, 0, 0, 0, time.UTC),   // Labor Day
+		time.Date(2024, 11, 28, 0, 0, 0, 0, time.UTC), // Thanksgiving
+		time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC), // Christmas
 	}
-	
-	start := time.Now()
-	for i := 0; i < 1000; i++ {
-		testDate := &mockDateTime{2024, time.July, 4}
-		cachedChecker.IsHoliday(testDate)
+
+	results := checker.AreHolidays(batchDates)
+	for i, date := range batchDates {
+		status := "Regular Day"
+		if results[i] {
+			status = "Holiday"
+		}
+		fmt.Printf("  %s: %s\n", date.Format("Jan 2, 2006"), status)
 	}
+
+	// Example 4: Holiday Range Analysis
+	fmt.Println("\n4. Holiday Range Analysis:")
+	start := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC)
+
+	holidayCount := checker.CountHolidaysInRange(start, end)
+	holidays := checker.GetHolidaysInRange(start, end)
+
+	fmt.Printf("  US Federal Holidays in 2024: %d\n", holidayCount)
+	fmt.Printf("  Holiday List:\n")
+
+	// Sort holidays by date for display
+	sortedDates := make([]time.Time, 0, len(holidays))
+	for date := range holidays {
+		sortedDates = append(sortedDates, date)
+	}
+
+	// Simple sort by comparing Unix timestamps
+	for i := 0; i < len(sortedDates); i++ {
+		for j := i + 1; j < len(sortedDates); j++ {
+			if sortedDates[i].After(sortedDates[j]) {
+				sortedDates[i], sortedDates[j] = sortedDates[j], sortedDates[i]
+			}
+		}
+	}
+
+	for _, date := range sortedDates {
+		fmt.Printf("    %s: %s\n", date.Format("Jan 2, 2006"), holidays[date])
+	}
+
+	// Example 5: Performance Demonstration
+	fmt.Println("\n5. Performance Demonstration:")
+	iterations := 10000
+	start = time.Now()
+
+	for i := 0; i < iterations; i++ {
+		checker.IsHoliday(time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC))
+	}
+
 	duration := time.Since(start)
-	
-	fmt.Printf("   1000 holiday checks: %v (avg: %v per check)\n", 
-		duration, duration/1000)
+	fmt.Printf("  %d holiday checks completed in: %v\n", iterations, duration)
+	fmt.Printf("  Average per check: %v\n", duration/time.Duration(iterations))
+	fmt.Printf("  Checks per second: %.0f\n", float64(iterations)/duration.Seconds())
 
-	// Example 7: Supported Countries
-	fmt.Println("\n7. Supported Countries:")
-	supportedCountries := checker.GetSupportedCountries()
-	fmt.Printf("   Total countries supported: %d\n", len(supportedCountries))
-	fmt.Printf("   Countries: %v\n", supportedCountries)
+	// Example 6: Business Day Calculation Helper
+	fmt.Println("\n6. Business Day Calculation Helper:")
+	businessStart := time.Date(2024, 12, 23, 0, 0, 0, 0, time.UTC)
+	businessEnd := time.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC)
 
-	// Example 8: Holiday Details
-	fmt.Println("\n8. Holiday Information:")
-	holidays := checker.GetHolidays(2024)
-	
-	fmt.Printf("   US Holidays in 2024:\n")
-	for i, holiday := range holidays {
-		if i >= 5 { // Show first 5
-			fmt.Printf("   ... and %d more holidays\n", len(holidays)-5)
-			break
+	businessHolidays := checker.CountHolidaysInRange(businessStart, businessEnd)
+	totalDays := int(businessEnd.Sub(businessStart).Hours()/24) + 1
+
+	// Count weekends
+	weekendDays := 0
+	for d := businessStart; !d.After(businessEnd); d = d.AddDate(0, 0, 1) {
+		if d.Weekday() == time.Saturday || d.Weekday() == time.Sunday {
+			weekendDays++
 		}
-		fmt.Printf("   - %s (%s) - %s\n", 
-			holiday.Name, 
-			holiday.Date.Format("Jan 2"), 
-			holiday.Category)
 	}
 
-	// Example 9: Integration Benefits
-	fmt.Println("\n9. Integration Benefits:")
-	fmt.Println("   ✅ Drop-in replacement for ChronoGo's DefaultHolidayChecker")
-	fmt.Println("   ✅ 7 countries supported (AU, CA, NZ, GB, US, DE, FR)")
-	fmt.Println("   ✅ Regional/subdivision holiday support")
-	fmt.Println("   ✅ Configuration-driven customization")
-	fmt.Println("   ✅ Performance optimized with caching")
-	fmt.Println("   ✅ Category-based filtering")
-	fmt.Println("   ✅ Multi-country business operations")
+	businessDays := totalDays - weekendDays - businessHolidays
 
+	fmt.Printf("  Date Range: %s to %s\n",
+		businessStart.Format("Jan 2, 2006"),
+		businessEnd.Format("Jan 2, 2006"))
+	fmt.Printf("  Total Days: %d\n", totalDays)
+	fmt.Printf("  Weekend Days: %d\n", weekendDays)
+	fmt.Printf("  Holiday Days: %d\n", businessHolidays)
+	fmt.Printf("  Business Days: %d\n", businessDays)
+
+	fmt.Println("\n✅ ChronoGo Integration Demo Complete!")
 	fmt.Println("\n📚 Usage in ChronoGo:")
-	fmt.Println(`
-   // In your ChronoGo application:
-   holidayChecker := chronogo.CreateDefaultUSChecker()
-   
-   // Business day calculations with GoHolidays
-   dt := chronogo.Now()
-   nextBusinessDay := dt.NextBusinessDay(holidayChecker)
-   businessDays := dt.AddBusinessDays(5, holidayChecker)
-   
-   // Check if today is a holiday
-   if dt.IsHoliday(holidayChecker) {
-       fmt.Println("Today is a holiday!")
-   }`)
+	fmt.Println("   // Create a fast holiday checker")
+	fmt.Println("   holidayChecker := chronogo.Checker(\"US\")")
+	fmt.Println("   ")
+	fmt.Println("   // Business day calculations with GoHolidays")
+	fmt.Println("   isHoliday := holidayChecker.IsHoliday(someDate)")
+	fmt.Println("   holidayName := holidayChecker.GetHolidayName(someDate)")
+	fmt.Println("   holidayCount := holidayChecker.CountHolidaysInRange(start, end)")
 }
-
-// mockDateTime implements the ChronoGoDateTime interface for testing
-type mockDateTime struct {
-	year  int
-	month time.Month
-	day   int
-}
-
-func (m *mockDateTime) Year() int        { return m.year }
-func (m *mockDateTime) Month() time.Month { return m.month }
-func (m *mockDateTime) Day() int         { return m.day }

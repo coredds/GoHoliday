@@ -20,16 +20,16 @@ func NewFRProvider() *FRProvider {
 		"57", // Moselle
 	}
 	base.categories = []string{"public", "religious", "regional", "secular"}
-	
+
 	return &FRProvider{BaseProvider: base}
 }
 
 // LoadHolidays loads all French holidays for a given year
 func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Fixed date holidays
-	
+
 	// New Year's Day - January 1
 	newYear := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
 	holidays[newYear] = fr.CreateHoliday(
@@ -41,7 +41,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "New Year's Day",
 		},
 	)
-	
+
 	// Labour Day - May 1
 	labourDay := time.Date(year, 5, 1, 0, 0, 0, 0, time.UTC)
 	holidays[labourDay] = fr.CreateHoliday(
@@ -53,7 +53,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Labour Day",
 		},
 	)
-	
+
 	// Victory in Europe Day - May 8
 	victoryDay := time.Date(year, 5, 8, 0, 0, 0, 0, time.UTC)
 	holidays[victoryDay] = fr.CreateHoliday(
@@ -65,7 +65,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Victory in Europe Day",
 		},
 	)
-	
+
 	// Bastille Day - July 14
 	bastilleDay := time.Date(year, 7, 14, 0, 0, 0, 0, time.UTC)
 	holidays[bastilleDay] = fr.CreateHoliday(
@@ -77,7 +77,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Bastille Day",
 		},
 	)
-	
+
 	// Assumption of Mary - August 15
 	assumption := time.Date(year, 8, 15, 0, 0, 0, 0, time.UTC)
 	holidays[assumption] = fr.CreateHoliday(
@@ -89,7 +89,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Assumption of Mary",
 		},
 	)
-	
+
 	// All Saints' Day - November 1
 	allSaints := time.Date(year, 11, 1, 0, 0, 0, 0, time.UTC)
 	holidays[allSaints] = fr.CreateHoliday(
@@ -101,7 +101,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "All Saints' Day",
 		},
 	)
-	
+
 	// Armistice Day - November 11
 	armistice := time.Date(year, 11, 11, 0, 0, 0, 0, time.UTC)
 	holidays[armistice] = fr.CreateHoliday(
@@ -113,7 +113,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Armistice Day",
 		},
 	)
-	
+
 	// Christmas Day - December 25
 	christmas := time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)
 	holidays[christmas] = fr.CreateHoliday(
@@ -125,10 +125,10 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Christmas Day",
 		},
 	)
-	
+
 	// Easter-based holidays
 	easter := EasterSunday(year)
-	
+
 	// Easter Sunday
 	holidays[easter] = fr.CreateHoliday(
 		"Pâques",
@@ -139,7 +139,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Easter Sunday",
 		},
 	)
-	
+
 	// Easter Monday
 	easterMonday := easter.AddDate(0, 0, 1)
 	holidays[easterMonday] = fr.CreateHoliday(
@@ -151,7 +151,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Easter Monday",
 		},
 	)
-	
+
 	// Ascension Day (39 days after Easter)
 	ascension := easter.AddDate(0, 0, 39)
 	holidays[ascension] = fr.CreateHoliday(
@@ -163,7 +163,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Ascension Day",
 		},
 	)
-	
+
 	// Whit Sunday (49 days after Easter)
 	whitSunday := easter.AddDate(0, 0, 49)
 	holidays[whitSunday] = fr.CreateHoliday(
@@ -175,7 +175,7 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Whit Sunday",
 		},
 	)
-	
+
 	// Whit Monday (50 days after Easter)
 	whitMonday := easter.AddDate(0, 0, 50)
 	holidays[whitMonday] = fr.CreateHoliday(
@@ -187,14 +187,14 @@ func (fr *FRProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"en": "Whit Monday",
 		},
 	)
-	
+
 	return holidays
 }
 
 // GetRegionalHolidays returns region-specific holidays
 func (fr *FRProvider) GetRegionalHolidays(year int, regions []string) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	for _, region := range regions {
 		// Alsace-Moselle specific holidays (departments 57, 67, 68)
 		if region == "57" || region == "67" || region == "68" {
@@ -210,7 +210,7 @@ func (fr *FRProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"en": "Good Friday",
 				},
 			)
-			
+
 			// St. Stephen's Day - December 26 (Alsace-Moselle only)
 			stStephen := time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)
 			holidays[stStephen] = fr.CreateHoliday(
@@ -223,7 +223,7 @@ func (fr *FRProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 				},
 			)
 		}
-		
+
 		// Overseas territories specific holidays
 		switch region {
 		case "GP", "MQ": // Guadeloupe, Martinique
@@ -246,7 +246,7 @@ func (fr *FRProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"en": "Slavery Abolition Day",
 				},
 			)
-			
+
 		case "GF": // French Guiana
 			// Slavery Abolition Day - June 10
 			abolition := time.Date(year, 6, 10, 0, 0, 0, 0, time.UTC)
@@ -259,7 +259,7 @@ func (fr *FRProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"en": "Slavery Abolition Day",
 				},
 			)
-			
+
 		case "RE": // Réunion
 			// Slavery Abolition Day - December 20
 			abolition := time.Date(year, 12, 20, 0, 0, 0, 0, time.UTC)
@@ -272,7 +272,7 @@ func (fr *FRProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 					"en": "Slavery Abolition Day",
 				},
 			)
-			
+
 		case "YT": // Mayotte
 			// Mayotte Day - March 31
 			mayotteDay := time.Date(year, 3, 31, 0, 0, 0, 0, time.UTC)
@@ -287,14 +287,14 @@ func (fr *FRProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 			)
 		}
 	}
-	
+
 	return holidays
 }
 
 // GetSecularObservances returns non-religious observances
 func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Epiphany - January 6
 	epiphany := time.Date(year, 1, 6, 0, 0, 0, 0, time.UTC)
 	holidays[epiphany] = fr.CreateHoliday(
@@ -306,7 +306,7 @@ func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 			"en": "Epiphany",
 		},
 	)
-	
+
 	// Candlemas - February 2
 	candlemas := time.Date(year, 2, 2, 0, 0, 0, 0, time.UTC)
 	holidays[candlemas] = fr.CreateHoliday(
@@ -318,7 +318,7 @@ func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 			"en": "Candlemas",
 		},
 	)
-	
+
 	// Valentine's Day - February 14
 	valentine := time.Date(year, 2, 14, 0, 0, 0, 0, time.UTC)
 	holidays[valentine] = fr.CreateHoliday(
@@ -330,7 +330,7 @@ func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 			"en": "Valentine's Day",
 		},
 	)
-	
+
 	// Mother's Day - Last Sunday of May (or first Sunday of June if coincides with Whit Sunday)
 	mothersDay := fr.getMothersDay(year)
 	holidays[mothersDay] = fr.CreateHoliday(
@@ -342,7 +342,7 @@ func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 			"en": "Mother's Day",
 		},
 	)
-	
+
 	// Father's Day - Third Sunday of June
 	fathersDay := NthWeekdayOfMonth(year, 6, time.Sunday, 3)
 	holidays[fathersDay] = fr.CreateHoliday(
@@ -354,7 +354,7 @@ func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 			"en": "Father's Day",
 		},
 	)
-	
+
 	// Music Day - June 21
 	musicDay := time.Date(year, 6, 21, 0, 0, 0, 0, time.UTC)
 	holidays[musicDay] = fr.CreateHoliday(
@@ -366,7 +366,7 @@ func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 			"en": "Music Day",
 		},
 	)
-	
+
 	// All Souls' Day - November 2
 	allSouls := time.Date(year, 11, 2, 0, 0, 0, 0, time.UTC)
 	holidays[allSouls] = fr.CreateHoliday(
@@ -378,7 +378,7 @@ func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 			"en": "All Souls' Day",
 		},
 	)
-	
+
 	return holidays
 }
 
@@ -387,15 +387,15 @@ func (fr *FRProvider) GetSecularObservances(year int) map[time.Time]*Holiday {
 func (fr *FRProvider) getMothersDay(year int) time.Time {
 	// Last Sunday of May
 	lastSundayMay := NthWeekdayOfMonth(year, 5, time.Sunday, -1)
-	
+
 	// Check if it coincides with Whit Sunday (49 days after Easter)
 	easter := EasterSunday(year)
 	whitSunday := easter.AddDate(0, 0, 49)
-	
+
 	if lastSundayMay.Equal(whitSunday) {
 		// Move to first Sunday of June
 		return NthWeekdayOfMonth(year, 6, time.Sunday, 1)
 	}
-	
+
 	return lastSundayMay
 }

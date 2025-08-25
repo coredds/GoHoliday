@@ -28,14 +28,14 @@ func NewCAProvider() *CAProvider {
 		"YT", // Yukon
 	}
 	base.categories = []string{"public", "bank", "government"}
-	
+
 	return &CAProvider{BaseProvider: base}
 }
 
 // LoadHolidays loads all Canadian holidays for a given year
 func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Fixed date holidays
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = ca.CreateHoliday(
 		"New Year's Day",
@@ -46,7 +46,7 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Jour de l'An",
 		},
 	)
-	
+
 	holidays[time.Date(year, 7, 1, 0, 0, 0, 0, time.UTC)] = ca.CreateHoliday(
 		"Canada Day",
 		time.Date(year, 7, 1, 0, 0, 0, 0, time.UTC),
@@ -56,7 +56,7 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Fête du Canada",
 		},
 	)
-	
+
 	holidays[time.Date(year, 11, 11, 0, 0, 0, 0, time.UTC)] = ca.CreateHoliday(
 		"Remembrance Day",
 		time.Date(year, 11, 11, 0, 0, 0, 0, time.UTC),
@@ -66,7 +66,7 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Jour du Souvenir",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = ca.CreateHoliday(
 		"Christmas Day",
 		time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC),
@@ -76,7 +76,7 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Noël",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)] = ca.CreateHoliday(
 		"Boxing Day",
 		time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC),
@@ -86,10 +86,10 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Lendemain de Noël",
 		},
 	)
-	
+
 	// Easter-based holidays
 	easter := EasterSunday(year)
-	
+
 	// Good Friday
 	goodFriday := easter.AddDate(0, 0, -2)
 	holidays[goodFriday] = ca.CreateHoliday(
@@ -101,7 +101,7 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Vendredi saint",
 		},
 	)
-	
+
 	// Easter Monday (not all provinces)
 	easterMonday := easter.AddDate(0, 0, 1)
 	holidays[easterMonday] = ca.CreateHoliday(
@@ -113,9 +113,9 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Lundi de Pâques",
 		},
 	)
-	
+
 	// Variable date holidays
-	
+
 	// Family Day - 3rd Monday in February (varies by province)
 	familyDay := NthWeekdayOfMonth(year, 2, time.Monday, 3)
 	holidays[familyDay] = ca.CreateHoliday(
@@ -127,7 +127,7 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Fête de la famille",
 		},
 	)
-	
+
 	// Victoria Day - Monday before May 25
 	victoriaDay := ca.getVictoriaDay(year)
 	holidays[victoriaDay] = ca.CreateHoliday(
@@ -139,7 +139,7 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Fête de la Reine",
 		},
 	)
-	
+
 	// Labour Day - 1st Monday in September
 	labourDay := NthWeekdayOfMonth(year, 9, time.Monday, 1)
 	holidays[labourDay] = ca.CreateHoliday(
@@ -151,7 +151,7 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Fête du Travail",
 		},
 	)
-	
+
 	// Thanksgiving Day - 2nd Monday in October
 	thanksgiving := NthWeekdayOfMonth(year, 10, time.Monday, 2)
 	holidays[thanksgiving] = ca.CreateHoliday(
@@ -163,27 +163,27 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"fr": "Action de grâce",
 		},
 	)
-	
+
 	return holidays
 }
 
 // getVictoriaDay calculates Victoria Day (Monday before May 25)
 func (ca *CAProvider) getVictoriaDay(year int) time.Time {
 	may25 := time.Date(year, 5, 25, 0, 0, 0, 0, time.UTC)
-	
+
 	// Find the Monday before May 25
 	daysToSubtract := int(may25.Weekday()) - int(time.Monday)
 	if daysToSubtract <= 0 {
 		daysToSubtract += 7
 	}
-	
+
 	return may25.AddDate(0, 0, -daysToSubtract)
 }
 
 // GetProvincialHolidays returns province-specific holidays
 func (ca *CAProvider) GetProvincialHolidays(year int, provinces []string) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	for _, province := range provinces {
 		switch province {
 		case "AB": // Alberta
@@ -197,7 +197,7 @@ func (ca *CAProvider) GetProvincialHolidays(year int, provinces []string) map[ti
 					"en": "Family Day",
 				},
 			)
-			
+
 		case "BC": // British Columbia
 			// Family Day - 2nd Monday in February
 			familyDay := NthWeekdayOfMonth(year, 2, time.Monday, 2)
@@ -209,7 +209,7 @@ func (ca *CAProvider) GetProvincialHolidays(year int, provinces []string) map[ti
 					"en": "Family Day",
 				},
 			)
-			
+
 		case "ON": // Ontario
 			// Family Day - 3rd Monday in February
 			familyDay := NthWeekdayOfMonth(year, 2, time.Monday, 3)
@@ -221,7 +221,7 @@ func (ca *CAProvider) GetProvincialHolidays(year int, provinces []string) map[ti
 					"en": "Family Day",
 				},
 			)
-			
+
 		case "QC": // Quebec
 			// St. Jean Baptiste Day - June 24
 			stJeanBaptiste := time.Date(year, 6, 24, 0, 0, 0, 0, time.UTC)
@@ -234,7 +234,7 @@ func (ca *CAProvider) GetProvincialHolidays(year int, provinces []string) map[ti
 					"fr": "Fête nationale du Québec",
 				},
 			)
-			
+
 		case "NL": // Newfoundland and Labrador
 			// St. Patrick's Day - March 17 (or nearest Monday)
 			stPatricks := time.Date(year, 3, 17, 0, 0, 0, 0, time.UTC)
@@ -249,7 +249,7 @@ func (ca *CAProvider) GetProvincialHolidays(year int, provinces []string) map[ti
 			)
 		}
 	}
-	
+
 	return holidays
 }
 

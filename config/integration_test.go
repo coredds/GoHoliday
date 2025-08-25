@@ -112,12 +112,12 @@ output:
 			mlkNewFound = true
 		}
 	}
-	
+
 	// If we have the original holiday, the override should have been applied
 	if mlkOriginalFound {
 		t.Error("Original 'Martin Luther King Jr. Day' should be renamed to 'MLK Day'")
 	}
-	
+
 	// We should have the renamed version if the holiday exists
 	if !mlkNewFound && mlkOriginalFound {
 		t.Error("MLK Day name override should be applied")
@@ -295,13 +295,13 @@ custom_holidays:
 	// Check Good Friday Custom (Easter - 2 days)
 	easter := countries.EasterSunday(2024)
 	expectedGoodFriday := easter.AddDate(0, 0, -2)
-	
+
 	goodFridayFound := false
 	for date, holiday := range holidays {
-		if holiday.Name == "Good Friday Custom" && 
-		   date.Year() == expectedGoodFriday.Year() &&
-		   date.Month() == expectedGoodFriday.Month() &&
-		   date.Day() == expectedGoodFriday.Day() {
+		if holiday.Name == "Good Friday Custom" &&
+			date.Year() == expectedGoodFriday.Year() &&
+			date.Month() == expectedGoodFriday.Month() &&
+			date.Day() == expectedGoodFriday.Day() {
 			goodFridayFound = true
 			break
 		}
@@ -313,9 +313,9 @@ custom_holidays:
 	// Check Second Monday of March
 	secondMondayFound := false
 	for date, holiday := range holidays {
-		if holiday.Name == "Second Monday March" && 
-		   date.Month() == 3 && 
-		   date.Weekday() == time.Monday {
+		if holiday.Name == "Second Monday March" &&
+			date.Month() == 3 &&
+			date.Weekday() == time.Monday {
 			// Check if it's the second Monday
 			firstMonday := countries.NthWeekdayOfMonth(2024, 3, time.Monday, 1)
 			secondMonday := firstMonday.AddDate(0, 0, 7)
@@ -382,28 +382,28 @@ performance:
 	// Test dev environment
 	originalConfigPath := os.Getenv("GOHOLIDAYS_CONFIG")
 	originalEnv := os.Getenv("GOHOLIDAYS_ENV")
-	
+
 	os.Setenv("GOHOLIDAYS_CONFIG", tmpDevFile.Name())
 	os.Setenv("GOHOLIDAYS_ENV", "dev")
-	
+
 	devManager := NewHolidayManager()
 	devConfig1 := devManager.configManager.GetConfig()
-	
+
 	if devConfig1.Logging.Level != "debug" {
 		t.Error("Dev config should have debug logging")
 	}
-	
+
 	// Test prod environment
 	os.Setenv("GOHOLIDAYS_CONFIG", tmpProdFile.Name())
 	os.Setenv("GOHOLIDAYS_ENV", "prod")
-	
+
 	prodManager := NewHolidayManager()
 	prodConfig1 := prodManager.configManager.GetConfig()
-	
+
 	if prodConfig1.Logging.Level != "info" {
 		t.Error("Prod config should have info logging")
 	}
-	
+
 	// Restore environment
 	if originalConfigPath != "" {
 		os.Setenv("GOHOLIDAYS_CONFIG", originalConfigPath)

@@ -18,10 +18,10 @@ type PythonASTParser struct {
 
 // Token represents a parsed token from Python source
 type Token struct {
-	Type    TokenType
-	Value   string
-	Line    int
-	Column  int
+	Type   TokenType
+	Value  string
+	Line   int
+	Column int
 }
 
 // TokenType represents the type of a parsed token
@@ -54,10 +54,10 @@ type MethodInfo struct {
 
 // ClassInfo contains information about a class definition
 type ClassInfo struct {
-	Name       string
+	Name        string
 	BaseClasses []string
 	Methods     map[string]MethodInfo
-	Line       int
+	Line        int
 }
 
 // Statement represents a Python statement
@@ -110,13 +110,13 @@ const (
 
 // HolidayCall represents a parsed holiday definition call
 type HolidayCall struct {
-	Method      string           // _add_holiday, _add_new_years_day, etc.
-	Name        string           // Holiday name
-	Date        *DateExpression  // Date calculation
-	Category    string           // Holiday category
+	Method      string            // _add_holiday, _add_new_years_day, etc.
+	Name        string            // Holiday name
+	Date        *DateExpression   // Date calculation
+	Category    string            // Holiday category
 	Languages   map[string]string // Multi-language names
-	Conditional string           // Conditional logic (if any)
-	Line        int              // Source line number
+	Conditional string            // Conditional logic (if any)
+	Line        int               // Source line number
 }
 
 // DateExpression represents a date calculation
@@ -153,31 +153,31 @@ func (p *PythonASTParser) Parse() ([]HolidayCall, error) {
 	if err := p.tokenize(); err != nil {
 		return nil, fmt.Errorf("tokenization failed: %w", err)
 	}
-	
+
 	// Parse class definitions
 	if err := p.parseClasses(); err != nil {
 		return nil, fmt.Errorf("class parsing failed: %w", err)
 	}
-	
+
 	// Extract holiday calls
 	holidayCalls, err := p.extractHolidayCalls()
 	if err != nil {
 		return nil, fmt.Errorf("holiday extraction failed: %w", err)
 	}
-	
+
 	return holidayCalls, nil
 }
 
 // tokenize breaks the source code into tokens
 func (p *PythonASTParser) tokenize() error {
 	lines := strings.Split(p.source, "\n")
-	
+
 	for lineNum, line := range lines {
 		if err := p.tokenizeLine(line, lineNum+1); err != nil {
 			return fmt.Errorf("error tokenizing line %d: %w", lineNum+1, err)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -187,7 +187,7 @@ func (p *PythonASTParser) tokenizeLine(line string, lineNum int) error {
 	if line == "" || strings.HasPrefix(line, "#") {
 		return nil
 	}
-	
+
 	// Handle indentation
 	originalLine := line
 	indentLevel := 0
@@ -199,7 +199,7 @@ func (p *PythonASTParser) tokenizeLine(line string, lineNum int) error {
 			break
 		}
 	}
-	
+
 	if indentLevel > 0 {
 		p.tokens = append(p.tokens, Token{
 			Type:   TokenIndent,
@@ -208,10 +208,10 @@ func (p *PythonASTParser) tokenizeLine(line string, lineNum int) error {
 			Column: 0,
 		})
 	}
-	
+
 	// Tokenize the rest of the line
 	p.tokenizeContent(line, lineNum, indentLevel)
-	
+
 	return nil
 }
 
@@ -219,7 +219,7 @@ func (p *PythonASTParser) tokenizeLine(line string, lineNum int) error {
 func (p *PythonASTParser) tokenizeContent(content string, lineNum, startColumn int) {
 	// Patterns for different token types
 	patterns := []struct {
-		regex *regexp.Regexp
+		regex     *regexp.Regexp
 		tokenType TokenType
 	}{
 		{regexp.MustCompile(`^class\b`), TokenClass},
@@ -231,7 +231,7 @@ func (p *PythonASTParser) tokenizeContent(content string, lineNum, startColumn i
 		{regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*`), TokenIdentifier},
 		{regexp.MustCompile(`^[+\-*/=(),.:]`), TokenOperator},
 	}
-	
+
 	pos := 0
 	for pos < len(content) {
 		// Skip whitespace
@@ -241,7 +241,7 @@ func (p *PythonASTParser) tokenizeContent(content string, lineNum, startColumn i
 		if pos >= len(content) {
 			break
 		}
-		
+
 		matched := false
 		for _, pattern := range patterns {
 			if match := pattern.regex.FindString(content[pos:]); match != "" {
@@ -256,7 +256,7 @@ func (p *PythonASTParser) tokenizeContent(content string, lineNum, startColumn i
 				break
 			}
 		}
-		
+
 		if !matched {
 			pos++ // Skip unknown character
 		}
@@ -283,19 +283,19 @@ func (p *PythonASTParser) parseClass(startPos int) (*ClassInfo, int, error) {
 	if startPos >= len(p.tokens) || p.tokens[startPos].Type != TokenClass {
 		return nil, startPos, fmt.Errorf("expected class token")
 	}
-	
+
 	// Look for class name
 	namePos := startPos + 1
 	if namePos >= len(p.tokens) || p.tokens[namePos].Type != TokenIdentifier {
 		return nil, startPos, fmt.Errorf("expected class name")
 	}
-	
+
 	className := p.tokens[namePos].Value
-	
+
 	// Parse base classes (simplified)
 	baseClasses := []string{}
 	pos := namePos + 1
-	
+
 	// Skip to end of class header (find colon)
 	for pos < len(p.tokens) && p.tokens[pos].Value != ":" {
 		if p.tokens[pos].Type == TokenIdentifier && pos > namePos+1 {
@@ -303,15 +303,15 @@ func (p *PythonASTParser) parseClass(startPos int) (*ClassInfo, int, error) {
 		}
 		pos++
 	}
-	
+
 	if pos >= len(p.tokens) {
 		return nil, startPos, fmt.Errorf("incomplete class definition")
 	}
-	
+
 	// Parse methods within the class
 	methods := make(map[string]MethodInfo)
 	pos++ // Skip colon
-	
+
 	for pos < len(p.tokens) {
 		// Look for method definitions
 		if p.tokens[pos].Type == TokenDef {
@@ -330,7 +330,7 @@ func (p *PythonASTParser) parseClass(startPos int) (*ClassInfo, int, error) {
 			pos++
 		}
 	}
-	
+
 	return &ClassInfo{
 		Name:        className,
 		BaseClasses: baseClasses,
@@ -344,19 +344,19 @@ func (p *PythonASTParser) parseMethod(startPos int) (*MethodInfo, int, error) {
 	if startPos >= len(p.tokens) || p.tokens[startPos].Type != TokenDef {
 		return nil, startPos, fmt.Errorf("expected def token")
 	}
-	
+
 	// Get method name
 	namePos := startPos + 1
 	if namePos >= len(p.tokens) || p.tokens[namePos].Type != TokenIdentifier {
 		return nil, startPos, fmt.Errorf("expected method name")
 	}
-	
+
 	methodName := p.tokens[namePos].Value
-	
+
 	// Parse parameters (simplified)
 	parameters := []string{}
 	pos := namePos + 1
-	
+
 	// Skip to end of method header
 	for pos < len(p.tokens) && p.tokens[pos].Value != ":" {
 		if p.tokens[pos].Type == TokenIdentifier {
@@ -364,18 +364,18 @@ func (p *PythonASTParser) parseMethod(startPos int) (*MethodInfo, int, error) {
 		}
 		pos++
 	}
-	
+
 	if pos >= len(p.tokens) {
 		return nil, startPos, fmt.Errorf("incomplete method definition")
 	}
-	
+
 	// Parse method body (simplified)
 	body := []Statement{}
 	pos++ // Skip colon
-	
+
 	// For now, we'll just capture the raw body
 	// In a full implementation, we'd parse statements properly
-	
+
 	return &MethodInfo{
 		Name:       methodName,
 		Parameters: parameters,
@@ -387,7 +387,7 @@ func (p *PythonASTParser) parseMethod(startPos int) (*MethodInfo, int, error) {
 // extractHolidayCalls extracts holiday definition calls from the parsed AST
 func (p *PythonASTParser) extractHolidayCalls() ([]HolidayCall, error) {
 	var holidayCalls []HolidayCall
-	
+
 	// Look for holiday method calls in the source
 	holidayPatterns := []*regexp.Regexp{
 		regexp.MustCompile(`self\._add_holiday\s*\(`),
@@ -396,9 +396,9 @@ func (p *PythonASTParser) extractHolidayCalls() ([]HolidayCall, error) {
 		regexp.MustCompile(`self\._add_easter_based_holiday\s*\(`),
 		regexp.MustCompile(`self\._add_weekday_holiday\s*\(`),
 	}
-	
+
 	lines := strings.Split(p.source, "\n")
-	
+
 	for lineNum, line := range lines {
 		for _, pattern := range holidayPatterns {
 			if pattern.MatchString(line) {
@@ -413,7 +413,7 @@ func (p *PythonASTParser) extractHolidayCalls() ([]HolidayCall, error) {
 			}
 		}
 	}
-	
+
 	return holidayCalls, nil
 }
 
@@ -425,9 +425,9 @@ func (p *PythonASTParser) parseHolidayCall(line string, lineNum int) (*HolidayCa
 	if len(methodMatch) < 2 {
 		return nil, fmt.Errorf("could not extract method name")
 	}
-	
+
 	methodName := methodMatch[1]
-	
+
 	// Parse different types of holiday calls
 	switch {
 	case strings.Contains(methodName, "_add_holiday"):
@@ -445,10 +445,10 @@ func (p *PythonASTParser) parseHolidayCall(line string, lineNum int) (*HolidayCa
 func (p *PythonASTParser) parseAddHolidayCall(line string, lineNum int, methodName string) (*HolidayCall, error) {
 	// Pattern: self._add_holiday(date_expr, "Holiday Name")
 	// or: self._add_holiday("Holiday Name", date_expr)
-	
+
 	// Extract holiday name - try both double and single quotes separately
 	var holidayName string
-	
+
 	// Try double quotes first
 	doubleQuotePattern := regexp.MustCompile(`"([^"]*)"`)
 	if matches := doubleQuotePattern.FindStringSubmatch(line); len(matches) >= 2 {
@@ -462,13 +462,13 @@ func (p *PythonASTParser) parseAddHolidayCall(line string, lineNum int, methodNa
 			return nil, fmt.Errorf("could not extract holiday name")
 		}
 	}
-	
+
 	// Extract date expression
 	dateExpr, err := p.extractDateExpression(line)
 	if err != nil {
 		return nil, fmt.Errorf("could not extract date expression: %w", err)
 	}
-	
+
 	return &HolidayCall{
 		Method: methodName,
 		Name:   holidayName,
@@ -480,9 +480,9 @@ func (p *PythonASTParser) parseAddHolidayCall(line string, lineNum int, methodNa
 // parseEasterBasedCall parses Easter-based holiday calls
 func (p *PythonASTParser) parseEasterBasedCall(line string, lineNum int, methodName string) (*HolidayCall, error) {
 	// Pattern: self._add_easter_based_holiday("Name", days_offset)
-	
+
 	var holidayName string
-	
+
 	// Try double quotes first
 	doubleQuotePattern := regexp.MustCompile(`"([^"]*)"`)
 	if matches := doubleQuotePattern.FindStringSubmatch(line); len(matches) >= 2 {
@@ -496,11 +496,11 @@ func (p *PythonASTParser) parseEasterBasedCall(line string, lineNum int, methodN
 			return nil, fmt.Errorf("could not extract holiday name")
 		}
 	}
-	
+
 	// Extract days offset
 	offsetPattern := regexp.MustCompile(`[+-]?\d+`)
 	offsetMatch := offsetPattern.FindString(line)
-	
+
 	calculation := "easter(year)"
 	if offsetMatch != "" {
 		offset, _ := strconv.Atoi(offsetMatch)
@@ -512,7 +512,7 @@ func (p *PythonASTParser) parseEasterBasedCall(line string, lineNum int, methodN
 			}
 		}
 	}
-	
+
 	return &HolidayCall{
 		Method: methodName,
 		Name:   holidayName,
@@ -527,9 +527,9 @@ func (p *PythonASTParser) parseEasterBasedCall(line string, lineNum int, methodN
 // parseWeekdayCall parses weekday-based holiday calls
 func (p *PythonASTParser) parseWeekdayCall(line string, lineNum int, methodName string) (*HolidayCall, error) {
 	// Pattern: self._add_weekday_holiday("Name", month, weekday, week)
-	
+
 	var holidayName string
-	
+
 	// Try double quotes first
 	doubleQuotePattern := regexp.MustCompile(`"([^"]*)"`)
 	if matches := doubleQuotePattern.FindStringSubmatch(line); len(matches) >= 2 {
@@ -543,7 +543,7 @@ func (p *PythonASTParser) parseWeekdayCall(line string, lineNum int, methodName 
 			return nil, fmt.Errorf("could not extract holiday name")
 		}
 	}
-	
+
 	return &HolidayCall{
 		Method: methodName,
 		Name:   holidayName,
@@ -558,7 +558,7 @@ func (p *PythonASTParser) parseWeekdayCall(line string, lineNum int, methodName 
 // parseGenericHolidayCall parses other types of holiday calls
 func (p *PythonASTParser) parseGenericHolidayCall(line string, lineNum int, methodName string) (*HolidayCall, error) {
 	var holidayName string
-	
+
 	// Try double quotes first
 	doubleQuotePattern := regexp.MustCompile(`"([^"]*)"`)
 	if matches := doubleQuotePattern.FindStringSubmatch(line); len(matches) >= 2 {
@@ -572,7 +572,7 @@ func (p *PythonASTParser) parseGenericHolidayCall(line string, lineNum int, meth
 			return nil, fmt.Errorf("could not extract holiday name")
 		}
 	}
-	
+
 	return &HolidayCall{
 		Method: methodName,
 		Name:   holidayName,
@@ -587,13 +587,13 @@ func (p *PythonASTParser) parseGenericHolidayCall(line string, lineNum int, meth
 // extractDateExpression extracts date expressions from holiday calls
 func (p *PythonASTParser) extractDateExpression(line string) (*DateExpression, error) {
 	// Look for common date patterns
-	
+
 	// Fixed date: date(year, MONTH, day)
 	fixedDatePattern := regexp.MustCompile(`date\s*\(\s*year\s*,\s*([A-Z]+|\d+)\s*,\s*(\d+)\s*\)`)
 	if match := fixedDatePattern.FindStringSubmatch(line); len(match) >= 3 {
 		month := match[1]
 		day, _ := strconv.Atoi(match[2])
-		
+
 		return &DateExpression{
 			Type:  DateFixed,
 			Year:  "year",
@@ -601,7 +601,7 @@ func (p *PythonASTParser) extractDateExpression(line string) (*DateExpression, e
 			Day:   day,
 		}, nil
 	}
-	
+
 	// Easter-based: easter(year) + rd(days=N)
 	easterPattern := regexp.MustCompile(`easter\s*\(\s*year\s*\)(\s*[+-]\s*rd\s*\(\s*days\s*=\s*(\d+)\s*\))?`)
 	if match := easterPattern.FindStringSubmatch(line); len(match) >= 1 {
@@ -614,13 +614,13 @@ func (p *PythonASTParser) extractDateExpression(line string) (*DateExpression, e
 				calculation = fmt.Sprintf("easter(year) - timedelta(days=%s)", days)
 			}
 		}
-		
+
 		return &DateExpression{
 			Type:        DateEasterBased,
 			Calculation: calculation,
 		}, nil
 	}
-	
+
 	// Default to calculated
 	return &DateExpression{
 		Type:        DateCalculated,
@@ -631,16 +631,16 @@ func (p *PythonASTParser) extractDateExpression(line string) (*DateExpression, e
 // ConvertToHolidayDefinitions converts parsed holiday calls to HolidayDefinition format
 func (p *PythonASTParser) ConvertToHolidayDefinitions(holidayCalls []HolidayCall) map[string]HolidayDefinition {
 	definitions := make(map[string]HolidayDefinition)
-	
+
 	for _, call := range holidayCalls {
 		key := strings.ToLower(strings.ReplaceAll(call.Name, " ", "_"))
-		
+
 		definition := HolidayDefinition{
 			Name:      call.Name,
 			Category:  "public", // Default category
 			Languages: map[string]string{"en": call.Name},
 		}
-		
+
 		// Convert date expression to definition fields
 		if call.Date != nil {
 			switch call.Date.Type {
@@ -654,23 +654,23 @@ func (p *PythonASTParser) ConvertToHolidayDefinitions(holidayCalls []HolidayCall
 				if day, ok := call.Date.Day.(int); ok {
 					definition.Day = day
 				}
-				
+
 			case DateEasterBased:
 				definition.Calculation = "easter_based"
 				definition.EasterOffset = p.extractEasterOffset(call.Date.Calculation)
-				
+
 			case DateWeekdayBased:
 				definition.Calculation = "weekday_based"
 				// Would need more parsing for weekday details
-				
+
 			default:
 				definition.Calculation = "complex"
 			}
 		}
-		
+
 		definitions[key] = definition
 	}
-	
+
 	return definitions
 }
 
@@ -681,16 +681,16 @@ func (p *PythonASTParser) convertMonthName(monthName string) int {
 		"MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8,
 		"SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
 	}
-	
+
 	if month, exists := monthMap[monthName]; exists {
 		return month
 	}
-	
+
 	// Try to parse as integer
 	if month, err := strconv.Atoi(monthName); err == nil {
 		return month
 	}
-	
+
 	return 1 // Default to January
 }
 

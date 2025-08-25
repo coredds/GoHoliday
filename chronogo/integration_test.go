@@ -5,369 +5,224 @@ import (
 	"time"
 )
 
-// mockChronoGoDT implements ChronoGoDateTime for testing
-type mockChronoGoDT struct {
-	year  int
-	month time.Month
-	day   int
-}
+func TestFastCountryChecker_IsHoliday(t *testing.T) {
+	checker := Checker("US")
 
-func (m *mockChronoGoDT) Year() int        { return m.year }
-func (m *mockChronoGoDT) Month() time.Month { return m.month }
-func (m *mockChronoGoDT) Day() int         { return m.day }
-
-func TestGoHolidaysChecker_IsHoliday(t *testing.T) {
-	checker := NewGoHolidaysChecker().WithCountries("US")
-
-	tests := []struct {
-		name     string
-		date     ChronoGoDateTime
-		expected bool
+	// Test known US holidays for 2024
+	testCases := []struct {
+		date        time.Time
+		isHoliday   bool
+		description string
 	}{
-		{
-			name:     "New Year's Day 2024",
-			date:     &mockChronoGoDT{2024, time.January, 1},
-			expected: true,
-		},
-		{
-			name:     "Independence Day 2024",
-			date:     &mockChronoGoDT{2024, time.July, 4},
-			expected: true,
-		},
-		{
-			name:     "Christmas Day 2024",
-			date:     &mockChronoGoDT{2024, time.December, 25},
-			expected: true,
-		},
-		{
-			name:     "Regular day 2024",
-			date:     &mockChronoGoDT{2024, time.March, 15},
-			expected: false,
-		},
-		{
-			name:     "Martin Luther King Jr. Day 2024",
-			date:     &mockChronoGoDT{2024, time.January, 15}, // Third Monday in January 2024
-			expected: true,
-		},
+		{time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC), true, "New Year's Day"},
+		{time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC), true, "Independence Day"},
+		{time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC), true, "Christmas Day"},
+		{time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC), false, "Regular day"},
+		{time.Date(2024, 6, 15, 0, 0, 0, 0, time.UTC), false, "Regular day"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := checker.IsHoliday(tt.date)
-			if result != tt.expected {
-				t.Errorf("IsHoliday() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
-}
-
-func TestGoHolidaysChecker_WithCountries(t *testing.T) {
-	// Test with US holidays
-	usChecker := NewGoHolidaysChecker().WithCountries("US")
-	
-	// Canada Day should not be a holiday for US-only checker
-	canadaDay := &mockChronoGoDT{2024, time.July, 1}
-	if usChecker.IsHoliday(canadaDay) {
-		t.Error("Canada Day should not be a US holiday")
-	}
-
-	// Test with both US and Canada
-	multiChecker := NewGoHolidaysChecker().WithCountries("US", "CA")
-	
-	// Canada Day should be a holiday for multi-country checker
-	if !multiChecker.IsHoliday(canadaDay) {
-		t.Error("Canada Day should be a holiday when including Canada")
-	}
-	
-	// Independence Day should still be a holiday
-	independenceDay := &mockChronoGoDT{2024, time.July, 4}
-	if !multiChecker.IsHoliday(independenceDay) {
-		t.Error("Independence Day should still be a holiday")
-	}
-}
-
-func TestGoHolidaysChecker_WithCategories(t *testing.T) {
-	// Test with only federal holidays
-	federalChecker := NewGoHolidaysChecker().
-		WithCountries("US").
-		WithCategories("federal")
-
-	// New Year's should be included (federal holiday)
-	newYear := &mockChronoGoDT{2024, time.January, 1}
-	if !federalChecker.IsHoliday(newYear) {
-		t.Error("New Year's Day should be a federal holiday")
-	}
-
-	// Test with no observance holidays
-	noObservanceChecker := NewGoHolidaysChecker().
-		WithCountries("US").
-		WithCategories("federal", "public") // Exclude observance
-
-	// Columbus Day might be observance in some configurations
-	// This test verifies category filtering works
-	columbusDay := &mockChronoGoDT{2024, time.October, 14} // Second Monday in October 2024
-	result := noObservanceChecker.IsHoliday(columbusDay)
-	t.Logf("Columbus Day (excluding observance): %v", result)
-}
-
-func TestGoHolidaysChecker_GetHolidays(t *testing.T) {
-	checker := NewGoHolidaysChecker().WithCountries("US")
-	
-	holidays := checker.GetHolidays(2024)
-	
-	if len(holidays) == 0 {
-		t.Error("Should have found US holidays for 2024")
-	}
-
-	// Check that we have some expected holidays
-	expectedHolidays := map[string]bool{
-		"New Year's Day":    false,
-		"Independence Day":  false,
-		"Christmas Day":     false,
-	}
-
-	for _, holiday := range holidays {
-		if _, exists := expectedHolidays[holiday.Name]; exists {
-			expectedHolidays[holiday.Name] = true
-		}
-		
-		// Verify holiday info structure
-		if holiday.Name == "" {
-			t.Error("Holiday should have a name")
-		}
-		if holiday.Date.IsZero() {
-			t.Error("Holiday should have a valid date")
-		}
-		if holiday.Country == "" {
-			t.Error("Holiday should have a country")
+	for _, tc := range testCases {
+		result := checker.IsHoliday(tc.date)
+		if result != tc.isHoliday {
+			t.Errorf("%s: expected %v, got %v", tc.description, tc.isHoliday, result)
 		}
 	}
+}
 
-	// Check that we found the expected holidays
-	for name, found := range expectedHolidays {
-		if !found {
-			t.Errorf("Expected to find holiday: %s", name)
+func TestFastCountryChecker_GetHolidayName(t *testing.T) {
+	checker := Checker("US")
+
+	// Test getting holiday names
+	testCases := []struct {
+		date         time.Time
+		expectedName string
+	}{
+		{time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC), "New Year's Day"},
+		{time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC), "Independence Day"},
+		{time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC), "Christmas Day"},
+		{time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC), ""}, // Not a holiday
+	}
+
+	for _, tc := range testCases {
+		result := checker.GetHolidayName(tc.date)
+		if result != tc.expectedName {
+			t.Errorf("Date %s: expected '%s', got '%s'",
+				tc.date.Format("2006-01-02"), tc.expectedName, result)
 		}
 	}
-
-	t.Logf("Found %d holidays for US in 2024", len(holidays))
 }
 
-func TestGoHolidaysChecker_WithSubdivisions(t *testing.T) {
-	// Test regional holidays (if available)
-	regionalChecker := NewGoHolidaysChecker().
-		WithCountries("US").
-		WithSubdivisions("CA") // California
+func TestFastCountryChecker_AreHolidays(t *testing.T) {
+	checker := Checker("US")
 
-	baseChecker := NewGoHolidaysChecker().WithCountries("US")
-
-	// Get holidays for both checkers
-	regionalHolidays := regionalChecker.GetHolidays(2024)
-	baseHolidays := baseChecker.GetHolidays(2024)
-
-	t.Logf("Base holidays: %d, Regional holidays: %d", len(baseHolidays), len(regionalHolidays))
-
-	// Regional checker should have at least as many holidays as base
-	if len(regionalHolidays) < len(baseHolidays) {
-		t.Error("Regional checker should have at least as many holidays as base checker")
-	}
-}
-
-func TestGoHolidaysChecker_GetSupportedCountries(t *testing.T) {
-	checker := NewGoHolidaysChecker()
-	
-	countries := checker.GetSupportedCountries()
-	
-	if len(countries) == 0 {
-		t.Error("Should have supported countries")
+	dates := []time.Time{
+		time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),   // New Year's Day
+		time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC),   // Regular day
+		time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),   // Independence Day
+		time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC), // Christmas Day
 	}
 
-	// Check that US is supported (our baseline)
-	usSupported := false
-	for _, country := range countries {
-		if country == "US" {
-			usSupported = true
-			break
+	expected := []bool{true, false, true, true}
+	results := checker.AreHolidays(dates)
+
+	if len(results) != len(expected) {
+		t.Fatalf("Expected %d results, got %d", len(expected), len(results))
+	}
+
+	for i, expectedResult := range expected {
+		if results[i] != expectedResult {
+			t.Errorf("Date %s: expected %v, got %v",
+				dates[i].Format("2006-01-02"), expectedResult, results[i])
 		}
 	}
-
-	if !usSupported {
-		t.Error("US should be supported")
-	}
-
-	t.Logf("Supported countries: %v", countries)
 }
 
-func TestGoHolidaysChecker_GetCountryInfo(t *testing.T) {
-	checker := NewGoHolidaysChecker()
-	
-	info, err := checker.GetCountryInfo("US")
-	if err != nil {
-		t.Fatalf("GetCountryInfo() error = %v", err)
+func TestFastCountryChecker_GetHolidaysInRange(t *testing.T) {
+	checker := Checker("US")
+
+	start := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2024, 1, 31, 0, 0, 0, 0, time.UTC)
+
+	holidays := checker.GetHolidaysInRange(start, end)
+
+	// Should include New Year's Day and MLK Day in January 2024
+	if len(holidays) < 1 {
+		t.Errorf("Expected at least 1 holiday in January 2024, got %d", len(holidays))
 	}
 
-	if info == nil {
-		t.Error("Country info should not be nil")
-	}
-
-	// Check that we have some expected info fields
-	if enabled, exists := info["enabled"]; !exists {
-		t.Error("Country info should include 'enabled' field")
-	} else if enabledBool, ok := enabled.(bool); !ok || !enabledBool {
-		t.Error("US should be enabled")
-	}
-
-	t.Logf("US info: %+v", info)
-}
-
-func TestGoHolidaysChecker_CachingBehavior(t *testing.T) {
-	checker := NewGoHolidaysChecker().WithCountries("US")
-	
-	testDate := &mockChronoGoDT{2024, time.July, 4}
-
-	// First call - should load and cache
-	result1 := checker.IsHoliday(testDate)
-	
-	// Second call - should use cache
-	result2 := checker.IsHoliday(testDate)
-	
-	if result1 != result2 {
-		t.Error("Cached result should match original result")
-	}
-
-	// Verify that cache was populated
-	if len(checker.holidayCache) == 0 {
-		t.Error("Cache should be populated after holiday check")
-	}
-
-	if yearCache, exists := checker.holidayCache[2024]; !exists {
-		t.Error("Cache should have entry for 2024")
-	} else if len(yearCache) == 0 {
-		t.Error("Year cache should have entries")
+	// Check if New Year's Day is included
+	newYears := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	if holidayName, exists := holidays[newYears]; !exists {
+		t.Error("New Year's Day should be included in January 2024 holidays")
+	} else if holidayName != "New Year's Day" {
+		t.Errorf("Expected 'New Year's Day', got '%s'", holidayName)
 	}
 }
 
-func TestGoHolidaysChecker_ConfigurationChange(t *testing.T) {
-	checker := NewGoHolidaysChecker().WithCountries("US")
-	
-	testDate := &mockChronoGoDT{2024, time.July, 4}
-	
-	// Check holiday and populate cache
-	result1 := checker.IsHoliday(testDate)
-	
-	// Change configuration
-	checker.WithCountries("CA")
-	
-	// Cache should be cleared
-	if len(checker.holidayCache) != 0 {
-		t.Error("Cache should be cleared when configuration changes")
-	}
-	
-	// Check with new configuration
-	result2 := checker.IsHoliday(testDate)
-	
-	// Results might be different due to different country
-	t.Logf("US config: %v, CA config: %v", result1, result2)
-}
+func TestFastCountryChecker_CountHolidaysInRange(t *testing.T) {
+	checker := Checker("US")
 
-func TestGoHolidaysChecker_PreloadYear(t *testing.T) {
-	checker := NewGoHolidaysChecker().WithCountries("US")
-	
-	// Preload 2024
-	err := checker.PreloadYear(2024)
-	if err != nil {
-		t.Fatalf("PreloadYear() error = %v", err)
-	}
-	
-	// Cache should be populated
-	if len(checker.holidayCache) == 0 {
-		t.Error("Cache should be populated after preloading")
-	}
-	
-	if _, exists := checker.holidayCache[2024]; !exists {
-		t.Error("Cache should have entry for 2024 after preloading")
+	start := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC)
+
+	count := checker.CountHolidaysInRange(start, end)
+
+	// US should have approximately 11 federal holidays in 2024
+	if count < 10 || count > 15 {
+		t.Errorf("Expected 10-15 holidays in 2024, got %d", count)
 	}
 }
 
-func TestCreateDefaultUSChecker(t *testing.T) {
-	checker := CreateDefaultUSChecker()
-	
-	if len(checker.countries) != 1 || checker.countries[0] != "US" {
-		t.Error("Default US checker should be configured for US only")
+func TestFastCountryChecker_MultipleCountries(t *testing.T) {
+	usChecker := Checker("US")
+	caChecker := Checker("CA")
+	gbChecker := Checker("GB")
+
+	// Test a date that might be a holiday in some countries but not others
+	date := time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC)
+
+	usResult := usChecker.IsHoliday(date) // Should be true (Independence Day)
+	caResult := caChecker.IsHoliday(date) // Should be false
+	gbResult := gbChecker.IsHoliday(date) // Should be false
+
+	if !usResult {
+		t.Error("July 4th should be a holiday in the US")
 	}
-	
-	// Should recognize US federal holidays
-	newYear := &mockChronoGoDT{2024, time.January, 1}
-	if !checker.IsHoliday(newYear) {
-		t.Error("Default US checker should recognize New Year's Day")
+	if caResult {
+		t.Error("July 4th should not be a holiday in Canada")
+	}
+	if gbResult {
+		t.Error("July 4th should not be a holiday in Great Britain")
 	}
 }
 
-func TestCreateMultiCountryChecker(t *testing.T) {
-	checker := CreateMultiCountryChecker("US", "CA", "GB")
-	
-	if len(checker.countries) != 3 {
-		t.Error("Multi-country checker should have 3 countries")
+func TestFastCountryChecker_ClearCache(t *testing.T) {
+	checker := Checker("US")
+
+	// Load some data
+	checker.IsHoliday(time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+
+	// Verify cache has data
+	checker.mutex.RLock()
+	cacheSize := len(checker.yearCache)
+	checker.mutex.RUnlock()
+
+	if cacheSize == 0 {
+		t.Error("Cache should have data after holiday check")
 	}
-	
-	// Should recognize holidays from multiple countries
-	usHoliday := &mockChronoGoDT{2024, time.July, 4}  // Independence Day
-	caHoliday := &mockChronoGoDT{2024, time.July, 1}  // Canada Day
-	
-	if !checker.IsHoliday(usHoliday) {
-		t.Error("Multi-country checker should recognize US holidays")
-	}
-	
-	if !checker.IsHoliday(caHoliday) {
-		t.Error("Multi-country checker should recognize Canadian holidays")
+
+	// Clear cache
+	checker.ClearCache()
+
+	// Verify cache is empty
+	checker.mutex.RLock()
+	cacheSize = len(checker.yearCache)
+	checker.mutex.RUnlock()
+
+	if cacheSize != 0 {
+		t.Error("Cache should be empty after ClearCache()")
 	}
 }
 
-func TestCreateRegionalChecker(t *testing.T) {
-	checker := CreateRegionalChecker("US", "CA", "NY")
-	
-	if len(checker.countries) != 1 || checker.countries[0] != "US" {
-		t.Error("Regional checker should be configured for single country")
-	}
-	
-	if !checker.includeRegional {
-		t.Error("Regional checker should have regional holidays enabled")
-	}
-	
-	if len(checker.subdivisions) != 2 {
-		t.Error("Regional checker should have 2 subdivisions")
+func TestFastCountryChecker_GetCountryCode(t *testing.T) {
+	testCases := []string{"US", "CA", "GB", "AU", "NZ", "DE", "FR"}
+
+	for _, countryCode := range testCases {
+		checker := Checker(countryCode)
+		if checker.GetCountryCode() != countryCode {
+			t.Errorf("Expected country code %s, got %s", countryCode, checker.GetCountryCode())
+		}
 	}
 }
 
-// Benchmark tests
-func BenchmarkGoHolidaysChecker_IsHoliday(b *testing.B) {
-	checker := NewGoHolidaysChecker().WithCountries("US")
-	testDate := &mockChronoGoDT{2024, time.July, 4}
+func TestFastCountryChecker_UnsupportedCountry(t *testing.T) {
+	// Test with unsupported country code - should fallback to US
+	checker := Checker("XX")
+
+	if checker.GetCountryCode() != "XX" {
+		t.Errorf("Expected country code XX, got %s", checker.GetCountryCode())
+	}
+
+	// Should still work (using US provider as fallback)
+	result := checker.IsHoliday(time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC))
+	if !result {
+		t.Error("Fallback to US provider should recognize July 4th as a holiday")
+	}
+}
+
+// Benchmark tests for performance optimization
+func BenchmarkFastCountryChecker_IsHoliday(b *testing.B) {
+	checker := Checker("US")
+	date := time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		checker.IsHoliday(testDate)
+		checker.IsHoliday(date)
 	}
 }
 
-func BenchmarkGoHolidaysChecker_IsHolidayWithCache(b *testing.B) {
-	checker := NewGoHolidaysChecker().WithCountries("US")
-	testDate := &mockChronoGoDT{2024, time.July, 4}
+func BenchmarkFastCountryChecker_AreHolidays_100Dates(b *testing.B) {
+	checker := Checker("US")
 
-	// Prime the cache
-	checker.IsHoliday(testDate)
+	// Create 100 dates spanning a year
+	dates := make([]time.Time, 100)
+	for i := 0; i < 100; i++ {
+		dates[i] = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 0, i*3)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		checker.IsHoliday(testDate)
+		checker.AreHolidays(dates)
 	}
 }
 
-func BenchmarkGoHolidaysChecker_GetHolidays(b *testing.B) {
-	checker := NewGoHolidaysChecker().WithCountries("US")
+func BenchmarkFastCountryChecker_CountHolidaysInRange(b *testing.B) {
+	checker := Checker("US")
+	start := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		checker.GetHolidays(2024)
+		checker.CountHolidaysInRange(start, end)
 	}
 }

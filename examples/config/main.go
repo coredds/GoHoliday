@@ -25,7 +25,7 @@ func main() {
 	// Demonstrate holidays for a specific country
 	year := 2024
 	countryCode := "US"
-	
+
 	fmt.Printf("\n2. Holidays for %s in %d:\n", countryCode, year)
 	holidays, err := manager.GetHolidays(countryCode, year)
 	if err != nil {
@@ -38,7 +38,7 @@ func main() {
 	for date := range holidays {
 		dates = append(dates, date)
 	}
-	
+
 	// Simple sort by date
 	for i := 0; i < len(dates); i++ {
 		for j := i + 1; j < len(dates); j++ {
@@ -50,9 +50,9 @@ func main() {
 
 	for _, date := range dates {
 		holiday := holidays[date]
-		fmt.Printf("   %s: %s (%s)\n", 
-			date.Format("2006-01-02"), 
-			holiday.Name, 
+		fmt.Printf("   %s: %s (%s)\n",
+			date.Format("2006-01-02"),
+			holiday.Name,
 			holiday.Category)
 	}
 
@@ -96,8 +96,8 @@ func main() {
 		count := 0
 		for date, holiday := range gbHolidays {
 			if count < 5 { // Show first 5
-				fmt.Printf("   %s: %s\n", 
-					date.Format("2006-01-02"), 
+				fmt.Printf("   %s: %s\n",
+					date.Format("2006-01-02"),
 					holiday.Name)
 				count++
 			}

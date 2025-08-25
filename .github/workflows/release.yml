@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Run tests
+      run: go test -v ./...
+
+    - name: Build binaries
+      run: |
+        # Build for multiple platforms
+        GOOS=linux GOARCH=amd64 go build -o goholidays-linux-amd64 ./cmd/goholidays
+        GOOS=darwin GOARCH=amd64 go build -o goholidays-darwin-amd64 ./cmd/goholidays
+        GOOS=darwin GOARCH=arm64 go build -o goholidays-darwin-arm64 ./cmd/goholidays
+        GOOS=windows GOARCH=amd64 go build -o goholidays-windows-amd64.exe ./cmd/goholidays
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          goholidays-linux-amd64
+          goholidays-darwin-amd64
+          goholidays-darwin-arm64
+          goholidays-windows-amd64.exe
+        generate_release_notes: true
+        draft: false
+        prerelease: false

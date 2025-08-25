@@ -204,7 +204,7 @@ func TestUSProvider_MultipleStates(t *testing.T) {
 
 	// Test multiple states
 	stateHolidays := provider.GetStateHolidays(2024, []string{"CA", "TX", "MA"})
-	
+
 	// Should have holidays from all three states
 	expectedCount := 3 // Chavez Day, Texas Independence, Patriots' Day
 	if len(stateHolidays) != expectedCount {
@@ -245,7 +245,7 @@ func TestUSProvider_FederalHolidayCount(t *testing.T) {
 			federalCount++
 		}
 	}
-	
+
 	expectedFederal := 11 // All current federal holidays including Juneteenth
 	if federalCount != expectedFederal {
 		t.Errorf("Expected %d federal holidays in 2024, got %d", expectedFederal, federalCount)
@@ -259,7 +259,7 @@ func TestUSProvider_FederalHolidayCount(t *testing.T) {
 			federalCount2020++
 		}
 	}
-	
+
 	expectedFederal2020 := 10 // Federal holidays before Juneteenth
 	if federalCount2020 != expectedFederal2020 {
 		t.Errorf("Expected %d federal holidays in 2020, got %d", expectedFederal2020, federalCount2020)
@@ -273,7 +273,7 @@ func TestUSProvider_FederalHolidayCount(t *testing.T) {
 			federalCount1982++
 		}
 	}
-	
+
 	expectedFederal1982 := 9 // Federal holidays before MLK Day
 	if federalCount1982 != expectedFederal1982 {
 		t.Errorf("Expected %d federal holidays in 1982, got %d", expectedFederal1982, federalCount1982)

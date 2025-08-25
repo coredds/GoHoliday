@@ -1,57 +1,62 @@
-# GoHolidays
+# GoHoliday
 
-A Go-native library providing comprehensive holiday data for countries and their subdivisions, designed as the premier holiday data provider for [ChronoGo](https://github.com/davidhintelmann/ChronoGo) and other date/time applications.
+[![CI](https://github.com/davidhintelmann/GoHoliday/workflows/CI/badge.svg)](https://github.com/davidhintelmann/GoHoliday/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/davidhintelmann/GoHoliday/branch/main/graph/badge.svg)](https://codecov.io/gh/davidhintelmann/GoHoliday)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/davidhintelmann/GoHoliday)](https://golang.org/)
+[![License](https://img.shields.io/github/license/davidhintelmann/GoHoliday)](LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/davidhintelmann/GoHoliday)](https://goreportcard.com/report/github.com/davidhintelmann/GoHoliday)
 
-## 🎯 Primary Use Case: ChronoGo Integration
+A comprehensive Go library for holiday data and business day calculations, designed as a high-performance backend for date/time applications including [ChronoGo](https://github.com/davidhintelmann/ChronoGo).
 
-GoHolidays is purpose-built as a drop-in replacement for ChronoGo's `DefaultHolidayChecker`, providing enterprise-grade holiday data for business day calculations:
+## Project Status
 
-```go
-// Replace ChronoGo's basic holiday checker with GoHolidays
-holidayChecker := chronogo.CreateDefaultUSChecker()
+**Current Version**: 0.1.2  
+**Supported Countries**: 8 countries with comprehensive regional subdivision support  
+**Performance**: Sub-microsecond holiday lookups with O(1) caching  
+**Integration**: Native ChronoGo HolidayChecker interface implementation  
 
-// Now ChronoGo has access to comprehensive holiday data
-dt := chronogo.Now()
-nextBusinessDay := dt.NextBusinessDay(holidayChecker)
-businessDays := dt.AddBusinessDays(5, holidayChecker)
+### Recent Additions
+- **Japan (JP)** support with 16 public holidays including cultural accuracy and Emperor transition handling
+- Enhanced ChronoGo integration with FastCountryChecker performance layer
+- Comprehensive test coverage with benchmark validation
 
-if dt.IsHoliday(holidayChecker) {
-    fmt.Println("Today is a holiday!")
-}
-```
+## Objectives
 
-## ✨ Features
+1. **Primary**: Provide enterprise-grade holiday data for ChronoGo business day calculations
+2. **Secondary**: Support international business operations with accurate regional holiday data  
+3. **Tertiary**: Enable rapid expansion to additional countries via Python holidays library integration
 
-- **🏢 Enterprise-Ready**: YAML-based configuration system with environment support
-- **🌍 Multi-Country Support**: 7 countries with regional subdivisions
-- **⚡ High Performance**: Sub-microsecond holiday lookups with intelligent caching
-- **🔧 ChronoGo Integration**: Native `HolidayChecker` interface implementation
-- **📊 Business Intelligence**: Holiday categories, regional variations, and custom overrides
-- **🔄 Auto-Updates**: GitHub syncer for real-time holiday data from Python holidays library
-- **🛡️ Thread-Safe**: Concurrent operations with built-in safety
+## Supported Countries
 
-## 🌍 Supported Countries
+| Country | Code | Subdivisions | Implementation |
+|---------|------|-------------|----------------|
+| United States | US | 56 (states, territories) | Native |
+| United Kingdom | GB | 4 (England, Scotland, Wales, NI) | Native |
+| Canada | CA | 13 (provinces, territories) | Native |
+| Australia | AU | 8 (states, territories) | Native |
+| New Zealand | NZ | 17 (regions) | Native |
+| Germany | DE | 16 (states) | Native |
+| France | FR | Regions & territories | Native |
+| Japan | JP | National public holidays | Native |
 
-| Country | Code | Subdivisions | Status |
-|---------|------|-------------|---------|
-| �� United States | US | 56 (states, territories) | ✅ Native |
-| 🇬🇧 United Kingdom | GB | 4 (England, Scotland, Wales, NI) | ✅ Native |
-| 🇨🇦 Canada | CA | 13 (provinces, territories) | ✅ Native |
-| 🇦🇺 Australia | AU | 8 (states, territories) | ✅ Native |
-| �� New Zealand | NZ | 17 (regions) | ✅ Native |
-| 🇩🇪 Germany | DE | 16 (states) | ✅ Native |
-| �� France | FR | Regions & territories | ✅ Native |
+**Total**: 8 countries with 100+ regional subdivisions
 
-**Total**: 7 countries with 100+ regional subdivisions
+### Future Expansion
+The library architecture supports rapid country expansion using data from the Python holidays ecosystem. Target countries include India, Brazil, Mexico, Italy, Spain, Singapore, and South Korea.
 
-### 🔄 Additional Countries via Python Sync
-- 80+ additional countries available through GitHub syncer
-- Real-time updates from [Python holidays library](https://github.com/vacanza/python-holidays)
-- Automatic country discovery and integration
+## Features
 
-## 🚀 Quick Start
+- **Enterprise Configuration**: YAML-based configuration system with environment support
+- **Multi-Country Support**: 8 countries with regional subdivisions
+- **High Performance**: Sub-microsecond holiday lookups with intelligent caching
+- **ChronoGo Integration**: Native HolidayChecker interface implementation
+- **Business Intelligence**: Holiday categories, regional variations, and custom overrides
+- **Thread-Safe**: Concurrent operations with built-in safety
+- **Cultural Accuracy**: Multi-language holiday names and historical transitions
 
-### ChronoGo Integration (Recommended)
+## Quick Start
+
+### ChronoGo Integration
 
 ```go
 package main
@@ -65,43 +70,22 @@ import (
 )
 
 func main() {
-    // Create GoHolidays checker for ChronoGo
-    holidayChecker := chronogo.CreateDefaultUSChecker()
+    // Create optimized holiday checker for ChronoGo
+    holidayChecker := chronogo.Checker("US")
     
     // Use with ChronoGo for business day calculations
     dt := chronogo_lib.Now()
     
     // Check if today is a holiday
-    if dt.IsHoliday(holidayChecker) {
-        fmt.Println("Today is a holiday!")
+    if holidayChecker.IsHoliday(dt.Time) {
+        name := holidayChecker.GetHolidayName(dt.Time)
+        fmt.Printf("Today is a holiday: %s\n", name)
     }
     
-    // Calculate next business day
+    // Calculate next business day (ChronoGo handles this with the checker)
     nextBusiness := dt.NextBusinessDay(holidayChecker)
     fmt.Printf("Next business day: %s\n", nextBusiness.Format("2006-01-02"))
-    
-    // Add business days (skipping holidays and weekends)
-    futureDate := dt.AddBusinessDays(5, holidayChecker)
-    fmt.Printf("5 business days from now: %s\n", futureDate.Format("2006-01-02"))
 }
-```
-
-### Advanced ChronoGo Configuration
-
-```go
-// Multi-country business operations
-checker := chronogo.New().
-    WithCountries("US", "CA", "GB").
-    WithSubdivisions(map[string][]string{
-        "US": {"CA", "NY"},  // California and New York
-        "CA": {"ON", "BC"},  // Ontario and British Columbia
-    }).
-    WithCategories("federal", "bank").
-    Build()
-
-// Regional business day calculations
-dt := chronogo_lib.Now()
-isRegionalHoliday := dt.IsHoliday(checker)
 ```
 
 ### Direct Library Usage
@@ -114,228 +98,77 @@ import (
     "time"
     
     "github.com/coredds/GoHoliday"
-    "github.com/coredds/GoHoliday/config"
 )
 
 func main() {
-    // Load configuration
-    cfg, err := config.LoadFromFile("config/goholidays.yaml")
-    if err != nil {
-        panic(err)
-    }
+    // Create a holiday provider for Japan
+    jp := goholidays.NewCountry("JP")
     
-    // Create holiday manager
-    manager := config.NewHolidayManager(cfg)
-    
-    // Check if today is a holiday in multiple countries
-    today := time.Now()
-    countries := []string{"US", "CA", "GB"}
-    
-    for _, country := range countries {
-        holidays, err := manager.GetHolidays(country, today.Year())
-        if err != nil {
-            continue
-        }
+    // Check if a specific date is a holiday
+    newYear := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+    if holiday, ok := jp.IsHoliday(newYear); ok {
+        fmt.Printf("%s is %s\n", newYear.Format("2006-01-02"), holiday.Name)
+        // Output: 2024-01-01 is New Year's Day
         
-        for _, holiday := range holidays {
-            if holiday.Date.Format("2006-01-02") == today.Format("2006-01-02") {
-                fmt.Printf("%s: %s is a holiday - %s\n", 
-                    country, today.Format("Jan 2"), holiday.Name)
-            }
+        // Check for Japanese translation
+        if japaneseName, exists := holiday.Languages["ja"]; exists {
+            fmt.Printf("In Japanese: %s\n", japaneseName)
+            // Output: In Japanese: 元日
         }
     }
+    
+    // Get all holidays for a year
+    holidays := jp.HolidaysForYear(2024)
+    fmt.Printf("Japan has %d public holidays in 2024\n", len(holidays))
 }
 ```
 
-## ⚙️ Configuration System
-
-GoHolidays uses a powerful YAML-based configuration system supporting multiple environments:
-
-### Environment Configurations
-
-```yaml
-# config/goholidays.yaml (base configuration)
-server:
-  name: "GoHolidays"
-  version: "1.0.0"
-  environment: "production"
-
-performance:
-  cache_enabled: true
-  cache_ttl: "24h"
-  preload_years: [2024, 2025]
-
-countries:
-  US:
-    enabled: true
-    categories: ["federal", "state"]
-    subdivisions: ["CA", "NY", "TX"]
-  
-  CA:
-    enabled: true
-    categories: ["federal", "provincial"]
-```
-
-```yaml
-# config/dev.yaml (development overrides)
-server:
-  environment: "development"
-
-performance:
-  cache_enabled: false
-  
-logging:
-  level: "debug"
-```
-
-### Custom Holiday Definitions
-
-```yaml
-countries:
-  US:
-    holiday_overrides:
-      "Company Day": "2024-03-15"
-      "Summer Break": "2024-07-01"
-    excluded_holidays:
-      - "Columbus Day"
-```
-
-## 🔧 Installation
+## Installation
 
 ```bash
 go get github.com/coredds/GoHoliday
 ```
 
-### For ChronoGo Integration
-
+For ChronoGo integration:
 ```bash
 go get github.com/coredds/GoHoliday/chronogo
-go get github.com/davidhintelmann/chronogo
 ```
 
-## 📊 Performance Benchmarks
+## Performance
 
-| Operation | Duration | Memory |
-|-----------|----------|---------|
-| Holiday Check | < 1μs | 0 allocs |
-| Year Load | < 100μs | Minimal |
-| Multi-Country | < 5μs | Shared cache |
+| Operation | Duration | Throughput |
+|-----------|----------|------------|
+| Holiday Check | ~50ns | 24M ops/sec |
+| Batch Operations | ~60ns/date | 16M ops/sec |
+| Range Counting | ~26μs | 40K ranges/sec |
 
 ### Caching Benefits
+- First check: loads and caches year data (~100μs)
+- Subsequent checks: O(1) cache hits (<50ns)
+- Thread-safe concurrent operations
+- Automatic memory management
 
-```go
-// First check: loads and caches year data
-checker.IsHoliday(dt) // ~100μs
-
-// Subsequent checks: cache hits
-checker.IsHoliday(dt) // <1μs (100x faster)
-```
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-GoHolidays
+GoHoliday/
 ├── chronogo/           # ChronoGo integration layer
-│   ├── integration.go  # HolidayChecker implementation
-│   └── examples/       # Usage examples
+│   ├── integration.go  # FastCountryChecker implementation
+│   └── integration_test.go
 ├── config/             # Configuration system
 │   ├── config.go       # YAML configuration
 │   ├── manager.go      # Holiday manager
 │   └── *.yaml          # Environment configs
 ├── countries/          # Country implementations
-│   ├── us/            # United States
-│   ├── gb/            # United Kingdom
-│   ├── ca/            # Canada
-│   └── ...            # Other countries
-└── sync/              # GitHub syncer
-    └── syncer.go      # Python holidays sync
+│   ├── base.go         # Base provider interface
+│   ├── us.go           # United States
+│   ├── jp.go           # Japan
+│   └── ...             # Other countries
+└── updater/            # Python holidays syncer
+    └── python_ast_parser.go
 ```
 
-## 🎯 Why GoHolidays for ChronoGo?
-
-| Feature | ChronoGo Default | GoHolidays |
-|---------|------------------|------------|
-| Countries | Basic US | 7 countries + 80 via sync |
-| Subdivisions | None | 100+ regions |
-| Configuration | Hardcoded | YAML + environment |
-| Performance | Basic | Cached + optimized |
-| Updates | Manual | Automated GitHub sync |
-| Categories | Single | Multiple (federal, state, etc.) |
-
-### Migration from ChronoGo Default
-
-```go
-// Before: ChronoGo's basic checker
-checker := chronogo.DefaultHolidayChecker{}
-
-// After: GoHolidays enterprise checker
-checker := chronogo.CreateDefaultUSChecker()
-
-// Same interface, enhanced capabilities!
-isHoliday := dt.IsHoliday(checker)
-```
-    // Create a holiday provider for New Zealand
-    nz := goholidays.NewCountry("NZ")
-    
-    // Check if a specific date is a holiday
-    waitangiDay := time.Date(2024, 2, 6, 0, 0, 0, 0, time.UTC)
-    if holiday, ok := nz.IsHoliday(waitangiDay); ok {
-        fmt.Printf("%s is %s\n", waitangiDay.Format("2006-01-02"), holiday.Name)
-        // Output: 2024-02-06 is Waitangi Day
-        
-        // Check for Māori translation
-        if maoriName, exists := holiday.Languages["mi"]; exists {
-            fmt.Printf("In Māori: %s\n", maoriName)
-            // Output: In Māori: Te Rā o Waitangi
-        }
-    }
-    
-    // Get all holidays for a year
-    holidays := nz.HolidaysForYear(2024)
-    fmt.Printf("New Zealand has %d public holidays in 2024\n", len(holidays))
-}
-```
-
-### Advanced Features
-
-## 🚀 Getting Started Examples
-
-### 1. Basic ChronoGo Integration
-
-```bash
-# Run the ChronoGo integration example
-cd examples/chronogo
-go run main.go
-```
-
-### 2. Enterprise Configuration
-
-```bash
-# Test different environments
-go run main.go -env=dev      # Development settings
-go run main.go -env=prod     # Production settings
-go run main.go -env=staging  # Staging settings
-```
-
-### 3. Multi-Country Business Operations
-
-```go
-// Setup for international business
-checker := chronogo.New().
-    WithCountries("US", "CA", "GB", "DE", "FR").
-    WithCategories("federal", "bank").
-    EnableCaching().
-    Build()
-
-// Check holidays across all countries
-dt := chronogo.Now()
-if dt.IsHoliday(checker) {
-    // Handle holiday in any configured country
-    fmt.Println("Holiday detected in at least one country")
-}
-```
-
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -344,86 +177,53 @@ go test ./...
 # Test specific components
 go test ./chronogo -v          # ChronoGo integration tests
 go test ./config -v            # Configuration system tests
-go test ./countries/us -v      # US holiday tests
+go test ./countries -v         # Country provider tests
 
 # Run benchmarks
 go test ./chronogo -bench=.    # Performance benchmarks
 ```
 
-## 🔄 GitHub Syncer
+## Development
 
-Keep holiday data up-to-date with the Python holidays library:
-
-```go
-import "github.com/coredds/GoHoliday/sync"
-
-// Sync with Python holidays repository
-syncer := sync.NewGitHubSyncer("your-token")
-countries, err := syncer.SyncCountries()
-if err != nil {
-    log.Fatal(err)
-}
-
-fmt.Printf("Synced %d countries\n", len(countries))
-```
-
-## 📈 Roadmap
-
-### Phase 1: ChronoGo Integration ✅
-- [x] HolidayChecker interface implementation
-- [x] Performance optimization with caching
-- [x] Multi-country support
-- [x] Regional subdivision support
-
-### Phase 2: Enhanced Features 🚧
-- [ ] Holiday forecast API
-- [ ] Business day calculation helpers
-- [ ] Advanced holiday rules engine
-- [ ] REST API service (optional)
-
-### Phase 3: Ecosystem Integration 📋
-- [ ] Integration with other date/time libraries
-- [ ] Enterprise authentication and authorization
-- [ ] Cloud deployment templates
-- [ ] Monitoring and observability
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### Development Setup
-
+### Setup
 ```bash
-# Clone the repository
 git clone https://github.com/coredds/GoHoliday
-cd goholidays
-
-# Install dependencies
+cd GoHoliday
 go mod download
-
-# Run tests
 go test ./...
-
-# Run the ChronoGo example
-cd examples/chronogo && go run main.go
 ```
 
-## 📄 License
+### Examples
+```bash
+# ChronoGo integration demo
+cd examples/chronogo && go run main.go
+
+# Japan holidays demo  
+cd examples/chronogo-japan && go run main.go
+```
+
+## Attribution
+
+This project builds upon and extends the excellent work of the Python holidays ecosystem:
+
+- **Python holidays library**: [github.com/python-holidays/python-holidays](https://github.com/python-holidays/python-holidays) - Comprehensive holiday data for 200+ countries
+- **Vacanza organization**: [github.com/vacanza](https://github.com/vacanza) - Current maintainers of the Python holidays ecosystem including the vacanza/python-holidays fork
+- **Original python-holidays contributors**: The community that built the foundational holiday calculation algorithms and country-specific implementations
+
+GoHoliday provides a Go-native implementation optimized for performance and ChronoGo integration while maintaining compatibility with the data structures and calculations established by the Python holidays community.
+
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Contributing
 
-- [ChronoGo](https://github.com/davidhintelmann/ChronoGo) - The excellent Go date/time library we integrate with
-- [Python holidays library](https://github.com/vacanza/python-holidays) - Source of comprehensive holiday data
-- [Vacanza community](https://github.com/vacanza) - Maintaining the Python holidays ecosystem
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ---
 
-**Ready to enhance your ChronoGo applications with comprehensive holiday data?**
+**Ready to enhance your Go applications with comprehensive holiday data?**
 
 ```bash
-go get github.com/coredds/GoHoliday/chronogo
+go get github.com/coredds/GoHoliday
 ```
-
-**Experience the difference**: From basic US holidays to enterprise-grade, multi-country holiday intelligence.

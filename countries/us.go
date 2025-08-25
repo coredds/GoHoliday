@@ -21,14 +21,14 @@ func NewUSProvider() *USProvider {
 		"DC", "AS", "GU", "MP", "PR", "VI",
 	}
 	base.categories = []string{"federal", "state", "religious", "observance"}
-	
+
 	return &USProvider{BaseProvider: base}
 }
 
 // LoadHolidays loads all US holidays for a given year
 func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	// Fixed date holidays
 	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = us.CreateHoliday(
 		"New Year's Day",
@@ -39,7 +39,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Año Nuevo",
 		},
 	)
-	
+
 	// Juneteenth - June 19 (federal holiday since 2021)
 	if year >= 2021 {
 		juneteenth := time.Date(year, 6, 19, 0, 0, 0, 0, time.UTC)
@@ -53,7 +53,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			},
 		)
 	}
-	
+
 	holidays[time.Date(year, 7, 4, 0, 0, 0, 0, time.UTC)] = us.CreateHoliday(
 		"Independence Day",
 		time.Date(year, 7, 4, 0, 0, 0, 0, time.UTC),
@@ -63,7 +63,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Día de la Independencia",
 		},
 	)
-	
+
 	holidays[time.Date(year, 11, 11, 0, 0, 0, 0, time.UTC)] = us.CreateHoliday(
 		"Veterans Day",
 		time.Date(year, 11, 11, 0, 0, 0, 0, time.UTC),
@@ -73,7 +73,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Día de los Veteranos",
 		},
 	)
-	
+
 	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = us.CreateHoliday(
 		"Christmas Day",
 		time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC),
@@ -83,9 +83,9 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Navidad",
 		},
 	)
-	
+
 	// Variable date holidays
-	
+
 	// Martin Luther King Jr. Day - 3rd Monday in January (since 1983)
 	if year >= 1983 {
 		mlkDay := NthWeekdayOfMonth(year, 1, time.Monday, 3)
@@ -99,7 +99,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			},
 		)
 	}
-	
+
 	// Presidents' Day - 3rd Monday in February
 	presidentsDay := NthWeekdayOfMonth(year, 2, time.Monday, 3)
 	holidays[presidentsDay] = us.CreateHoliday(
@@ -111,7 +111,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Día de los Presidentes",
 		},
 	)
-	
+
 	// Memorial Day - Last Monday in May
 	memorialDay := NthWeekdayOfMonth(year, 5, time.Monday, -1)
 	holidays[memorialDay] = us.CreateHoliday(
@@ -123,7 +123,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Día de los Caídos",
 		},
 	)
-	
+
 	// Labor Day - 1st Monday in September
 	laborDay := NthWeekdayOfMonth(year, 9, time.Monday, 1)
 	holidays[laborDay] = us.CreateHoliday(
@@ -135,7 +135,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Día del Trabajo",
 		},
 	)
-	
+
 	// Columbus Day - 2nd Monday in October
 	columbusDay := NthWeekdayOfMonth(year, 10, time.Monday, 2)
 	holidays[columbusDay] = us.CreateHoliday(
@@ -147,7 +147,7 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Día de Colón",
 		},
 	)
-	
+
 	// Thanksgiving Day - 4th Thursday in November
 	thanksgiving := NthWeekdayOfMonth(year, 11, time.Thursday, 4)
 	holidays[thanksgiving] = us.CreateHoliday(
@@ -159,14 +159,14 @@ func (us *USProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 			"es": "Día de Acción de Gracias",
 		},
 	)
-	
+
 	return holidays
 }
 
 // GetStateHolidays returns state-specific holidays for given subdivisions
 func (us *USProvider) GetStateHolidays(year int, subdivisions []string) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
-	
+
 	for _, state := range subdivisions {
 		switch state {
 		case "CA":
@@ -182,7 +182,7 @@ func (us *USProvider) GetStateHolidays(year int, subdivisions []string) map[time
 					"es": "Día de César Chávez",
 				},
 			)
-			
+
 		case "TX":
 			// Texas-specific holidays
 			// Texas Independence Day - March 2
@@ -196,7 +196,7 @@ func (us *USProvider) GetStateHolidays(year int, subdivisions []string) map[time
 					"es": "Día de la Independencia de Texas",
 				},
 			)
-			
+
 		case "MA":
 			// Massachusetts-specific holidays
 			// Patriots' Day - 3rd Monday in April
@@ -211,6 +211,6 @@ func (us *USProvider) GetStateHolidays(year int, subdivisions []string) map[time
 			)
 		}
 	}
-	
+
 	return holidays
 }

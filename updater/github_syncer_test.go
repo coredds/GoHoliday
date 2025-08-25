@@ -8,19 +8,19 @@ import (
 
 func TestGitHubSyncer_Creation(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	if syncer == nil {
 		t.Fatal("Expected syncer to be created")
 	}
-	
+
 	if syncer.repoOwner != "vacanza" {
 		t.Errorf("Expected repo owner 'vacanza', got '%s'", syncer.repoOwner)
 	}
-	
+
 	if syncer.repoName != "holidays" {
 		t.Errorf("Expected repo name 'holidays', got '%s'", syncer.repoName)
 	}
-	
+
 	if syncer.branch != "dev" {
 		t.Errorf("Expected branch 'dev', got '%s'", syncer.branch)
 	}
@@ -28,7 +28,7 @@ func TestGitHubSyncer_Creation(t *testing.T) {
 
 func TestGitHubSyncer_ExtractCountryCode(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	testCases := []struct {
 		filename string
 		expected string
@@ -45,7 +45,7 @@ func TestGitHubSyncer_ExtractCountryCode(t *testing.T) {
 		{"__init__.py", ""},
 		{"invalid", ""}, // Changed expectation: non-.py files return ""
 	}
-	
+
 	for _, tc := range testCases {
 		result := syncer.extractCountryCode(tc.filename)
 		if result != tc.expected {
@@ -56,7 +56,7 @@ func TestGitHubSyncer_ExtractCountryCode(t *testing.T) {
 
 func TestGitHubSyncer_GetCountryFilename(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	testCases := []struct {
 		countryCode string
 		expected    string
@@ -71,7 +71,7 @@ func TestGitHubSyncer_GetCountryFilename(t *testing.T) {
 		{"ZA", "south_africa.py"},
 		{"XX", "xx.py"}, // fallback case
 	}
-	
+
 	for _, tc := range testCases {
 		result := syncer.getCountryFilename(tc.countryCode)
 		if result != tc.expected {
@@ -82,7 +82,7 @@ func TestGitHubSyncer_GetCountryFilename(t *testing.T) {
 
 func TestGitHubSyncer_ConvertClassName(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	testCases := []struct {
 		className string
 		expected  string
@@ -94,7 +94,7 @@ func TestGitHubSyncer_ConvertClassName(t *testing.T) {
 		{"Germany", "Germany"},
 		{"Canada", "Canada"},
 	}
-	
+
 	for _, tc := range testCases {
 		result := syncer.convertClassName(tc.className)
 		if result != tc.expected {
@@ -105,7 +105,7 @@ func TestGitHubSyncer_ConvertClassName(t *testing.T) {
 
 func TestGitHubSyncer_ExtractCountryCodeFromClass(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	testCases := []struct {
 		className string
 		expected  string
@@ -118,7 +118,7 @@ func TestGitHubSyncer_ExtractCountryCodeFromClass(t *testing.T) {
 		{"France", "FR"},
 		{"UnknownCountry", ""}, // fallback
 	}
-	
+
 	for _, tc := range testCases {
 		result := syncer.extractCountryCodeFromClass(tc.className)
 		if result != tc.expected {
@@ -129,25 +129,25 @@ func TestGitHubSyncer_ExtractCountryCodeFromClass(t *testing.T) {
 
 func TestGitHubSyncer_ValidatePythonContent(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	validContent := `
 class UnitedStates(HolidayBase):
     def _populate(self, year):
         self._add_holiday(1, 1, "New Year's Day")
         self._add_holiday(7, 4, "Independence Day")
 `
-	
+
 	invalidContentNoClass := `
 def some_function():
     pass
 `
-	
+
 	invalidContentNoHolidays := `
 class UnitedStates(HolidayBase):
     def _populate(self, year):
         pass
 `
-	
+
 	testCases := []struct {
 		name    string
 		content string
@@ -157,7 +157,7 @@ class UnitedStates(HolidayBase):
 		{"no class definition", invalidContentNoClass, true},
 		{"no holiday definitions", invalidContentNoHolidays, true},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			err := syncer.ValidatePythonContent(tc.content)
@@ -170,7 +170,7 @@ class UnitedStates(HolidayBase):
 
 func TestGitHubSyncer_ExtractSubdivisions(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	pythonContent := `
 class UnitedStates(HolidayBase):
     subdivisions = {
@@ -180,20 +180,20 @@ class UnitedStates(HolidayBase):
         'NY': 'New York',
     }
 `
-	
+
 	result := syncer.extractSubdivisions(pythonContent)
-	
+
 	expected := map[string]string{
 		"AL": "Alabama",
-		"CA": "California", 
+		"CA": "California",
 		"TX": "Texas",
 		"NY": "New York",
 	}
-	
+
 	if len(result) != len(expected) {
 		t.Errorf("Expected %d subdivisions, got %d", len(expected), len(result))
 	}
-	
+
 	for code, name := range expected {
 		if result[code] != name {
 			t.Errorf("Expected subdivision %s: %s, got %s", code, name, result[code])
@@ -203,7 +203,7 @@ class UnitedStates(HolidayBase):
 
 func TestGitHubSyncer_ExtractHolidays(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	pythonContent := `
 class UnitedStates(HolidayBase):
     def _populate(self, year):
@@ -211,15 +211,15 @@ class UnitedStates(HolidayBase):
         self._add_holiday(JUL, 4, "Independence Day") 
         self._add_holiday(DEC, 25, "Christmas Day")
 `
-	
+
 	result := syncer.extractHolidays(pythonContent)
-	
+
 	// This is a simplified test since our regex parsing is basic
 	// Real implementation would need more sophisticated AST parsing
 	if len(result) == 0 {
 		t.Log("No holidays extracted - this is expected with our simplified regex parser")
 	}
-	
+
 	// The test mainly verifies the function doesn't crash
 	for name, holiday := range result {
 		if holiday.Name == "" {
@@ -256,16 +256,16 @@ func TestDecodeBase64Content(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result, err := decodeBase64Content(tc.input)
-			
+
 			if (err != nil) != tc.wantErr {
 				t.Errorf("decodeBase64Content() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			
+
 			if !tc.wantErr && result != tc.expected {
 				t.Errorf("decodeBase64Content() = %v, want %v", result, tc.expected)
 			}
@@ -275,7 +275,7 @@ func TestDecodeBase64Content(t *testing.T) {
 
 func TestGitHubSyncer_ParseHolidayDefinitions(t *testing.T) {
 	syncer := NewGitHubSyncer()
-	
+
 	pythonSource := `
 class UnitedStates(HolidayBase):
     country = "US"
@@ -289,37 +289,37 @@ class UnitedStates(HolidayBase):
         self._add_holiday(JAN, 1, "New Year's Day")
         self._add_holiday(JUL, 4, "Independence Day")
 `
-	
+
 	result, err := syncer.ParseHolidayDefinitions(pythonSource)
 	if err != nil {
 		t.Fatalf("ParseHolidayDefinitions() failed: %v", err)
 	}
-	
+
 	if result == nil {
 		t.Fatal("Expected non-nil result")
 	}
-	
+
 	// Verify basic structure
 	if result.CountryCode != "US" {
 		t.Errorf("Expected country code 'US', got '%s'", result.CountryCode)
 	}
-	
+
 	if result.Name != "United States" {
 		t.Errorf("Expected name 'United States', got '%s'", result.Name)
 	}
-	
+
 	if len(result.Categories) == 0 {
 		t.Error("Expected at least one category")
 	}
-	
+
 	if len(result.Languages) == 0 {
 		t.Error("Expected at least one language")
 	}
-	
+
 	if result.Holidays == nil {
 		t.Error("Expected holidays map to be initialized")
 	}
-	
+
 	if result.UpdatedAt.IsZero() {
 		t.Error("Expected UpdatedAt to be set")
 	}
@@ -330,36 +330,36 @@ func TestGitHubSyncer_Integration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
-	
+
 	// This test would make real API calls to GitHub
 	// Only run when explicitly testing integration
 	t.Skip("Integration test disabled - enable manually for testing")
-	
+
 	syncer := NewGitHubSyncer()
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	
+
 	// Test fetching country list
 	countries, err := syncer.FetchCountryList(ctx)
 	if err != nil {
 		t.Fatalf("FetchCountryList() failed: %v", err)
 	}
-	
+
 	if len(countries) == 0 {
 		t.Error("Expected at least one country")
 	}
-	
+
 	// Test fetching a known country
 	if contains(countries, "US") {
 		content, err := syncer.FetchCountryFile(ctx, "US")
 		if err != nil {
 			t.Fatalf("FetchCountryFile() failed: %v", err)
 		}
-		
+
 		if len(content) == 0 {
 			t.Error("Expected non-empty content")
 		}
-		
+
 		if err := syncer.ValidatePythonContent(content); err != nil {
 			t.Errorf("Content validation failed: %v", err)
 		}
@@ -380,7 +380,7 @@ func contains(slice []string, item string) bool {
 func BenchmarkGitHubSyncer_ExtractCountryCode(b *testing.B) {
 	syncer := NewGitHubSyncer()
 	filename := "united_states.py"
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = syncer.extractCountryCode(filename)
@@ -396,7 +396,7 @@ class UnitedStates(HolidayBase):
         self._add_holiday(JUL, 4, "Independence Day")
         self._add_holiday(DEC, 25, "Christmas Day")
 `
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = syncer.ParseHolidayDefinitions(pythonSource)
