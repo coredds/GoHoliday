@@ -4,7 +4,6 @@
 [![codecov](https://codecov.io/gh/coredds/GoHoliday/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/GoHoliday)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/GoHoliday)](https://golang.org/)
 [![License](https://img.shields.io/github/license/coredds/GoHoliday)](LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/coredds/GoHoliday)](https://goreportcard.com/report/github.com/coredds/GoHoliday)
 
 A comprehensive Go library for holiday data and business day calculations, designed as a high-performance backend for date/time applications including [ChronoGo](https://github.com/davidhintelmann/ChronoGo).
 
