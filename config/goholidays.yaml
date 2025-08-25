@@ -1,0 +1,109 @@
+# GoHolidays Configuration
+# This is the main configuration file for GoHolidays
+
+# General application settings
+general:
+  default_country: "US"           # Default country code
+  default_language: "en"          # Default language for holiday names
+  default_timezone: "UTC"         # Default timezone for date calculations
+  supported_languages: ["en", "es", "fr", "de", "mi"]  # Available languages
+  environment: "prod"             # Environment: dev, staging, prod
+
+# Country-specific configuration overrides
+countries:
+  # United States configuration
+  US:
+    enabled: true
+    subdivisions: ["CA", "TX", "NY", "FL"]  # Only enable specific states
+    categories: ["federal", "state"]         # Only include these categories
+    excluded_holidays: []                    # Holidays to exclude
+    additional_holidays: []                  # Additional holidays to include
+    overrides:
+      "Columbus Day": "Indigenous Peoples' Day"  # Rename holidays
+  
+  # Germany configuration
+  DE:
+    enabled: true
+    subdivisions: ["BW", "BY", "BE"]        # Only Bavaria, Baden-Württemberg, Berlin
+    categories: ["public", "religious"]     # Exclude regional holidays
+    excluded_holidays: ["Silvester"]        # Exclude New Year's Eve
+  
+  # Canada configuration  
+  CA:
+    enabled: true
+    subdivisions: ["ON", "QC", "BC"]        # Major provinces only
+    overrides:
+      "Victoria Day": "May Long Weekend"    # Regional naming
+  
+  # United Kingdom
+  GB:
+    enabled: true
+    subdivisions: ["ENG", "SCT"]            # England and Scotland only
+    excluded_holidays: ["Boxing Day"]       # Some companies don't observe
+
+# Custom holidays - add your own company/organization holidays
+custom_holidays:
+  # Company-specific holidays
+  - name: "Company Founding Day"
+    date: "2024-03-15"                      # Fixed date
+    countries: ["US", "CA"]                 # Apply to these countries
+    subdivisions: ["CA", "ON"]              # Specific regions
+    category: "company"
+    languages:
+      en: "Company Founding Day"
+      es: "Día de Fundación de la Empresa"
+    year_range:
+      start: 2020                           # Started in 2020
+  
+  # Variable date custom holiday  
+  - name: "Annual Team Retreat"
+    countries: ["*"]                        # All countries
+    category: "company"
+    calculation:
+      type: "weekday"
+      weekday_rule:
+        weekday: "friday"                   # Second Friday
+        week: 2
+        month: 6                            # of June
+    languages:
+      en: "Annual Team Retreat"
+      fr: "Retraite Annuelle d'Équipe"
+
+  # Easter-based custom holiday
+  - name: "Easter Week Break"
+    countries: ["US", "CA", "GB"]
+    category: "company"
+    calculation:
+      type: "easter_offset"
+      easter_offset: 1                      # Easter Monday
+    languages:
+      en: "Easter Week Break"
+
+# Output formatting configuration
+output:
+  date_format: "January 2, 2006"           # Human-readable format
+  time_format: "3:04 PM"                   # 12-hour format
+  timezone: "Local"                        # Use local timezone for output
+  include_metadata: true                   # Include category, subdivisions, etc.
+  languages: ["en", "es"]                  # Preferred language order
+  formats:
+    short_date: "01/02/2006"               # Custom format definitions
+    long_date: "Monday, January 2, 2006"
+    iso_date: "2006-01-02"
+
+# Performance optimization settings
+performance:
+  enable_caching: true                     # Enable holiday caching
+  cache_ttl: "24h"                         # Cache time-to-live
+  max_cache_size: 1000                     # Maximum cached items
+  preload_years: 2                         # Preload this many future years
+  concurrent_limit: 10                     # Max concurrent holiday calculations
+  batch_size: 100                          # Batch size for bulk operations
+
+# Logging configuration
+logging:
+  level: "info"                            # debug, info, warn, error
+  format: "text"                           # text or json
+  output: "stdout"                         # stdout, stderr, or file path
+  enable_file: false                       # Write to log files
+  max_size: 100                            # Max log file size in MB

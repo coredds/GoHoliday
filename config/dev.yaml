@@ -1,0 +1,59 @@
+# Development Configuration for GoHolidays
+# This configuration is optimized for development and testing
+
+general:
+  default_country: "US"
+  default_language: "en"
+  default_timezone: "UTC"
+  supported_languages: ["en", "es", "fr", "de"]
+  environment: "dev"
+
+countries:
+  # Enable all countries for development
+  US:
+    enabled: true
+    subdivisions: ["CA", "TX", "NY"]       # Limited for faster testing
+    categories: ["federal", "state"]
+  
+  CA:
+    enabled: true
+    subdivisions: ["ON", "QC"]             # Limited for testing
+    
+  GB:
+    enabled: true
+    
+  DE:
+    enabled: true
+    subdivisions: ["BW", "BY"]             # Limited for testing
+
+custom_holidays:
+  # Test holidays for development
+  - name: "Development Test Day"
+    date: "2024-04-01"
+    countries: ["*"]
+    category: "test"
+    languages:
+      en: "Development Test Day"
+      es: "Día de Prueba de Desarrollo"
+
+output:
+  date_format: "2006-01-02"               # ISO format for development
+  time_format: "15:04:05"                 # 24-hour format
+  timezone: "UTC"                         # UTC for consistency
+  include_metadata: true                  # Include all metadata for debugging
+  languages: ["en"]
+
+performance:
+  enable_caching: false                   # Disable caching for development
+  cache_ttl: "1h"                         # Short TTL for development
+  max_cache_size: 100                     # Small cache for development
+  preload_years: 1                        # Only preload current year
+  concurrent_limit: 5                     # Lower limit for development
+  batch_size: 10                          # Smaller batches for testing
+
+logging:
+  level: "debug"                          # Verbose logging for development
+  format: "text"                          # Human-readable format
+  output: "stdout"
+  enable_file: true                       # Enable file logging for debugging
+  max_size: 10                            # Smaller log files

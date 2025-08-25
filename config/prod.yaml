@@ -1,0 +1,65 @@
+# Production Configuration for GoHolidays
+# This configuration is optimized for production environments
+
+general:
+  default_country: "US"
+  default_language: "en"
+  default_timezone: "UTC"
+  supported_languages: ["en", "es", "fr", "de", "mi"]
+  environment: "prod"
+
+countries:
+  # All major countries enabled for production
+  US:
+    enabled: true
+    # All subdivisions enabled by default
+    categories: ["federal", "state", "observance"]
+    
+  CA:
+    enabled: true
+    categories: ["public", "bank", "government"]
+    
+  GB:
+    enabled: true
+    categories: ["public", "bank", "government"]
+    
+  DE:
+    enabled: true
+    categories: ["public", "religious", "regional"]
+    
+  FR:
+    enabled: true
+    categories: ["public", "religious", "regional", "secular"]
+    
+  AU:
+    enabled: true
+    categories: ["public", "bank", "government"]
+    
+  NZ:
+    enabled: true
+    categories: ["public", "regional"]
+
+# No custom holidays in base production config
+custom_holidays: []
+
+output:
+  date_format: "2006-01-02"               # ISO format for APIs
+  time_format: "15:04:05"                 # 24-hour format
+  timezone: "UTC"                         # UTC for consistency
+  include_metadata: true                  # Include metadata for API responses
+  languages: ["en"]                       # English primary
+
+performance:
+  enable_caching: true                    # Enable caching for performance
+  cache_ttl: "24h"                        # Long TTL for production
+  max_cache_size: 5000                    # Large cache for production
+  preload_years: 3                        # Preload multiple years
+  concurrent_limit: 20                    # Higher limit for production
+  batch_size: 500                         # Large batches for efficiency
+
+logging:
+  level: "info"                           # Info level for production
+  format: "json"                          # Structured logging for production
+  output: "/var/log/goholidays.log"       # Log to file in production
+  enable_file: true                       # Enable file logging
+  max_size: 100                           # Large log files for production
