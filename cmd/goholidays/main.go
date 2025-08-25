@@ -87,7 +87,10 @@ func checkSpecificDate(country *goholidays.Country, dateStr, format string, show
 		if isHoliday {
 			result["holiday"] = holiday
 		}
-		json.NewEncoder(os.Stdout).Encode(result)
+		if err := json.NewEncoder(os.Stdout).Encode(result); err != nil {
+			fmt.Fprintf(os.Stderr, "Error encoding JSON output: %v\n", err)
+			os.Exit(1)
+		}
 	default:
 		if isHoliday {
 			fmt.Printf("%s is a holiday: %s\n", dateStr, holiday.Name)
@@ -121,7 +124,10 @@ func listHolidaysForYear(country *goholidays.Country, year int, format string) {
 
 	switch format {
 	case "json":
-		json.NewEncoder(os.Stdout).Encode(holidays)
+		if err := json.NewEncoder(os.Stdout).Encode(holidays); err != nil {
+			fmt.Fprintf(os.Stderr, "Error encoding JSON output: %v\n", err)
+			os.Exit(1)
+		}
 	case "csv":
 		fmt.Println("Date,Name,Category,Observed")
 		for date, holiday := range holidays {
