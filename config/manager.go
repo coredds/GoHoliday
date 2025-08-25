@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/your-username/goholidays/countries"
+	"github.com/coredds/GoHoliday/countries"
 )
 
 // HolidayManager integrates configuration with holiday providers

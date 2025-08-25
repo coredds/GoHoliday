@@ -1,4 +1,4 @@
-module github.com/your-username/goholidays
+module github.com/coredds/GoHoliday
 
 go 1.21
 

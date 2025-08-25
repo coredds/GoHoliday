@@ -3,8 +3,8 @@ package chronogo
 import (
 	"time"
 
-	"github.com/your-username/goholidays/config"
-	"github.com/your-username/goholidays/countries"
+	"github.com/coredds/GoHoliday/config"
+	"github.com/coredds/GoHoliday/countries"
 )
 
 // GoHolidaysChecker implements ChronoGo's HolidayChecker interface

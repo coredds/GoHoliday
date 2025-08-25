@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/your-username/goholidays/chronogo"
+	"github.com/coredds/GoHoliday/chronogo"
 )
 
 func main() {

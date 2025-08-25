@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/your-username/goholidays"
-	"github.com/your-username/goholidays/updater"
+	"github.com/coredds/GoHoliday"
+	"github.com/coredds/GoHoliday/updater"
 )
 
 func main() {

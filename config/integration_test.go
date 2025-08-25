@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/your-username/goholidays/countries"
+	"github.com/coredds/GoHoliday/countries"
 )
 
 func TestConfigurationIntegration(t *testing.T) {

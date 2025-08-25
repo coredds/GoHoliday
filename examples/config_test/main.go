@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/your-username/goholidays/config"
+	"github.com/coredds/GoHoliday/config"
 )
 
 func main() {

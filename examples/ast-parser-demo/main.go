@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/your-username/goholidays/updater"
+	"github.com/coredds/GoHoliday/updater"
 )
 
 func main() {

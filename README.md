@@ -60,7 +60,7 @@ import (
     "fmt"
     "time"
     
-    "github.com/your-username/goholidays/chronogo"
+    "github.com/coredds/GoHoliday/chronogo"
     chronogo_lib "github.com/davidhintelmann/chronogo"
 )
 
@@ -113,8 +113,8 @@ import (
     "fmt"
     "time"
     
-    "github.com/your-username/goholidays"
-    "github.com/your-username/goholidays/config"
+    "github.com/coredds/GoHoliday"
+    "github.com/coredds/GoHoliday/config"
 )
 
 func main() {
@@ -203,13 +203,13 @@ countries:
 ## 🔧 Installation
 
 ```bash
-go get github.com/your-username/goholidays
+go get github.com/coredds/GoHoliday
 ```
 
 ### For ChronoGo Integration
 
 ```bash
-go get github.com/your-username/goholidays/chronogo
+go get github.com/coredds/GoHoliday/chronogo
 go get github.com/davidhintelmann/chronogo
 ```
 
@@ -355,7 +355,7 @@ go test ./chronogo -bench=.    # Performance benchmarks
 Keep holiday data up-to-date with the Python holidays library:
 
 ```go
-import "github.com/your-username/goholidays/sync"
+import "github.com/coredds/GoHoliday/sync"
 
 // Sync with Python holidays repository
 syncer := sync.NewGitHubSyncer("your-token")
@@ -395,7 +395,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/goholidays
+git clone https://github.com/coredds/GoHoliday
 cd goholidays
 
 # Install dependencies
@@ -423,7 +423,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Ready to enhance your ChronoGo applications with comprehensive holiday data?**
 
 ```bash
-go get github.com/your-username/goholidays/chronogo
+go get github.com/coredds/GoHoliday/chronogo
 ```
 
 **Experience the difference**: From basic US holidays to enterprise-grade, multi-country holiday intelligence.

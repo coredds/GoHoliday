@@ -10,7 +10,7 @@ Thank you for your interest in contributing to GoHolidays! This document provide
 
 2. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/goholidays.git
+   git clone https://github.com/coredds/GoHoliday.git
    cd goholidays
    ```
 

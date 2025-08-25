@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/your-username/goholidays/countries"
+	"github.com/coredds/GoHoliday/countries"
 )
 
 func main() {
