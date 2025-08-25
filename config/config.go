@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -233,7 +232,7 @@ func (cm *ConfigManager) loadFromFile(path string, config *Config) error {
 		return err
 	}
 	
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
@@ -340,7 +339,7 @@ func (cm *ConfigManager) SaveConfig(path string) error {
 		return err
 	}
 	
-	return ioutil.WriteFile(path, data, 0644)
+	return os.WriteFile(path, data, 0644)
 }
 
 // GetCountryConfig returns configuration for a specific country

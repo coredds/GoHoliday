@@ -12,7 +12,6 @@ import (
 type PythonASTParser struct {
 	source           string
 	tokens           []Token
-	currentPos       int
 	holidayMethods   map[string]MethodInfo
 	classDefinitions map[string]ClassInfo
 }
