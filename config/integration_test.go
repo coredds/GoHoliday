@@ -14,7 +14,7 @@ func TestConfigurationIntegration(t *testing.T) {
 countries:
   US:
     enabled: true
-    categories: ["public"]
+    categories: ["federal"]
     subdivisions: ["CA", "NY"]
     excluded_holidays: ["Columbus Day"]
     overrides:

@@ -18,15 +18,15 @@ type HolidayManager struct {
 func NewHolidayManager() *HolidayManager {
 	cm := NewConfigManager()
 	config, _ := cm.LoadConfig()
-	
+
 	hm := &HolidayManager{
 		configManager: cm,
 		providers:     make(map[string]countries.HolidayProvider),
 	}
-	
+
 	// Initialize providers based on configuration
 	hm.initializeProviders(config)
-	
+
 	return hm
 }
 
@@ -45,33 +45,33 @@ func (hm *HolidayManager) initializeProviders(config *Config) {
 // GetHolidays returns holidays for a country with configuration applied
 func (hm *HolidayManager) GetHolidays(countryCode string, year int) (map[time.Time]*countries.Holiday, error) {
 	config := hm.configManager.GetConfig()
-	
+
 	// Check if country is enabled
 	if !hm.configManager.IsCountryEnabled(countryCode) {
 		return nil, fmt.Errorf("country %s is not enabled", countryCode)
 	}
-	
+
 	// Get the provider
 	provider, exists := hm.providers[countryCode]
 	if !exists {
 		return nil, fmt.Errorf("no provider available for country %s", countryCode)
 	}
-	
+
 	// Load base holidays
 	holidays := provider.LoadHolidays(year)
-	
+
 	// Apply configuration overrides
 	holidays = hm.applyCountryConfig(holidays, countryCode, config)
-	
+
 	// Add custom holidays
 	customHolidays := hm.getCustomHolidays(countryCode, year, config)
 	for date, holiday := range customHolidays {
 		holidays[date] = holiday
 	}
-	
+
 	// Apply output formatting
 	holidays = hm.applyOutputFormatting(holidays, config)
-	
+
 	return holidays, nil
 }
 
@@ -82,20 +82,20 @@ func (hm *HolidayManager) GetHolidaysWithSubdivisions(countryCode string, year i
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Get country configuration
 	countryConfig := hm.configManager.GetCountryConfig(countryCode)
-	
+
 	// Filter subdivisions based on configuration
 	allowedSubdivisions := hm.filterSubdivisions(subdivisions, countryConfig.Subdivisions)
-	
+
 	if len(allowedSubdivisions) == 0 {
 		return holidays, nil
 	}
-	
+
 	// Get regional holidays based on provider type
 	var regionalHolidays map[time.Time]*countries.Holiday
-	
+
 	switch provider := hm.providers[countryCode].(type) {
 	case *countries.USProvider:
 		regionalHolidays = provider.GetStateHolidays(year, allowedSubdivisions)
@@ -105,28 +105,28 @@ func (hm *HolidayManager) GetHolidaysWithSubdivisions(countryCode string, year i
 		regionalHolidays = provider.GetRegionalHolidays(year, allowedSubdivisions)
 	case *countries.FRProvider:
 		regionalHolidays = provider.GetRegionalHolidays(year, allowedSubdivisions)
-	// Add other providers as needed
+		// Add other providers as needed
 	}
-	
+
 	// Merge regional holidays
 	for date, holiday := range regionalHolidays {
 		holidays[date] = holiday
 	}
-	
+
 	return holidays, nil
 }
 
 // applyCountryConfig applies country-specific configuration
 func (hm *HolidayManager) applyCountryConfig(holidays map[time.Time]*countries.Holiday, countryCode string, config *Config) map[time.Time]*countries.Holiday {
 	countryConfig := hm.configManager.GetCountryConfig(countryCode)
-	
+
 	// Apply holiday name overrides
 	for _, holiday := range holidays {
 		if newName, exists := countryConfig.Overrides[holiday.Name]; exists {
 			holiday.Name = newName
 		}
 	}
-	
+
 	// Exclude holidays
 	for _, excludedName := range countryConfig.ExcludedHolidays {
 		for date, holiday := range holidays {
@@ -135,7 +135,7 @@ func (hm *HolidayManager) applyCountryConfig(holidays map[time.Time]*countries.H
 			}
 		}
 	}
-	
+
 	// Filter by categories
 	if len(countryConfig.Categories) > 0 {
 		filteredHolidays := make(map[time.Time]*countries.Holiday)
@@ -149,7 +149,7 @@ func (hm *HolidayManager) applyCountryConfig(holidays map[time.Time]*countries.H
 		}
 		holidays = filteredHolidays
 	}
-	
+
 	return holidays
 }
 
@@ -157,7 +157,7 @@ func (hm *HolidayManager) applyCountryConfig(holidays map[time.Time]*countries.H
 func (hm *HolidayManager) getCustomHolidays(countryCode string, year int, config *Config) map[time.Time]*countries.Holiday {
 	holidays := make(map[time.Time]*countries.Holiday)
 	customHolidays := hm.configManager.GetCustomHolidays(countryCode)
-	
+
 	for _, custom := range customHolidays {
 		// Check year range
 		if custom.YearRange != nil {
@@ -168,13 +168,13 @@ func (hm *HolidayManager) getCustomHolidays(countryCode string, year int, config
 				continue
 			}
 		}
-		
+
 		// Calculate the date
 		date, err := hm.calculateCustomHolidayDate(custom, year)
 		if err != nil {
 			continue // Skip invalid dates
 		}
-		
+
 		// Create the holiday
 		holiday := &countries.Holiday{
 			Name:      custom.Name,
@@ -182,10 +182,10 @@ func (hm *HolidayManager) getCustomHolidays(countryCode string, year int, config
 			Category:  custom.Category,
 			Languages: custom.Languages,
 		}
-		
+
 		holidays[date] = holiday
 	}
-	
+
 	return holidays
 }
 
@@ -199,25 +199,25 @@ func (hm *HolidayManager) calculateCustomHolidayDate(custom CustomHoliday, year 
 			return time.Parse("2006-01-02", fmt.Sprintf("%d-%s", year, custom.Date))
 		}
 	}
-	
+
 	if custom.Calculation != nil {
 		switch custom.Calculation.Type {
 		case "easter_offset":
 			easter := countries.EasterSunday(year)
 			return easter.AddDate(0, 0, custom.Calculation.EasterOffset), nil
-			
+
 		case "weekday":
 			if custom.Calculation.WeekdayRule != nil {
 				weekday := parseWeekday(custom.Calculation.WeekdayRule.Weekday)
-				return countries.NthWeekdayOfMonth(year, time.Month(custom.Calculation.WeekdayRule.Month), 
+				return countries.NthWeekdayOfMonth(year, time.Month(custom.Calculation.WeekdayRule.Month),
 					weekday, custom.Calculation.WeekdayRule.Week), nil
 			}
-			
+
 		case "fixed":
 			return time.Date(year, time.Month(custom.Calculation.Month), 1, 0, 0, 0, 0, time.UTC), nil
 		}
 	}
-	
+
 	return time.Time{}, fmt.Errorf("unable to calculate date for custom holiday %s", custom.Name)
 }
 
@@ -248,7 +248,7 @@ func (hm *HolidayManager) filterSubdivisions(requested, allowed []string) []stri
 	if len(allowed) == 0 {
 		return requested // No restrictions
 	}
-	
+
 	var filtered []string
 	for _, req := range requested {
 		for _, allow := range allowed {
@@ -258,25 +258,15 @@ func (hm *HolidayManager) filterSubdivisions(requested, allowed []string) []stri
 			}
 		}
 	}
-	
+
 	return filtered
 }
 
 // applyOutputFormatting applies output formatting configuration
 func (hm *HolidayManager) applyOutputFormatting(holidays map[time.Time]*countries.Holiday, config *Config) map[time.Time]*countries.Holiday {
-	// Apply timezone conversion if needed
-	if config.Output.Timezone != "UTC" && config.Output.Timezone != "" {
-		loc, err := time.LoadLocation(config.Output.Timezone)
-		if err == nil {
-			convertedHolidays := make(map[time.Time]*countries.Holiday)
-			for date, holiday := range holidays {
-				convertedDate := date.In(loc)
-				holiday.Date = convertedDate
-				convertedHolidays[convertedDate] = holiday
-			}
-			holidays = convertedHolidays
-		}
-	}
+	// Note: We don't apply timezone conversion to holiday dates as they should remain
+	// as calendar dates (midnight UTC) to avoid changing the actual holiday date.
+	// Timezone conversion should only be applied when displaying times, not dates.
 	
 	return holidays
 }
@@ -284,13 +274,13 @@ func (hm *HolidayManager) applyOutputFormatting(holidays map[time.Time]*countrie
 // GetSupportedCountries returns list of supported countries
 func (hm *HolidayManager) GetSupportedCountries() []string {
 	var countries []string
-	
+
 	for countryCode := range hm.providers {
 		if hm.configManager.IsCountryEnabled(countryCode) {
 			countries = append(countries, countryCode)
 		}
 	}
-	
+
 	return countries
 }
 
@@ -300,19 +290,19 @@ func (hm *HolidayManager) GetCountryInfo(countryCode string) (map[string]interfa
 	if !exists {
 		return nil, fmt.Errorf("country %s not supported", countryCode)
 	}
-	
+
 	countryConfig := hm.configManager.GetCountryConfig(countryCode)
-	
+
 	info := map[string]interface{}{
-		"country_code":        countryCode,
-		"enabled":            countryConfig.Enabled,
-		"supported_subdivisions": provider.GetSupportedSubdivisions(),
-		"supported_categories":   provider.GetSupportedCategories(),
+		"country_code":            countryCode,
+		"enabled":                 countryConfig.Enabled,
+		"supported_subdivisions":  provider.GetSupportedSubdivisions(),
+		"supported_categories":    provider.GetSupportedCategories(),
 		"configured_subdivisions": countryConfig.Subdivisions,
 		"configured_categories":   countryConfig.Categories,
-		"excluded_holidays":      countryConfig.ExcludedHolidays,
-		"holiday_overrides":      countryConfig.Overrides,
+		"excluded_holidays":       countryConfig.ExcludedHolidays,
+		"holiday_overrides":       countryConfig.Overrides,
 	}
-	
+
 	return info, nil
 }

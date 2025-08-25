@@ -123,11 +123,11 @@ custom_holidays:
 
 	// Create mock holidays to test configuration application
 	testHolidays := make(map[time.Time]*countries.Holiday)
-	
+
 	date1 := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	date2 := time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC)
 	date3 := time.Date(2024, 3, 1, 0, 0, 0, 0, time.UTC)
-	
+
 	testHolidays[date1] = &countries.Holiday{
 		Name:     "Old Holiday",
 		Date:     date1,
@@ -219,10 +219,10 @@ logging:
 	// Set environment variables to override file settings
 	originalUSEnabled := os.Getenv("GOHOLIDAYS_COUNTRIES_US_ENABLED")
 	originalLogLevel := os.Getenv("GOHOLIDAYS_LOGGING_LEVEL")
-	
+
 	os.Setenv("GOHOLIDAYS_COUNTRIES_US_ENABLED", "true")
 	os.Setenv("GOHOLIDAYS_LOGGING_LEVEL", "debug")
-	
+
 	defer func() {
 		if originalUSEnabled != "" {
 			os.Setenv("GOHOLIDAYS_COUNTRIES_US_ENABLED", originalUSEnabled)

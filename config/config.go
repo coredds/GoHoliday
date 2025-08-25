@@ -137,10 +137,17 @@ func (cm *ConfigManager) LoadConfig() (*Config, error) {
 	// Start with default configuration
 	config := cm.getDefaultConfig()
 	
-	// Try to load from files
-	for _, path := range cm.paths {
-		if err := cm.loadFromFile(path, config); err == nil {
-			break // Successfully loaded from this file
+	// Check for environment-specified config file first
+	if configPath := os.Getenv("GOHOLIDAYS_CONFIG"); configPath != "" {
+		if err := cm.loadFromFile(configPath, config); err != nil {
+			return nil, fmt.Errorf("failed to load config from environment path %s: %w", configPath, err)
+		}
+	} else {
+		// Try to load from default files
+		for _, path := range cm.paths {
+			if err := cm.loadFromFile(path, config); err == nil {
+				break // Successfully loaded from this file
+			}
 		}
 	}
 	
@@ -272,6 +279,34 @@ func (cm *ConfigManager) loadFromEnvironment(config *Config) {
 	// Logging settings
 	if env := os.Getenv("GOHOLIDAYS_LOG_LEVEL"); env != "" {
 		config.Logging.Level = env
+	}
+	if env := os.Getenv("GOHOLIDAYS_LOGGING_LEVEL"); env != "" {
+		config.Logging.Level = env
+	}
+	
+	// Country-specific settings
+	// Check for common country codes
+	countryCodes := []string{"US", "CA", "GB", "AU", "NZ", "DE", "FR"}
+	for _, countryCode := range countryCodes {
+		enabledKey := fmt.Sprintf("GOHOLIDAYS_COUNTRIES_%s_ENABLED", countryCode)
+		if env := os.Getenv(enabledKey); env != "" {
+			// Ensure the country exists in the config
+			if _, exists := config.Countries[countryCode]; !exists {
+				config.Countries[countryCode] = CountryConfig{
+					Enabled: false,
+					Subdivisions: []string{},
+					Categories: []string{},
+					Overrides: make(map[string]string),
+					ExcludedHolidays: []string{},
+					AdditionalHolidays: []string{},
+				}
+			}
+			
+			// Set the enabled status
+			countryConfig := config.Countries[countryCode]
+			countryConfig.Enabled = strings.ToLower(env) == "true"
+			config.Countries[countryCode] = countryConfig
+		}
 	}
 }
 
