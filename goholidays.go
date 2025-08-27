@@ -6,10 +6,12 @@ package goholidays
 import (
 	"sync"
 	"time"
+
+	"github.com/coredds/GoHoliday/countries"
 )
 
 // Version represents the current version of the GoHoliday library
-const Version = "0.1.2"
+const Version = "0.2.2"
 
 // HolidayCategory represents different types of holidays
 type HolidayCategory string
@@ -85,12 +87,12 @@ func NewCountry(countryCode string, options ...CountryOptions) *Country {
 // IsHoliday checks if the given date is a holiday (thread-safe)
 func (c *Country) IsHoliday(date time.Time) (*Holiday, bool) {
 	year := date.Year()
-	
+
 	// First, try to read with read lock
 	c.mu.RLock()
 	holidays, exists := c.years[year]
 	c.mu.RUnlock()
-	
+
 	if exists {
 		// Normalize date to compare only year, month, day
 		dateKey := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
@@ -110,7 +112,7 @@ func (c *Country) HolidaysForYear(year int) map[time.Time]*Holiday {
 	c.mu.RLock()
 	holidays, exists := c.years[year]
 	c.mu.RUnlock()
-	
+
 	if exists {
 		// Return a copy to prevent external modification
 		result := make(map[time.Time]*Holiday, len(holidays))
@@ -121,10 +123,10 @@ func (c *Country) HolidaysForYear(year int) map[time.Time]*Holiday {
 	}
 
 	c.loadYear(year)
-	
+
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	
+
 	// Return a copy to prevent external modification
 	result := make(map[time.Time]*Holiday, len(c.years[year]))
 	for k, v := range c.years[year] {
@@ -178,14 +180,14 @@ func (c *Country) loadYear(year int) {
 	c.mu.RLock()
 	_, exists := c.years[year]
 	c.mu.RUnlock()
-	
+
 	if exists {
 		return // Already loaded
 	}
-	
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	// Check again after acquiring write lock
 	if c.years[year] == nil {
 		c.years[year] = make(map[time.Time]*Holiday)
@@ -221,6 +223,10 @@ func (c *Country) loadCountryHolidays(year int) {
 		c.loadINHolidays(year)
 	case "FR":
 		c.loadFRHolidays(year)
+	case "BR":
+		c.loadBRHolidays(year)
+	case "MX":
+		c.loadMXHolidays(year)
 	// Add more countries as needed
 	default:
 		// Load from generic holiday data or return empty
@@ -800,7 +806,7 @@ func (c *Country) loadINHolidays(year int) {
 
 	// Note: Religious festivals like Diwali, Holi, Eid are approximated
 	// In a full implementation, these would use proper lunar calendar calculations
-	
+
 	// Diwali (approximate - typically October/November)
 	// This is a simplified calculation; actual dates vary based on lunar calendar
 	diwaliDate := c.approximateDiwali(year)
@@ -993,5 +999,35 @@ func (c *Country) loadFRHolidays(year int) {
 			"en": "Whit Monday",
 			"fr": "Lundi de Pentecôte",
 		},
+	}
+}
+
+// loadBRHolidays loads Brazil holidays using the BR provider
+func (c *Country) loadBRHolidays(year int) {
+	provider := countries.NewBRProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:      holiday.Name,
+			Date:      holiday.Date,
+			Category:  HolidayCategory(holiday.Category),
+			Languages: holiday.Languages,
+		}
+	}
+}
+
+// loadMXHolidays loads Mexico holidays using the MX provider
+func (c *Country) loadMXHolidays(year int) {
+	provider := countries.NewMXProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:      holiday.Name,
+			Date:      holiday.Date,
+			Category:  HolidayCategory(holiday.Category),
+			Languages: holiday.Languages,
+		}
 	}
 }

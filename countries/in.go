@@ -28,7 +28,7 @@ func (in *INProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
 
 	// National holidays observed across India
-	
+
 	// Republic Day - January 26
 	holidays[time.Date(year, 1, 26, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Republic Day",
@@ -40,7 +40,7 @@ func (in *INProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 		},
 		IsObserved: false,
 	}
-	
+
 	// Independence Day - August 15
 	holidays[time.Date(year, 8, 15, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Independence Day",
@@ -52,7 +52,7 @@ func (in *INProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 		},
 		IsObserved: false,
 	}
-	
+
 	// Gandhi Jayanti - October 2
 	holidays[time.Date(year, 10, 2, 0, 0, 0, 0, time.UTC)] = &Holiday{
 		Name:     "Gandhi Jayanti",
@@ -64,16 +64,16 @@ func (in *INProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 		},
 		IsObserved: false,
 	}
-	
+
 	// Add major Hindu festivals (dates vary by lunar calendar)
 	in.addHinduFestivals(holidays, year)
-	
+
 	// Add major Islamic festivals (dates vary by lunar calendar)
 	in.addIslamicFestivals(holidays, year)
-	
+
 	// Add major Christian festivals
 	in.addChristianFestivals(holidays, year)
-	
+
 	return holidays
 }
 
@@ -94,7 +94,7 @@ func (in *INProvider) addHinduFestivals(holidays map[time.Time]*Holiday, year in
 		// Fallback calculation needed for other years
 		return
 	}
-	
+
 	holidays[diwaliDate] = &Holiday{
 		Name:     "Diwali",
 		Date:     diwaliDate,
@@ -105,7 +105,7 @@ func (in *INProvider) addHinduFestivals(holidays map[time.Time]*Holiday, year in
 		},
 		IsObserved: false,
 	}
-	
+
 	// Holi (approximate dates)
 	var holiDate time.Time
 	switch year {
@@ -118,7 +118,7 @@ func (in *INProvider) addHinduFestivals(holidays map[time.Time]*Holiday, year in
 	default:
 		return
 	}
-	
+
 	holidays[holiDate] = &Holiday{
 		Name:     "Holi",
 		Date:     holiDate,
@@ -145,7 +145,7 @@ func (in *INProvider) addIslamicFestivals(holidays map[time.Time]*Holiday, year 
 	default:
 		return
 	}
-	
+
 	holidays[eidFitrDate] = &Holiday{
 		Name:     "Eid al-Fitr",
 		Date:     eidFitrDate,
@@ -172,11 +172,11 @@ func (in *INProvider) addChristianFestivals(holidays map[time.Time]*Holiday, yea
 		},
 		IsObserved: false,
 	}
-	
+
 	// Good Friday (varies by Easter calculation)
 	easterDate := in.calculateEaster(year)
 	goodFridayDate := easterDate.AddDate(0, 0, -2)
-	
+
 	holidays[goodFridayDate] = &Holiday{
 		Name:     "Good Friday",
 		Date:     goodFridayDate,
@@ -206,6 +206,6 @@ func (in *INProvider) calculateEaster(year int) time.Time {
 	m := (a + 11*h + 22*l) / 451
 	n := (h + l - 7*m + 114) / 31
 	p := (h + l - 7*m + 114) % 31
-	
+
 	return time.Date(year, time.Month(n), p+1, 0, 0, 0, 0, time.UTC)
 }

@@ -33,7 +33,7 @@ func (p *HolidayPool) Put(h *Holiday) {
 	h.Observed = nil
 	h.Languages = nil
 	h.IsObserved = false
-	
+
 	p.pool.Put(h)
 }
 
@@ -56,15 +56,15 @@ func (si *StringInterner) Intern(s string) string {
 		return interned
 	}
 	si.mu.RUnlock()
-	
+
 	si.mu.Lock()
 	defer si.mu.Unlock()
-	
+
 	// Double-check after acquiring write lock
 	if interned, exists := si.strings[s]; exists {
 		return interned
 	}
-	
+
 	si.strings[s] = s
 	return s
 }
@@ -86,19 +86,19 @@ func (si *StringInterner) GetCacheSize() int {
 // OptimizedHoliday creates a memory-optimized Holiday with interned strings
 func OptimizedHoliday(name string, date time.Time, category HolidayCategory, languages map[string]string) *Holiday {
 	h := GlobalHolidayPool.Get()
-	
+
 	h.Name = GlobalStringInterner.Intern(name)
 	h.Date = date
 	h.Category = category
 	h.IsObserved = false
-	
+
 	if languages != nil {
 		h.Languages = make(map[string]string, len(languages))
 		for lang, translation := range languages {
 			h.Languages[GlobalStringInterner.Intern(lang)] = GlobalStringInterner.Intern(translation)
 		}
 	}
-	
+
 	return h
 }
 
@@ -132,7 +132,7 @@ func NewHolidayCache(maxSize int) *HolidayCache {
 func (hc *HolidayCache) Get(key string) (map[time.Time]*Holiday, bool) {
 	hc.mu.RLock()
 	defer hc.mu.RUnlock()
-	
+
 	holidays, exists := hc.cache[key]
 	if exists {
 		hc.accessed[key] = time.Now()
@@ -144,25 +144,25 @@ func (hc *HolidayCache) Get(key string) (map[time.Time]*Holiday, bool) {
 func (hc *HolidayCache) Set(key string, holidays map[time.Time]*Holiday) {
 	hc.mu.Lock()
 	defer hc.mu.Unlock()
-	
+
 	// Evict oldest if at capacity
 	if len(hc.cache) >= hc.maxSize {
 		oldestKey := ""
 		oldestTime := time.Now()
-		
+
 		for k, accessTime := range hc.accessed {
 			if accessTime.Before(oldestTime) {
 				oldestTime = accessTime
 				oldestKey = k
 			}
 		}
-		
+
 		if oldestKey != "" {
 			delete(hc.cache, oldestKey)
 			delete(hc.accessed, oldestKey)
 		}
 	}
-	
+
 	hc.cache[key] = holidays
 	hc.accessed[key] = time.Now()
 }
@@ -171,7 +171,7 @@ func (hc *HolidayCache) Set(key string, holidays map[time.Time]*Holiday) {
 func (hc *HolidayCache) Clear() {
 	hc.mu.Lock()
 	defer hc.mu.Unlock()
-	
+
 	hc.cache = make(map[string]map[time.Time]*Holiday)
 	hc.accessed = make(map[string]time.Time)
 }

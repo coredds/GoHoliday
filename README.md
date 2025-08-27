@@ -9,15 +9,16 @@ A comprehensive Go library for holiday data and business day calculations, desig
 
 ## Project Status
 
-**Current Version**: 0.1.2  
-**Supported Countries**: 8 countries with comprehensive regional subdivision support  
+**Current Version**: 0.2.2  
+**Supported Countries**: 11 countries with comprehensive regional subdivision support  
 **Performance**: Sub-microsecond holiday lookups with O(1) caching  
 **Integration**: Native ChronoGo HolidayChecker interface implementation  
 
 ### Recent Additions
-- **Japan (JP)** support with 16 public holidays including cultural accuracy and Emperor transition handling
-- Enhanced ChronoGo integration with FastCountryChecker performance layer
-- Comprehensive test coverage with benchmark validation
+- **Brazil (BR)** and **Mexico (MX)** support with cultural celebrations and constitutional reforms
+- Enhanced performance optimization with 400K+ operations/second
+- Comprehensive Latin American coverage with bilingual support
+- API stability framework and production-ready features
 
 ## Objectives
 

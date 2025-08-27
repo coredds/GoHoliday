@@ -12,7 +12,7 @@ type APIVersion string
 const (
 	// APIVersionV1 represents version 1.0 of the API
 	APIVersionV1 APIVersion = "v1.0"
-	
+
 	// CurrentAPIVersion is the current stable API version
 	CurrentAPIVersion = APIVersionV1
 )
@@ -23,13 +23,13 @@ type DeprecationLevel int
 const (
 	// DeprecationNone indicates no deprecation
 	DeprecationNone DeprecationLevel = iota
-	
+
 	// DeprecationWarning indicates the feature is deprecated but still works
 	DeprecationWarning
-	
+
 	// DeprecationError indicates the feature will be removed soon
 	DeprecationError
-	
+
 	// DeprecationRemoved indicates the feature has been removed
 	DeprecationRemoved
 )
@@ -76,13 +76,13 @@ type APIStabilityLevel int
 const (
 	// StabilityExperimental indicates experimental features that may change
 	StabilityExperimental APIStabilityLevel = iota
-	
+
 	// StabilityBeta indicates beta features that are mostly stable
 	StabilityBeta
-	
+
 	// StabilityStable indicates stable features with backward compatibility
 	StabilityStable
-	
+
 	// StabilityFrozen indicates frozen features that will never change
 	StabilityFrozen
 )
@@ -115,13 +115,13 @@ func ValidateAPIUsage(featureName string, requiredStability APIStabilityLevel) e
 	if !exists {
 		return fmt.Errorf("unknown API feature: %s", featureName)
 	}
-	
+
 	if feature.Stability < requiredStability {
 		stabilityNames := []string{"experimental", "beta", "stable", "frozen"}
 		return fmt.Errorf("feature %s has %s stability, but %s required",
 			featureName, stabilityNames[feature.Stability], stabilityNames[requiredStability])
 	}
-	
+
 	return nil
 }
 
@@ -157,28 +157,28 @@ func init() {
 		Since:       APIVersionV1,
 		Description: "Creates a new country holiday provider",
 	})
-	
+
 	RegisterAPIFeature(APIFeature{
 		Name:        "IsHoliday",
 		Stability:   StabilityStable,
 		Since:       APIVersionV1,
 		Description: "Checks if a given date is a holiday",
 	})
-	
+
 	RegisterAPIFeature(APIFeature{
 		Name:        "HolidaysForYear",
 		Stability:   StabilityStable,
 		Since:       APIVersionV1,
 		Description: "Returns all holidays for a specific year",
 	})
-	
+
 	RegisterAPIFeature(APIFeature{
 		Name:        "HolidaysForDateRange",
 		Stability:   StabilityStable,
 		Since:       APIVersionV1,
 		Description: "Returns holidays within a date range",
 	})
-	
+
 	// Register beta features
 	RegisterAPIFeature(APIFeature{
 		Name:        "OptimizedHoliday",
@@ -186,7 +186,7 @@ func init() {
 		Since:       APIVersionV1,
 		Description: "Memory-optimized holiday creation",
 	})
-	
+
 	RegisterAPIFeature(APIFeature{
 		Name:        "HolidayCache",
 		Stability:   StabilityBeta,
@@ -220,7 +220,7 @@ type APIContract interface {
 	GetCountryCode() string
 	GetSupportedSubdivisions() []string
 	GetSupportedCategories() []string
-	
+
 	// Optional methods for enhanced functionality
 	GetName() string
 	GetLanguages() []string
@@ -244,22 +244,22 @@ func (cv *CompatibilityValidator) ValidateProvider(provider APIContract) error {
 	if provider.GetCountryCode() == "" {
 		return fmt.Errorf("provider must return a valid country code")
 	}
-	
+
 	if provider.GetSupportedSubdivisions() == nil {
 		return fmt.Errorf("provider must return supported subdivisions list")
 	}
-	
+
 	if provider.GetSupportedCategories() == nil {
 		return fmt.Errorf("provider must return supported categories list")
 	}
-	
+
 	// Test holiday loading
 	testYear := time.Now().Year()
 	holidays := provider.LoadHolidays(testYear)
 	if holidays == nil {
 		return fmt.Errorf("provider must return a valid holidays map")
 	}
-	
+
 	return nil
 }
 

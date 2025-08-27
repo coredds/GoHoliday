@@ -366,16 +366,27 @@ wg.Wait()
 
 ## Migration Guide
 
-### From v0.1.2 to v1.0.0
+### From v0.2.2 to v1.0.0
 
 #### Breaking Changes
-- None! v1.0.0 is fully backward compatible with v0.1.2
+- None! v1.0.0 is fully backward compatible with v0.2.2
 
 #### New Features in v1.0.0
-1. **France Support**: Full French holiday implementation
-2. **Enhanced Performance**: 40M+ ops/sec concurrent access
-3. **API Stability**: Version management and deprecation system
-4. **Memory Optimization**: Object pooling and string interning
+1. **Enhanced Global Coverage**: Additional country implementations
+2. **Advanced Performance**: Further optimization beyond 40M+ ops/sec
+3. **API Stability**: Mature version management and deprecation system
+4. **Enterprise Features**: Advanced configuration and monitoring
+
+### From v0.1.2 to v0.2.2
+
+#### Breaking Changes
+- None! v0.2.2 is fully backward compatible with v0.1.2
+
+#### New Features in v0.2.2
+1. **Brazil Support**: Complete Brazilian holiday implementation with Carnival
+2. **Mexico Support**: Mexican holidays with constitutional reforms
+3. **Latin American Coverage**: Comprehensive South/North American representation
+4. **Cultural Accuracy**: Real-world holiday calculations and traditions
 
 #### Migration Steps
 1. Update import if needed:

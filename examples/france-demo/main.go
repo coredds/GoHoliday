@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/GoHoliday"
 )
 
 func main() {
@@ -29,12 +29,12 @@ func main() {
 	// Sort and display holidays
 	for date, holiday := range holidays {
 		fmt.Printf("%-20s | %s", date.Format("January 2, 2006"), holiday.Name)
-		
+
 		// Show French translation
 		if holiday.Languages != nil && holiday.Languages["fr"] != "" {
 			fmt.Printf(" (%s)", holiday.Languages["fr"])
 		}
-		
+
 		// Show category
 		fmt.Printf(" [%s]", holiday.Category)
 		fmt.Println()
@@ -83,10 +83,10 @@ func main() {
 	// Show cultural context
 	fmt.Println("\n🎭 French Holiday Categories:")
 	fmt.Println("-----------------------------")
-	
+
 	holidays2024 := france.HolidaysForYear(2024)
 	categories := make(map[string][]string)
-	
+
 	for _, holiday := range holidays2024 {
 		categoryName := string(holiday.Category)
 		if categories[categoryName] == nil {
@@ -94,7 +94,7 @@ func main() {
 		}
 		categories[categoryName] = append(categories[categoryName], holiday.Name)
 	}
-	
+
 	for category, holidayList := range categories {
 		fmt.Printf("%s: %v\n", category, holidayList)
 	}
@@ -102,11 +102,11 @@ func main() {
 	// Show bilingual features
 	fmt.Println("\n🌐 Bilingual Holiday Names (French/English):")
 	fmt.Println("---------------------------------------------")
-	
+
 	for _, holiday := range holidays2024 {
 		if len(holiday.Languages) > 1 {
-			fmt.Printf("🇫🇷 %-20s | 🇬🇧 %s\n", 
-				holiday.Languages["fr"], 
+			fmt.Printf("🇫🇷 %-20s | 🇬🇧 %s\n",
+				holiday.Languages["fr"],
 				holiday.Languages["en"])
 		}
 	}

@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/GoHoliday"
 )
 
 func main() {
@@ -29,12 +29,12 @@ func main() {
 	// Sort and display holidays
 	for date, holiday := range holidays {
 		fmt.Printf("%-20s | %s", date.Format("January 2, 2006"), holiday.Name)
-		
+
 		// Show Hindi translation if available
 		if holiday.Languages != nil && holiday.Languages["hi"] != "" {
 			fmt.Printf(" (%s)", holiday.Languages["hi"])
 		}
-		
+
 		// Show category
 		fmt.Printf(" [%s]", holiday.Category)
 		fmt.Println()
@@ -79,10 +79,10 @@ func main() {
 	// Show cultural diversity
 	fmt.Println("\n🎭 Cultural Holiday Categories:")
 	fmt.Println("-------------------------------")
-	
+
 	holidays2024 := india.HolidaysForYear(2024)
 	categories := make(map[string][]string)
-	
+
 	for _, holiday := range holidays2024 {
 		categoryName := string(holiday.Category)
 		if categories[categoryName] == nil {
@@ -90,7 +90,7 @@ func main() {
 		}
 		categories[categoryName] = append(categories[categoryName], holiday.Name)
 	}
-	
+
 	for category, holidayList := range categories {
 		fmt.Printf("%s: %v\n", category, holidayList)
 	}
