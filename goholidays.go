@@ -11,7 +11,7 @@ import (
 )
 
 // Version represents the current version of the GoHoliday library
-const Version = "0.2.2"
+const Version = "0.3.0"
 
 // HolidayCategory represents different types of holidays
 type HolidayCategory string
@@ -223,10 +223,20 @@ func (c *Country) loadCountryHolidays(year int) {
 		c.loadINHolidays(year)
 	case "FR":
 		c.loadFRHolidays(year)
+	case "DE":
+		c.loadDEHolidays(year)
 	case "BR":
 		c.loadBRHolidays(year)
 	case "MX":
 		c.loadMXHolidays(year)
+	case "IT":
+		c.loadITHolidays(year)
+	case "ES":
+		c.loadESHolidays(year)
+	case "NL":
+		c.loadNLHolidays(year)
+	case "KR":
+		c.loadKRHolidays(year)
 	// Add more countries as needed
 	default:
 		// Load from generic holiday data or return empty
@@ -1002,6 +1012,21 @@ func (c *Country) loadFRHolidays(year int) {
 	}
 }
 
+// loadDEHolidays loads Germany holidays using the DE provider
+func (c *Country) loadDEHolidays(year int) {
+	provider := countries.NewDEProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:      holiday.Name,
+			Date:      holiday.Date,
+			Category:  HolidayCategory(holiday.Category),
+			Languages: holiday.Languages,
+		}
+	}
+}
+
 // loadBRHolidays loads Brazil holidays using the BR provider
 func (c *Country) loadBRHolidays(year int) {
 	provider := countries.NewBRProvider()
@@ -1020,6 +1045,66 @@ func (c *Country) loadBRHolidays(year int) {
 // loadMXHolidays loads Mexico holidays using the MX provider
 func (c *Country) loadMXHolidays(year int) {
 	provider := countries.NewMXProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:      holiday.Name,
+			Date:      holiday.Date,
+			Category:  HolidayCategory(holiday.Category),
+			Languages: holiday.Languages,
+		}
+	}
+}
+
+// loadITHolidays loads Italy holidays using the IT provider
+func (c *Country) loadITHolidays(year int) {
+	provider := countries.NewITProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:      holiday.Name,
+			Date:      holiday.Date,
+			Category:  HolidayCategory(holiday.Category),
+			Languages: holiday.Languages,
+		}
+	}
+}
+
+// loadESHolidays loads Spain holidays using the ES provider
+func (c *Country) loadESHolidays(year int) {
+	provider := countries.NewESProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:      holiday.Name,
+			Date:      holiday.Date,
+			Category:  HolidayCategory(holiday.Category),
+			Languages: holiday.Languages,
+		}
+	}
+}
+
+// loadNLHolidays loads Netherlands holidays using the NL provider
+func (c *Country) loadNLHolidays(year int) {
+	provider := countries.NewNLProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:      holiday.Name,
+			Date:      holiday.Date,
+			Category:  HolidayCategory(holiday.Category),
+			Languages: holiday.Languages,
+		}
+	}
+}
+
+// loadKRHolidays loads South Korea holidays using the KR provider
+func (c *Country) loadKRHolidays(year int) {
+	provider := countries.NewKRProvider()
 	holidayMap := provider.LoadHolidays(year)
 
 	for date, holiday := range holidayMap {

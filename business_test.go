@@ -175,3 +175,74 @@ func BenchmarkAddBusinessDays(b *testing.B) {
 		calc.AddBusinessDays(start, 10)
 	}
 }
+
+// TestPreviousBusinessDay tests the PreviousBusinessDay function
+func TestPreviousBusinessDay(t *testing.T) {
+	us := NewCountry("US")
+	calc := NewBusinessDayCalculator(us)
+
+	// Test from Monday to previous Friday
+	monday := time.Date(2024, 3, 11, 0, 0, 0, 0, time.UTC)
+	prevBusiness := calc.PreviousBusinessDay(monday)
+	expected := time.Date(2024, 3, 8, 0, 0, 0, 0, time.UTC) // Friday
+
+	if !prevBusiness.Equal(expected) {
+		t.Errorf("Expected %v, got %v", expected, prevBusiness)
+	}
+}
+
+// TestSetWeekendsCustom tests SetWeekends functionality with different patterns
+func TestSetWeekendsCustom(t *testing.T) {
+	us := NewCountry("US")
+	calc := NewBusinessDayCalculator(us)
+
+	// Set Friday and Saturday as weekends (Middle East pattern)
+	calc.SetWeekends([]time.Weekday{time.Friday, time.Saturday})
+
+	friday := time.Date(2024, 3, 8, 0, 0, 0, 0, time.UTC)
+	saturday := time.Date(2024, 3, 9, 0, 0, 0, 0, time.UTC)
+	sunday := time.Date(2024, 3, 10, 0, 0, 0, 0, time.UTC)
+
+	if calc.IsBusinessDay(friday) {
+		t.Error("Friday should not be a business day with custom weekends")
+	}
+
+	if calc.IsBusinessDay(saturday) {
+		t.Error("Saturday should not be a business day with custom weekends")
+	}
+
+	if !calc.IsBusinessDay(sunday) {
+		t.Error("Sunday should be a business day with custom weekends")
+	}
+}
+
+// TestHolidayAndWeekendInteraction tests holidays falling on weekends
+func TestHolidayAndWeekendInteraction(t *testing.T) {
+	us := NewCountry("US")
+	calc := NewBusinessDayCalculator(us)
+
+	// Test Independence Day 2021 (Sunday) and 2020 (Saturday)
+	july4th2021 := time.Date(2021, 7, 4, 0, 0, 0, 0, time.UTC) // Sunday
+	july4th2020 := time.Date(2020, 7, 4, 0, 0, 0, 0, time.UTC) // Saturday
+
+	// Both should not be business days (holiday + weekend)
+	if calc.IsBusinessDay(july4th2021) {
+		t.Error("July 4th 2021 (Sunday) should not be a business day")
+	}
+
+	if calc.IsBusinessDay(july4th2020) {
+		t.Error("July 4th 2020 (Saturday) should not be a business day")
+	}
+}
+
+// BenchmarkIsBusinessDay benchmarks the IsBusinessDay function
+func BenchmarkIsBusinessDay(b *testing.B) {
+	us := NewCountry("US")
+	calc := NewBusinessDayCalculator(us)
+	date := time.Date(2024, 3, 5, 0, 0, 0, 0, time.UTC)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		calc.IsBusinessDay(date)
+	}
+}

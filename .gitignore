@@ -48,6 +48,14 @@ Thumbs.db
 coverage.txt
 coverage.html
 coverage.out
+countries_coverage.out
+new_coverage.out
+countries_coverage
+coverage
+*.coverage
+profile.out
+test_coverage*
+*_coverage*
 
 # Profiling data
 *.prof

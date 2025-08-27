@@ -366,6 +366,29 @@ wg.Wait()
 
 ## Migration Guide
 
+### From v0.3.0 to v1.0.0
+
+#### Breaking Changes
+- None! v1.0.0 is fully backward compatible with v0.3.0
+
+#### New Features in v1.0.0
+1. **Enhanced Global Coverage**: Additional country implementations beyond 15 countries
+2. **Advanced Performance**: Further optimization beyond 275K+ ops/sec
+3. **API Stability**: Mature version management and deprecation system
+4. **Enterprise Features**: Advanced configuration and monitoring
+
+### From v0.2.2 to v0.3.0
+
+#### Breaking Changes
+- None! v0.3.0 is fully backward compatible with v0.2.2
+
+#### New Features in v0.3.0
+1. **Four New Countries**: Italy (IT), Spain (ES), Netherlands (NL), South Korea (KR)
+2. **Enhanced Coverage**: 15 countries with 200+ regional subdivisions
+3. **Cultural Accuracy**: Native language support for all new countries
+4. **Maintained Performance**: 275K+ operations/second with expanded coverage
+5. **Comprehensive Testing**: 82.7% test coverage in countries package
+
 ### From v0.2.2 to v1.0.0
 
 #### Breaking Changes

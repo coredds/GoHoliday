@@ -7,24 +7,17 @@
 
 A comprehensive Go library for holiday data and business day calculations, designed as a high-performance backend for date/time applications including [ChronoGo](https://github.com/davidhintelmann/ChronoGo).
 
-## Project Status
+## Features
 
-**Current Version**: 0.2.2  
-**Supported Countries**: 11 countries with comprehensive regional subdivision support  
-**Performance**: Sub-microsecond holiday lookups with O(1) caching  
-**Integration**: Native ChronoGo HolidayChecker interface implementation  
+- **Multi-Country Support**: 15 countries with 200+ regional subdivisions
+- **High Performance**: Sub-microsecond holiday lookups with intelligent caching  
+- **ChronoGo Integration**: Native HolidayChecker interface implementation
+- **Enterprise Configuration**: YAML-based configuration system with environment support
+- **Cultural Accuracy**: Multi-language holiday names and historical transitions
+- **Thread-Safe**: Concurrent operations with built-in safety
+- **Business Intelligence**: Holiday categories, regional variations, and custom overrides
 
-### Recent Additions
-- **Brazil (BR)** and **Mexico (MX)** support with cultural celebrations and constitutional reforms
-- Enhanced performance optimization with 400K+ operations/second
-- Comprehensive Latin American coverage with bilingual support
-- API stability framework and production-ready features
-
-## Objectives
-
-1. **Primary**: Provide enterprise-grade holiday data for ChronoGo business day calculations
-2. **Secondary**: Support international business operations with accurate regional holiday data  
-3. **Tertiary**: Enable rapid expansion to additional countries via Python holidays library integration
+Current version: **0.3.0** with Italy, Spain, Netherlands, and South Korea support
 
 ## Supported Countries
 
@@ -38,21 +31,29 @@ A comprehensive Go library for holiday data and business day calculations, desig
 | Germany | DE | 16 (states) | Native |
 | France | FR | Regions & territories | Native |
 | Japan | JP | National public holidays | Native |
+| India | IN | National & state holidays | Native |
+| Brazil | BR | 27 (states & federal district) | Native |
+| Mexico | MX | 32 (states & federal district) | Native |
+| Italy | IT | 20 (regions) | Native |
+| Spain | ES | 19 (autonomous communities) | Native |
+| Netherlands | NL | 12 (provinces) | Native |
+| South Korea | KR | 17 (provinces & cities) | Native |
 
-**Total**: 8 countries with 100+ regional subdivisions
+**Total**: 15 countries with 200+ regional subdivisions
 
-### Future Expansion
-The library architecture supports rapid country expansion using data from the Python holidays ecosystem. Target countries include India, Brazil, Mexico, Italy, Spain, Singapore, and South Korea.
+The library architecture supports rapid expansion to additional countries including Singapore and additional Latin American countries.
 
 ## Features
 
-- **Enterprise Configuration**: YAML-based configuration system with environment support
-- **Multi-Country Support**: 8 countries with regional subdivisions
-- **High Performance**: Sub-microsecond holiday lookups with intelligent caching
+- **Multi-Country Support**: 15 countries with 200+ regional subdivisions
+- **High Performance**: Sub-microsecond holiday lookups with intelligent caching  
 - **ChronoGo Integration**: Native HolidayChecker interface implementation
-- **Business Intelligence**: Holiday categories, regional variations, and custom overrides
-- **Thread-Safe**: Concurrent operations with built-in safety
+- **Enterprise Configuration**: YAML-based configuration system with environment support
 - **Cultural Accuracy**: Multi-language holiday names and historical transitions
+- **Thread-Safe**: Concurrent operations with built-in safety
+- **Business Intelligence**: Holiday categories, regional variations, and custom overrides
+
+Current version: **0.3.0** with Italy, Spain, Netherlands, and South Korea support
 
 ## Quick Start
 
@@ -123,6 +124,45 @@ func main() {
 }
 ```
 
+### Multi-Country and Multilingual Support
+
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+    
+    "github.com/coredds/GoHoliday"
+)
+
+func main() {
+    // Brazil with Portuguese support
+    br := goholidays.NewCountry("BR")
+    
+    // Check Carnival (complex calculation based on Easter)
+    carnival2024 := time.Date(2024, 2, 13, 0, 0, 0, 0, time.UTC)
+    if holiday, ok := br.IsHoliday(carnival2024); ok {
+        fmt.Printf("Brazil: %s\n", holiday.Name)
+        if ptName, exists := holiday.Languages["pt"]; exists {
+            fmt.Printf("Em português: %s\n", ptName)
+        }
+    }
+    
+    // Mexico with Spanish support  
+    mx := goholidays.NewCountry("MX")
+    
+    // Check Constitution Day (variable Monday holiday)
+    constDay2024 := time.Date(2024, 2, 5, 0, 0, 0, 0, time.UTC)
+    if holiday, ok := mx.IsHoliday(constDay2024); ok {
+        fmt.Printf("Mexico: %s\n", holiday.Name)
+        if esName, exists := holiday.Languages["es"]; exists {
+            fmt.Printf("En español: %s\n", esName)
+        }
+    }
+}
+```
+
 ## Installation
 
 ```bash
@@ -142,30 +182,20 @@ go get github.com/coredds/GoHoliday/chronogo
 | Batch Operations | ~60ns/date | 16M ops/sec |
 | Range Counting | ~26μs | 40K ranges/sec |
 
-### Caching Benefits
-- First check: loads and caches year data (~100μs)
-- Subsequent checks: O(1) cache hits (<50ns)
-- Thread-safe concurrent operations
-- Automatic memory management
+### Performance Characteristics
+- **First lookup**: Loads and caches year data (~100μs)
+- **Subsequent lookups**: O(1) cache hits (<50ns)
+- **Thread-safe**: Concurrent operations with automatic memory management
 
 ## Architecture
 
 ```
 GoHoliday/
 ├── chronogo/           # ChronoGo integration layer
-│   ├── integration.go  # FastCountryChecker implementation
-│   └── integration_test.go
 ├── config/             # Configuration system
-│   ├── config.go       # YAML configuration
-│   ├── manager.go      # Holiday manager
-│   └── *.yaml          # Environment configs
 ├── countries/          # Country implementations
-│   ├── base.go         # Base provider interface
-│   ├── us.go           # United States
-│   ├── jp.go           # Japan
-│   └── ...             # Other countries
-└── updater/            # Python holidays syncer
-    └── python_ast_parser.go
+├── updater/            # Python holidays syncer
+└── examples/           # Demo applications
 ```
 
 ## Testing
@@ -198,19 +228,22 @@ go test ./...
 # ChronoGo integration demo
 cd examples/chronogo && go run main.go
 
-# Japan holidays demo  
-cd examples/chronogo-japan && go run main.go
+# Country-specific demos
+cd examples/japan-demo && go run main.go
+cd examples/brazil-demo && go run main.go
+cd examples/mexico-demo && go run main.go
+
+# Multi-country comparisons
+cd examples/br-mx-demo && go run main.go
+cd examples/latam-comparison && go run main.go
+
+# Performance analysis
+cd examples/performance-analysis && go run main.go
 ```
 
 ## Attribution
 
-This project builds upon and extends the excellent work of the Python holidays ecosystem:
-
-- **Python holidays library**: [github.com/vacanza/holidays](https://github.com/vacanza/holidays) - Comprehensive holiday data for 200+ countries
-- **Vacanza organization**: [github.com/vacanza](https://github.com/vacanza) - Current maintainers of the Python holidays ecosystem
-- **Original python holidays contributors**: The community that built the foundational holiday calculation algorithms and country-specific implementations
-
-GoHoliday provides a Go-native implementation optimized for performance and ChronoGo integration while maintaining compatibility with the data structures and calculations established by the Vacanza holidays community.
+This project builds upon the [Python holidays library](https://github.com/vacanza/holidays) and the work of the [Vacanza organization](https://github.com/vacanza), providing a Go-native implementation optimized for performance and ChronoGo integration.
 
 ## License
 
@@ -219,11 +252,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
----
-
-**Ready to enhance your Go applications with comprehensive holiday data?**
-
-```bash
-go get github.com/coredds/GoHoliday
-```
