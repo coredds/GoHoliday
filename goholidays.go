@@ -4,6 +4,7 @@
 package goholidays
 
 import (
+	"sync"
 	"time"
 )
 
@@ -35,13 +36,14 @@ type Holiday struct {
 	IsObserved bool              `json:"is_observed"`
 }
 
-// Country represents a country's holiday provider
+// Country represents a country's holiday provider with thread-safe caching
 type Country struct {
 	code         string
 	subdivisions []string
 	years        map[int]map[time.Time]*Holiday
 	categories   []HolidayCategory
 	language     string
+	mu           sync.RWMutex // Protects concurrent access to years map
 }
 
 // CountryOptions provides configuration options for creating a Country
@@ -80,10 +82,16 @@ func NewCountry(countryCode string, options ...CountryOptions) *Country {
 	return c
 }
 
-// IsHoliday checks if the given date is a holiday
+// IsHoliday checks if the given date is a holiday (thread-safe)
 func (c *Country) IsHoliday(date time.Time) (*Holiday, bool) {
 	year := date.Year()
-	if holidays, exists := c.years[year]; exists {
+	
+	// First, try to read with read lock
+	c.mu.RLock()
+	holidays, exists := c.years[year]
+	c.mu.RUnlock()
+	
+	if exists {
 		// Normalize date to compare only year, month, day
 		dateKey := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
 		if holiday, found := holidays[dateKey]; found {
@@ -97,14 +105,32 @@ func (c *Country) IsHoliday(date time.Time) (*Holiday, bool) {
 	return nil, false
 }
 
-// HolidaysForYear returns all holidays for a specific year
+// HolidaysForYear returns all holidays for a specific year (thread-safe)
 func (c *Country) HolidaysForYear(year int) map[time.Time]*Holiday {
-	if holidays, exists := c.years[year]; exists {
-		return holidays
+	c.mu.RLock()
+	holidays, exists := c.years[year]
+	c.mu.RUnlock()
+	
+	if exists {
+		// Return a copy to prevent external modification
+		result := make(map[time.Time]*Holiday, len(holidays))
+		for k, v := range holidays {
+			result[k] = v
+		}
+		return result
 	}
 
 	c.loadYear(year)
-	return c.years[year]
+	
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	
+	// Return a copy to prevent external modification
+	result := make(map[time.Time]*Holiday, len(c.years[year]))
+	for k, v := range c.years[year] {
+		result[k] = v
+	}
+	return result
 }
 
 // HolidaysForDateRange returns all holidays within a date range
@@ -146,15 +172,25 @@ func (c *Country) GetLanguage() string {
 	return c.language
 }
 
-// loadYear loads holidays for a specific year (placeholder implementation)
+// loadYear loads holidays for a specific year (thread-safe)
 func (c *Country) loadYear(year int) {
+	// Double-checked locking pattern for performance
+	c.mu.RLock()
+	_, exists := c.years[year]
+	c.mu.RUnlock()
+	
+	if exists {
+		return // Already loaded
+	}
+	
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	
+	// Check again after acquiring write lock
 	if c.years[year] == nil {
 		c.years[year] = make(map[time.Time]*Holiday)
+		c.loadCountryHolidays(year)
 	}
-
-	// TODO: Implement actual holiday loading logic
-	// This will be replaced with country-specific holiday calculations
-	c.loadCountryHolidays(year)
 }
 
 // loadYears loads holidays for multiple years
@@ -181,6 +217,8 @@ func (c *Country) loadCountryHolidays(year int) {
 		c.loadNZHolidays(year)
 	case "JP":
 		c.loadJPHolidays(year)
+	case "IN":
+		c.loadINHolidays(year)
 	// Add more countries as needed
 	default:
 		// Load from generic holiday data or return empty
@@ -684,4 +722,142 @@ func (c *Country) easterSunday(year int) time.Time {
 	p := (h + l - 7*m + 114) % 31
 
 	return time.Date(year, time.Month(n), p+1, 0, 0, 0, 0, time.UTC)
+}
+
+// loadINHolidays loads holidays specific to India
+func (c *Country) loadINHolidays(year int) {
+	holidays := c.years[year]
+
+	// New Year's Day
+	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "New Year's Day",
+		Date:     time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "New Year's Day",
+			"hi": "नव वर्ष दिवस",
+		},
+	}
+
+	// Republic Day
+	holidays[time.Date(year, 1, 26, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Republic Day",
+		Date:     time.Date(year, 1, 26, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Republic Day",
+			"hi": "गणतंत्र दिवस",
+		},
+	}
+
+	// Independence Day
+	holidays[time.Date(year, 8, 15, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Independence Day",
+		Date:     time.Date(year, 8, 15, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Independence Day",
+			"hi": "स्वतंत्रता दिवस",
+		},
+	}
+
+	// Gandhi Jayanti
+	holidays[time.Date(year, 10, 2, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Gandhi Jayanti",
+		Date:     time.Date(year, 10, 2, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Gandhi Jayanti",
+			"hi": "गांधी जयंती",
+		},
+	}
+
+	// Christmas Day
+	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Christmas Day",
+		Date:     time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC),
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Christmas Day",
+			"hi": "क्रिसमस",
+		},
+	}
+
+	// Good Friday (varies each year based on Easter calculation)
+	easter := c.easterSunday(year)
+	goodFriday := easter.AddDate(0, 0, -2)
+	holidays[goodFriday] = &Holiday{
+		Name:     "Good Friday",
+		Date:     goodFriday,
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Good Friday",
+			"hi": "गुड फ्राइडे",
+		},
+	}
+
+	// Note: Religious festivals like Diwali, Holi, Eid are approximated
+	// In a full implementation, these would use proper lunar calendar calculations
+	
+	// Diwali (approximate - typically October/November)
+	// This is a simplified calculation; actual dates vary based on lunar calendar
+	diwaliDate := c.approximateDiwali(year)
+	holidays[diwaliDate] = &Holiday{
+		Name:     "Diwali",
+		Date:     diwaliDate,
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Diwali",
+			"hi": "दीवाली",
+		},
+	}
+
+	// Holi (approximate - typically March)
+	// This is a simplified calculation; actual dates vary based on lunar calendar
+	holiDate := c.approximateHoli(year)
+	holidays[holiDate] = &Holiday{
+		Name:     "Holi",
+		Date:     holiDate,
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Holi",
+			"hi": "होली",
+		},
+	}
+}
+
+// approximateDiwali provides an approximate date for Diwali
+// Note: In a production system, this should use proper lunar calendar calculations
+func (c *Country) approximateDiwali(year int) time.Time {
+	// Diwali typically falls in October/November
+	// This is a very rough approximation for demonstration
+	switch year {
+	case 2024:
+		return time.Date(year, 11, 1, 0, 0, 0, 0, time.UTC)
+	case 2025:
+		return time.Date(year, 10, 20, 0, 0, 0, 0, time.UTC)
+	case 2026:
+		return time.Date(year, 11, 8, 0, 0, 0, 0, time.UTC)
+	default:
+		// Default approximation: third week of October
+		return time.Date(year, 10, 21, 0, 0, 0, 0, time.UTC)
+	}
+}
+
+// approximateHoli provides an approximate date for Holi
+// Note: In a production system, this should use proper lunar calendar calculations
+func (c *Country) approximateHoli(year int) time.Time {
+	// Holi typically falls in March
+	// This is a very rough approximation for demonstration
+	switch year {
+	case 2024:
+		return time.Date(year, 3, 25, 0, 0, 0, 0, time.UTC)
+	case 2025:
+		return time.Date(year, 3, 14, 0, 0, 0, 0, time.UTC)
+	case 2026:
+		return time.Date(year, 3, 3, 0, 0, 0, 0, time.UTC)
+	default:
+		// Default approximation: second week of March
+		return time.Date(year, 3, 14, 0, 0, 0, 0, time.UTC)
+	}
 }
