@@ -219,6 +219,8 @@ func (c *Country) loadCountryHolidays(year int) {
 		c.loadJPHolidays(year)
 	case "IN":
 		c.loadINHolidays(year)
+	case "FR":
+		c.loadFRHolidays(year)
 	// Add more countries as needed
 	default:
 		// Load from generic holiday data or return empty
@@ -859,5 +861,137 @@ func (c *Country) approximateHoli(year int) time.Time {
 	default:
 		// Default approximation: second week of March
 		return time.Date(year, 3, 14, 0, 0, 0, 0, time.UTC)
+	}
+}
+
+// loadFRHolidays loads holidays specific to France
+func (c *Country) loadFRHolidays(year int) {
+	holidays := c.years[year]
+
+	// New Year's Day
+	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Jour de l'An",
+		Date:     time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "New Year's Day",
+			"fr": "Jour de l'An",
+		},
+	}
+
+	// Labour Day
+	holidays[time.Date(year, 5, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Fête du Travail",
+		Date:     time.Date(year, 5, 1, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Labour Day",
+			"fr": "Fête du Travail",
+		},
+	}
+
+	// Victory in Europe Day
+	holidays[time.Date(year, 5, 8, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Fête de la Victoire",
+		Date:     time.Date(year, 5, 8, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Victory in Europe Day",
+			"fr": "Fête de la Victoire",
+		},
+	}
+
+	// Bastille Day
+	holidays[time.Date(year, 7, 14, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Fête nationale",
+		Date:     time.Date(year, 7, 14, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Bastille Day",
+			"fr": "Fête nationale",
+		},
+	}
+
+	// Assumption of Mary
+	holidays[time.Date(year, 8, 15, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Assomption",
+		Date:     time.Date(year, 8, 15, 0, 0, 0, 0, time.UTC),
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Assumption of Mary",
+			"fr": "Assomption",
+		},
+	}
+
+	// All Saints' Day
+	holidays[time.Date(year, 11, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Toussaint",
+		Date:     time.Date(year, 11, 1, 0, 0, 0, 0, time.UTC),
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "All Saints' Day",
+			"fr": "Toussaint",
+		},
+	}
+
+	// Armistice Day
+	holidays[time.Date(year, 11, 11, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Armistice",
+		Date:     time.Date(year, 11, 11, 0, 0, 0, 0, time.UTC),
+		Category: CategoryPublic,
+		Languages: map[string]string{
+			"en": "Armistice Day",
+			"fr": "Armistice",
+		},
+	}
+
+	// Christmas Day
+	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
+		Name:     "Noël",
+		Date:     time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC),
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Christmas Day",
+			"fr": "Noël",
+		},
+	}
+
+	// Easter-based holidays
+	easter := c.easterSunday(year)
+
+	// Easter Monday
+	easterMonday := easter.AddDate(0, 0, 1)
+	holidays[easterMonday] = &Holiday{
+		Name:     "Lundi de Pâques",
+		Date:     easterMonday,
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Easter Monday",
+			"fr": "Lundi de Pâques",
+		},
+	}
+
+	// Ascension Day (39 days after Easter)
+	ascension := easter.AddDate(0, 0, 39)
+	holidays[ascension] = &Holiday{
+		Name:     "Ascension",
+		Date:     ascension,
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Ascension Day",
+			"fr": "Ascension",
+		},
+	}
+
+	// Whit Monday (50 days after Easter)
+	whitMonday := easter.AddDate(0, 0, 50)
+	holidays[whitMonday] = &Holiday{
+		Name:     "Lundi de Pentecôte",
+		Date:     whitMonday,
+		Category: CategoryReligious,
+		Languages: map[string]string{
+			"en": "Whit Monday",
+			"fr": "Lundi de Pentecôte",
+		},
 	}
 }
