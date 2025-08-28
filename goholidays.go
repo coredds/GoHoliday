@@ -11,7 +11,7 @@ import (
 )
 
 // Version represents the current version of the GoHoliday library
-const Version = "0.3.0"
+const Version = "0.5.0"
 
 // HolidayCategory represents different types of holidays
 type HolidayCategory string

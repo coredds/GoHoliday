@@ -5,6 +5,36 @@ All notable changes to the GoHoliday project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-08-28
+
+### Added
+- **Norway (NO) Holiday Provider**: Complete Nordic implementation with traditional celebrations
+  - Constitution Day (Grunnlovsdag), Maundy Thursday, Good Friday
+  - Easter-based holidays with accurate astronomical calculations
+  - Norwegian/English bilingual support
+  - All 11 Norwegian counties supported
+- **Turkey (TR) Holiday Provider**: Comprehensive secular and Islamic holiday implementation  
+  - Democracy and National Unity Day, Victory Day, Republic Day
+  - Religious holidays: Ramadan Feast, Sacrifice Feast
+  - Turkish/English bilingual support
+  - All 81 Turkish provinces supported
+- **Russia (RU) Holiday Provider**: Orthodox calendar with extensive New Year celebrations
+  - Extended New Year holidays (8-day period), Defender of the Fatherland Day
+  - Orthodox Easter, Russia Day, Unity Day
+  - Russian/English bilingual support
+  - All 85 federal subjects supported
+- **Indonesia (ID) Holiday Provider**: Multi-religious society with diverse cultural holidays
+  - Islamic holidays: Eid al-Fitr, Eid al-Adha, Mawlid
+  - Christian holidays: Good Friday, Ascension Day
+  - Buddhist, Hindu, and Chinese New Year celebrations
+  - Indonesian/English bilingual support
+  - All 38 Indonesian provinces supported
+
+### Performance
+- Optimized holiday calculations for Orthodox Easter in Russia
+- Enhanced multi-religious calendar support for Indonesia
+- Improved subdivision lookup performance for Turkey (81 provinces)
+
 ## [0.3.0] - 2025-08-27
 
 ### Added

@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/coredds/GoHoliday/workflows/CI/badge.svg)](https://github.com/coredds/GoHoliday/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/coredds/GoHoliday/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/GoHoliday)
+[![Security](https://github.com/coredds/GoHoliday/workflows/CI/badge.svg?job=security)](https://github.com/coredds/GoHoliday/actions/workflows/ci.yml)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/GoHoliday?v=1.23)](https://golang.org/)
 [![License](https://img.shields.io/github/license/coredds/GoHoliday)](LICENSE)
 
@@ -9,7 +10,7 @@ A comprehensive Go library for holiday data and business day calculations, desig
 
 ## Features
 
-- **Multi-Country Support**: 15 countries with 200+ regional subdivisions
+- **Multi-Country Support**: 25 countries with 500+ regional subdivisions
 - **High Performance**: Sub-microsecond holiday lookups with intelligent caching  
 - **ChronoGo Integration**: Native HolidayChecker interface implementation
 - **Enterprise Configuration**: YAML-based configuration system with environment support
@@ -17,43 +18,51 @@ A comprehensive Go library for holiday data and business day calculations, desig
 - **Thread-Safe**: Concurrent operations with built-in safety
 - **Business Intelligence**: Holiday categories, regional variations, and custom overrides
 
-Current version: **0.3.0** with Italy, Spain, Netherlands, and South Korea support
+Current version: **0.5.0** with Norway, Turkey, Russia, and Indonesia support
 
 ## Supported Countries
 
-| Country | Code | Subdivisions | Implementation |
-|---------|------|-------------|----------------|
-| United States | US | 56 (states, territories) | Native |
-| United Kingdom | GB | 4 (England, Scotland, Wales, NI) | Native |
-| Canada | CA | 13 (provinces, territories) | Native |
-| Australia | AU | 8 (states, territories) | Native |
-| New Zealand | NZ | 17 (regions) | Native |
-| Germany | DE | 16 (states) | Native |
-| France | FR | Regions & territories | Native |
-| Japan | JP | National public holidays | Native |
-| India | IN | National & state holidays | Native |
-| Brazil | BR | 27 (states & federal district) | Native |
-| Mexico | MX | 32 (states & federal district) | Native |
-| Italy | IT | 20 (regions) | Native |
-| Spain | ES | 19 (autonomous communities) | Native |
-| Netherlands | NL | 12 (provinces) | Native |
-| South Korea | KR | 17 (provinces & cities) | Native |
+| Country | Code | Subdivisions | Languages | Implementation |
+|---------|------|-------------|-----------|----------------|
+| United States | US | 56 (states, territories) | EN, ES | Native |
+| United Kingdom | GB | 4 (England, Scotland, Wales, NI) | EN | Native |
+| Canada | CA | 13 (provinces, territories) | EN, FR | Native |
+| Australia | AU | 8 (states, territories) | EN | Native |
+| New Zealand | NZ | 17 (regions) | EN, MI | Native |
+| Germany | DE | 16 (states) | DE, EN | Native |
+| France | FR | Regions & territories | FR, EN | Native |
+| Japan | JP | National public holidays | JA, EN | Native |
+| India | IN | National & state holidays | HI, EN | Native |
+| Brazil | BR | 27 (states & federal district) | PT, EN | Native |
+| Mexico | MX | 32 (states & federal district) | ES, EN | Native |
+| Italy | IT | 20 (regions) | IT, EN | Native |
+| Spain | ES | 19 (autonomous communities) | ES, EN | Native |
+| Netherlands | NL | 12 (provinces) | NL, EN | Native |
+| South Korea | KR | 17 (provinces & cities) | KO, EN | Native |
+| Singapore | SG | 5 (regions) | EN, ZH, MS, TA | Native |
+| Switzerland | CH | 26 (cantons) | DE, FR, IT, RM | Native |
+| Sweden | SE | 21 (counties) | SV, EN | Native |
+| Argentina | AR | 24 (provinces) | ES, EN | Native |
+| Thailand | TH | 77 (provinces) | TH, EN | Native |
+| **Norway** | **NO** | **11 (counties)** | **NO, EN** | **Native** |
+| **Turkey** | **TR** | **81 (provinces)** | **TR, EN** | **Native** |
+| **Russia** | **RU** | **85 (federal subjects)** | **RU, EN** | **Native** |
+| **Indonesia** | **ID** | **38 (provinces)** | **ID, EN** | **Native** |
 
-**Total**: 15 countries with 200+ regional subdivisions
+**Total**: 25 countries with 500+ regional subdivisions
 
-The library architecture supports rapid expansion to additional countries including Singapore and additional Latin American countries.
+### Recent Additions (v0.5.0)
+- **Norway**: Nordic country with Constitution Day (Grunnlovsdag) and traditional Norse holidays
+- **Turkey**: Secular and Islamic holidays including Democracy Day and national observances  
+- **Russia**: Orthodox calendar with extensive New Year celebration period and federal holidays
+- **Indonesia**: Multi-religious society with Islamic, Christian, Buddhist, Hindu, and Chinese holidays
 
-## Features
-
-- **Multi-Country Support**: 15 countries with 200+ regional subdivisions
-- **High Performance**: Sub-microsecond holiday lookups with intelligent caching  
-- **ChronoGo Integration**: Native HolidayChecker interface implementation
-- **Enterprise Configuration**: YAML-based configuration system with environment support
-- **Cultural Accuracy**: Multi-language holiday names and historical transitions
-- **Thread-Safe**: Concurrent operations with built-in safety
-- **Business Intelligence**: Holiday categories, regional variations, and custom overrides
-
-Current version: **0.3.0** with Italy, Spain, Netherlands, and South Korea support
+### Previous Additions (v0.4.0)
+- **Singapore**: Multicultural holidays with 4 official languages (English, Chinese, Malay, Tamil)
+- **Switzerland**: Federal and cantonal holidays with 4 national languages (German, French, Italian, Romansh)
+- **Sweden**: Traditional Nordic holidays including Midsummer calculations
+- **Argentina**: Latin American representation with Spanish localization and movable holidays
+- **Thailand**: Southeast Asian Buddhist calendar with royal observances and lunar calculations
 
 ## Quick Start
 
@@ -89,41 +98,6 @@ func main() {
 }
 ```
 
-### Direct Library Usage
-
-```go
-package main
-
-import (
-    "fmt"
-    "time"
-    
-    "github.com/coredds/GoHoliday"
-)
-
-func main() {
-    // Create a holiday provider for Japan
-    jp := goholidays.NewCountry("JP")
-    
-    // Check if a specific date is a holiday
-    newYear := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-    if holiday, ok := jp.IsHoliday(newYear); ok {
-        fmt.Printf("%s is %s\n", newYear.Format("2006-01-02"), holiday.Name)
-        // Output: 2024-01-01 is New Year's Day
-        
-        // Check for Japanese translation
-        if japaneseName, exists := holiday.Languages["ja"]; exists {
-            fmt.Printf("In Japanese: %s\n", japaneseName)
-            // Output: In Japanese: 元日
-        }
-    }
-    
-    // Get all holidays for a year
-    holidays := jp.HolidaysForYear(2024)
-    fmt.Printf("Japan has %d public holidays in 2024\n", len(holidays))
-}
-```
-
 ### Multi-Country and Multilingual Support
 
 ```go
@@ -137,27 +111,44 @@ import (
 )
 
 func main() {
-    // Brazil with Portuguese support
-    br := goholidays.NewCountry("BR")
+    // Thailand with Buddhist holidays and Thai language support
+    th := goholidays.NewCountry("TH")
     
-    // Check Carnival (complex calculation based on Easter)
-    carnival2024 := time.Date(2024, 2, 13, 0, 0, 0, 0, time.UTC)
-    if holiday, ok := br.IsHoliday(carnival2024); ok {
-        fmt.Printf("Brazil: %s\n", holiday.Name)
-        if ptName, exists := holiday.Languages["pt"]; exists {
-            fmt.Printf("Em português: %s\n", ptName)
+    // Check Songkran Festival (Thai New Year)
+    songkran2024 := time.Date(2024, 4, 13, 0, 0, 0, 0, time.UTC)
+    if holiday, ok := th.IsHoliday(songkran2024); ok {
+        fmt.Printf("Thailand: %s\n", holiday.Name)
+        if thName, exists := holiday.Languages["th"]; exists {
+            fmt.Printf("ไทย: %s\n", thName)
         }
     }
     
-    // Mexico with Spanish support  
-    mx := goholidays.NewCountry("MX")
+    // Argentina with Spanish support and movable holidays
+    ar := goholidays.NewCountry("AR")
     
-    // Check Constitution Day (variable Monday holiday)
-    constDay2024 := time.Date(2024, 2, 5, 0, 0, 0, 0, time.UTC)
-    if holiday, ok := mx.IsHoliday(constDay2024); ok {
-        fmt.Printf("Mexico: %s\n", holiday.Name)
+    // Check Flag Day (movable to Monday if weekend)
+    flagDay2024 := time.Date(2024, 6, 20, 0, 0, 0, 0, time.UTC)
+    if holiday, ok := ar.IsHoliday(flagDay2024); ok {
+        fmt.Printf("Argentina: %s\n", holiday.Name)
         if esName, exists := holiday.Languages["es"]; exists {
-            fmt.Printf("En español: %s\n", esName)
+            fmt.Printf("Español: %s\n", esName)
+        }
+    }
+    
+    // Singapore with 4 official languages
+    sg := goholidays.NewCountry("SG")
+    
+    // Check Chinese New Year
+    cny2024 := time.Date(2024, 2, 10, 0, 0, 0, 0, time.UTC)
+    if holiday, ok := sg.IsHoliday(cny2024); ok {
+        fmt.Printf("Singapore: %s\n", holiday.Name)
+        
+        // Display in all 4 official languages
+        languages := []string{"en", "zh", "ms", "ta"}
+        for _, lang := range languages {
+            if name, exists := holiday.Languages[lang]; exists {
+                fmt.Printf("  %s: %s\n", lang, name)
+            }
         }
     }
 }
@@ -186,6 +177,15 @@ go get github.com/coredds/GoHoliday/chronogo
 - **First lookup**: Loads and caches year data (~100μs)
 - **Subsequent lookups**: O(1) cache hits (<50ns)
 - **Thread-safe**: Concurrent operations with automatic memory management
+
+### New Country Performance (v0.4.0)
+| Provider | Load Time | Memory | Features |
+|----------|-----------|--------|----------|
+| Singapore | ~2.9μs | Low | 4-language multicultural |
+| Switzerland | ~3.2μs | Low | Federal/cantonal system |
+| Sweden | ~4.3μs | Low | Traditional calculations |
+| Argentina | ~3.6μs | Low | Movable holidays |
+| Thailand | ~6.8μs | Medium | Buddhist lunar calendar |
 
 ## Architecture
 
@@ -228,14 +228,14 @@ go test ./...
 # ChronoGo integration demo
 cd examples/chronogo && go run main.go
 
-# Country-specific demos
-cd examples/japan-demo && go run main.go
-cd examples/brazil-demo && go run main.go
-cd examples/mexico-demo && go run main.go
+# New country demos (v0.4.0)
+cd examples/singapore-demo && go run main.go
+cd examples/thailand-demo && go run main.go
+cd examples/argentina-demo && go run main.go
 
 # Multi-country comparisons
-cd examples/br-mx-demo && go run main.go
-cd examples/latam-comparison && go run main.go
+cd examples/multi-country && go run main.go
+cd examples/new-countries-demo && go run main.go
 
 # Performance analysis
 cd examples/performance-analysis && go run main.go
