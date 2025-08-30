@@ -24,7 +24,7 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Clean go mod cache
-      run: rm -rf ~/go/pkg/mod
+      run: go clean -modcache || true
 
     - name: Cache Go modules
       uses: actions/cache@v3
