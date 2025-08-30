@@ -47,7 +47,7 @@ jobs:
       continue-on-error: true
 
     - name: Generate coverage report
-      run: go tool cover -html=coverage.out -o coverage.html
+      run: go tool cover -html coverage.out -o coverage.html
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
