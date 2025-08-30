@@ -396,24 +396,38 @@ func (cm *ConfigManager) IsCountryEnabled(countryCode string) bool {
 	return config.Enabled
 }
 
-// GetCustomHolidays returns custom holidays for a country
+// GetCustomHolidays returns custom holidays for a country with deduplication
 func (cm *ConfigManager) GetCustomHolidays(countryCode string) []CustomHoliday {
 	if cm.config == nil {
 		return []CustomHoliday{}
 	}
 
+	var allHolidays []CustomHoliday
+
 	// Get holidays for the specific country
 	if holidays, exists := cm.config.CustomHolidays[countryCode]; exists {
-		return holidays
+		allHolidays = append(allHolidays, holidays...)
 	}
 
 	// Also check for global holidays (if any are marked with "*")
-	var globalHolidays []CustomHoliday
 	if holidays, exists := cm.config.CustomHolidays["*"]; exists {
-		globalHolidays = append(globalHolidays, holidays...)
+		allHolidays = append(allHolidays, holidays...)
 	}
 
-	return globalHolidays
+	// Deduplicate based on name and date
+	seen := make(map[string]bool)
+	var uniqueHolidays []CustomHoliday
+	
+	for _, holiday := range allHolidays {
+		// Create unique key (name + date)
+		uniqueKey := fmt.Sprintf("%s|%s", holiday.Name, holiday.Date)
+		if !seen[uniqueKey] {
+			seen[uniqueKey] = true
+			uniqueHolidays = append(uniqueHolidays, holiday)
+		}
+	}
+
+	return uniqueHolidays
 }
 
 // Global configuration manager instance

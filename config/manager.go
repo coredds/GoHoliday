@@ -157,6 +157,9 @@ func (hm *HolidayManager) applyCountryConfig(holidays map[time.Time]*countries.H
 func (hm *HolidayManager) getCustomHolidays(countryCode string, year int, config *Config) map[time.Time]*countries.Holiday {
 	holidays := make(map[time.Time]*countries.Holiday)
 	customHolidays := hm.configManager.GetCustomHolidays(countryCode)
+	
+	// Use a map to track unique holidays by date+name combination for deduplication
+	seen := make(map[string]bool)
 
 	for _, custom := range customHolidays {
 		// Check year range
@@ -174,6 +177,13 @@ func (hm *HolidayManager) getCustomHolidays(countryCode string, year int, config
 		if err != nil {
 			continue // Skip invalid dates
 		}
+
+		// Create unique key for deduplication (date + name)
+		uniqueKey := fmt.Sprintf("%s|%s", date.Format("2006-01-02"), custom.Name)
+		if seen[uniqueKey] {
+			continue // Skip duplicate
+		}
+		seen[uniqueKey] = true
 
 		// Create the holiday
 		holiday := &countries.Holiday{

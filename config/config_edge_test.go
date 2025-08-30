@@ -121,10 +121,11 @@ custom_holidays:
 		}
 
 		holidays := cm.GetCustomHolidays("US")
-		// Note: Current implementation doesn't deduplicate holidays
-		// This test documents the current behavior
-		if len(holidays) >= 1 {
-			t.Logf("Found %d holidays (current implementation doesn't deduplicate)", len(holidays))
+		// Deduplication should now work - expect only 1 unique holiday
+		if len(holidays) != 1 {
+			t.Errorf("Expected 1 unique holiday after deduplication, got %d", len(holidays))
+		} else {
+			t.Logf("Found %d unique holiday after deduplication (expected)", len(holidays))
 		}
 	})
 

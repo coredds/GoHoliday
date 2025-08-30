@@ -65,7 +65,7 @@ func TestSyncFunctionality(t *testing.T) {
 		}
 
 		// Check that country file exists
-		countryFile := filepath.Join(tempDir, "us.json")
+		countryFile := filepath.Join(tempDir, "US.json")
 		if _, err := os.Stat(countryFile); os.IsNotExist(err) {
 			t.Error("Country file should exist after sync")
 		}
