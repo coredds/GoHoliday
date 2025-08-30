@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+// Note: All tests in this file use NewMockPythonHolidaysSync() instead of
+// NewPythonHolidaysSync() to avoid making real API calls to GitHub.
+// This ensures tests work in CI/CD environments without GitHub tokens.
+
 func TestNewPythonHolidaysSync(t *testing.T) {
 	// Test with valid directory
 	tempDir := t.TempDir()
@@ -84,7 +88,7 @@ func TestPythonHolidaysSync_CheckForUpdates(t *testing.T) {
 
 func TestPythonHolidaysSync_SyncCountry(t *testing.T) {
 	tempDir := t.TempDir()
-	sync := NewPythonHolidaysSync(tempDir)
+	sync := NewMockPythonHolidaysSync(tempDir)
 
 	ctx := context.Background()
 
@@ -109,7 +113,7 @@ func TestPythonHolidaysSync_SyncCountry(t *testing.T) {
 
 func TestPythonHolidaysSync_SyncAll(t *testing.T) {
 	tempDir := t.TempDir()
-	sync := NewPythonHolidaysSync(tempDir)
+	sync := NewMockPythonHolidaysSync(tempDir)
 
 	ctx := context.Background()
 
@@ -141,7 +145,7 @@ func TestPythonHolidaysSync_SyncAll(t *testing.T) {
 
 func TestPythonHolidaysSync_GetLastSyncTime(t *testing.T) {
 	tempDir := t.TempDir()
-	sync := NewPythonHolidaysSync(tempDir)
+	sync := NewMockPythonHolidaysSync(tempDir)
 
 	// Test with no existing data
 	_, err := sync.getLastSyncTime()
@@ -181,7 +185,7 @@ func TestPythonHolidaysSync_GetLastSyncTime(t *testing.T) {
 
 func TestPythonHolidaysSync_SaveLastSyncTime(t *testing.T) {
 	tempDir := t.TempDir()
-	sync := NewPythonHolidaysSync(tempDir)
+	sync := NewMockPythonHolidaysSync(tempDir)
 
 	// Test saving sync time
 	now := time.Now()
@@ -214,7 +218,7 @@ func TestPythonHolidaysSync_SaveLastSyncTime(t *testing.T) {
 
 func TestPythonHolidaysSync_SaveCountryData(t *testing.T) {
 	tempDir := t.TempDir()
-	sync := NewPythonHolidaysSync(tempDir)
+	sync := NewMockPythonHolidaysSync(tempDir)
 
 	countryData := &CountryData{
 		CountryCode: "US",
@@ -259,7 +263,7 @@ func TestPythonHolidaysSync_SaveCountryData(t *testing.T) {
 
 func TestPythonHolidaysSync_LoadCountryData(t *testing.T) {
 	tempDir := t.TempDir()
-	sync := NewPythonHolidaysSync(tempDir)
+	sync := NewMockPythonHolidaysSync(tempDir)
 
 	// Test loading non-existent data
 	_, err := sync.LoadCountryData("US")
