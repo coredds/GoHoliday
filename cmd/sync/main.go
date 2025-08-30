@@ -180,12 +180,12 @@ func syncSingleCountry(ctx context.Context, syncer updater.Syncer, countryCode, 
 	if !dryRun {
 		// Save to file
 		outputFile := filepath.Join(outputDir, fmt.Sprintf("%s.json", strings.ToUpper(countryCode)))
-		
+
 		// Ensure parent directory exists
 		if err := os.MkdirAll(filepath.Dir(outputFile), 0755); err != nil {
 			return fmt.Errorf("failed to create directory for country file: %w", err)
 		}
-		
+
 		if err := saveCountryData(countryData, outputFile); err != nil {
 			return fmt.Errorf("failed to save data to %s: %w", outputFile, err)
 		}

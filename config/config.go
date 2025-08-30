@@ -417,7 +417,7 @@ func (cm *ConfigManager) GetCustomHolidays(countryCode string) []CustomHoliday {
 	// Deduplicate based on name and date
 	seen := make(map[string]bool)
 	var uniqueHolidays []CustomHoliday
-	
+
 	for _, holiday := range allHolidays {
 		// Create unique key (name + date)
 		uniqueKey := fmt.Sprintf("%s|%s", holiday.Name, holiday.Date)
