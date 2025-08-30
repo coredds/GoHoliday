@@ -1,159 +1,297 @@
 package countries
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
 
-func TestINProvider_LoadHolidays(t *testing.T) {
+func TestINProvider_Creation(t *testing.T) {
 	provider := NewINProvider()
 
-	tests := []struct {
-		year int
-		want int // Expected number of holidays
-	}{
-		{2024, 8}, // Approximate count for major holidays
-		{2025, 8},
-		{2026, 8},
+	if provider.GetCountryCode() != "IN" {
+		t.Errorf("Expected country code IN, got %s", provider.GetCountryCode())
 	}
 
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("year_%d", tt.year), func(t *testing.T) {
-			holidays := provider.LoadHolidays(tt.year)
-
-			if len(holidays) < 6 { // At least the fixed national holidays + some religious ones
-				t.Errorf("LoadHolidays(%d) returned %d holidays, want at least 6", tt.year, len(holidays))
-			}
-
-			// Test specific national holidays
-			republicDay := time.Date(tt.year, 1, 26, 0, 0, 0, 0, time.UTC)
-			if holiday, exists := holidays[republicDay]; !exists {
-				t.Errorf("Republic Day not found for year %d", tt.year)
-			} else if holiday.Name != "Republic Day" {
-				t.Errorf("Expected Republic Day, got %s", holiday.Name)
-			}
-
-			independenceDay := time.Date(tt.year, 8, 15, 0, 0, 0, 0, time.UTC)
-			if holiday, exists := holidays[independenceDay]; !exists {
-				t.Errorf("Independence Day not found for year %d", tt.year)
-			} else if holiday.Name != "Independence Day" {
-				t.Errorf("Expected Independence Day, got %s", holiday.Name)
-			}
-
-			gandhiJayanti := time.Date(tt.year, 10, 2, 0, 0, 0, 0, time.UTC)
-			if holiday, exists := holidays[gandhiJayanti]; !exists {
-				t.Errorf("Gandhi Jayanti not found for year %d", tt.year)
-			} else if holiday.Name != "Gandhi Jayanti" {
-				t.Errorf("Expected Gandhi Jayanti, got %s", holiday.Name)
-			}
-
-			christmas := time.Date(tt.year, 12, 25, 0, 0, 0, 0, time.UTC)
-			if holiday, exists := holidays[christmas]; !exists {
-				t.Errorf("Christmas Day not found for year %d", tt.year)
-			} else if holiday.Name != "Christmas Day" {
-				t.Errorf("Expected Christmas Day, got %s", holiday.Name)
-			}
-		})
-	}
-}
-
-func TestINProvider_GetCountryCode(t *testing.T) {
-	provider := NewINProvider()
-	if code := provider.GetCountryCode(); code != "IN" {
-		t.Errorf("GetCountryCode() = %v, want IN", code)
-	}
-}
-
-func TestINProvider_GetSupportedSubdivisions(t *testing.T) {
-	provider := NewINProvider()
 	subdivisions := provider.GetSupportedSubdivisions()
-
-	// Check that we have all major Indian states/territories
-	expectedCount := 36 // As per the list in NewINProvider
-	if len(subdivisions) != expectedCount {
-		t.Errorf("GetSupportedSubdivisions() returned %d subdivisions, want %d", len(subdivisions), expectedCount)
+	if len(subdivisions) != 36 { // 28 states + 8 union territories
+		t.Errorf("Expected 36 subdivisions, got %d", len(subdivisions))
 	}
 
-	// Check for specific states
+	categories := provider.GetSupportedCategories()
+	expectedCategories := []string{"national", "gazetted", "restricted", "hindu", "muslim", "christian", "sikh", "buddhist", "jain", "regional"}
+	if len(categories) != len(expectedCategories) {
+		t.Errorf("Expected %d categories, got %d", len(expectedCategories), len(categories))
+	}
+}
+
+func TestINProvider_LoadHolidays2024(t *testing.T) {
+	provider := NewINProvider()
+	holidays := provider.LoadHolidays(2024)
+
+	// Test national holidays for 2024
+	expectedHolidays := map[string]time.Time{
+		"Republic Day":     time.Date(2024, 1, 26, 0, 0, 0, 0, time.UTC),
+		"Independence Day": time.Date(2024, 8, 15, 0, 0, 0, 0, time.UTC),
+		"Gandhi Jayanti":   time.Date(2024, 10, 2, 0, 0, 0, 0, time.UTC),
+		"Christmas Day":    time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC),
+	}
+
+	for name, expectedDate := range expectedHolidays {
+		found := false
+		for _, holiday := range holidays {
+			if holiday.Name == name && holiday.Date.Equal(expectedDate) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected national holiday %s on %s not found", name, expectedDate.Format("2006-01-02"))
+		}
+	}
+
+	// Test Christian holidays for 2024 (Easter was March 31, 2024)
+	christianHolidays := map[string]time.Time{
+		"Good Friday":   time.Date(2024, 3, 29, 0, 0, 0, 0, time.UTC), // Easter - 2 days
+		"Easter Sunday": time.Date(2024, 3, 31, 0, 0, 0, 0, time.UTC), // Easter
+	}
+
+	for name, expectedDate := range christianHolidays {
+		found := false
+		for _, holiday := range holidays {
+			if holiday.Name == name && holiday.Date.Equal(expectedDate) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected Christian holiday %s on %s not found", name, expectedDate.Format("2006-01-02"))
+		}
+	}
+
+	// Check minimum number of holidays
+	if len(holidays) < 6 {
+		t.Errorf("Expected at least 6 holidays, got %d", len(holidays))
+	}
+}
+
+func TestINProvider_NationalHolidays(t *testing.T) {
+	provider := NewINProvider()
+	holidays := provider.LoadHolidays(2024)
+
+	// Check that national holidays have proper categories
+	nationalHolidays := []string{"Republic Day", "Independence Day", "Gandhi Jayanti"}
+
+	for _, name := range nationalHolidays {
+		found := false
+		for _, holiday := range holidays {
+			if holiday.Name == name {
+				found = true
+				if holiday.Category != "national" {
+					t.Errorf("Expected %s to be national category, got %s", name, holiday.Category)
+				}
+				// Check for Hindi translation
+				if holiday.Languages == nil || holiday.Languages["hi"] == "" {
+					t.Errorf("Expected %s to have Hindi translation", name)
+				}
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected to find national holiday: %s", name)
+		}
+	}
+}
+
+func TestINProvider_StateHolidays(t *testing.T) {
+	provider := NewINProvider()
+
+	// Test Maharashtra state holidays
+	maharashtraHolidays := provider.GetStateHolidays(2024, "MH")
+	if len(maharashtraHolidays) == 0 {
+		t.Error("Expected Maharashtra to have state holidays")
+	}
+
+	// Check for Maharashtra Day
+	maharashtraDay := time.Date(2024, 5, 1, 0, 0, 0, 0, time.UTC)
 	found := false
-	for _, sub := range subdivisions {
-		if sub == "DL" { // Delhi
+	for _, holiday := range maharashtraHolidays {
+		if holiday.Date.Equal(maharashtraDay) && holiday.Name == "Maharashtra Day" {
 			found = true
+			if holiday.Category != "regional" {
+				t.Errorf("Expected Maharashtra Day to be regional category, got %s", holiday.Category)
+			}
+			if len(holiday.Subdivisions) == 0 || holiday.Subdivisions[0] != "MH" {
+				t.Errorf("Expected Maharashtra Day to be specific to MH subdivision")
+			}
 			break
 		}
 	}
 	if !found {
-		t.Error("Delhi (DL) not found in supported subdivisions")
+		t.Error("Expected to find Maharashtra Day in Maharashtra holidays")
+	}
+
+	// Test Gujarat state holidays
+	gujaratHolidays := provider.GetStateHolidays(2024, "GJ")
+	if len(gujaratHolidays) == 0 {
+		t.Error("Expected Gujarat to have state holidays")
+	}
+
+	// Test unknown state
+	unknownHolidays := provider.GetStateHolidays(2024, "XX")
+	if len(unknownHolidays) != 0 {
+		t.Error("Expected unknown state to have no holidays")
 	}
 }
 
-func TestINProvider_GetSupportedCategories(t *testing.T) {
+func TestINProvider_MajorFestivals(t *testing.T) {
 	provider := NewINProvider()
-	categories := provider.GetSupportedCategories()
+	festivals := provider.GetMajorFestivals(2024)
 
-	expectedCategories := []string{"public", "national", "religious", "hindu", "islamic", "christian"}
-	if len(categories) != len(expectedCategories) {
-		t.Errorf("GetSupportedCategories() returned %d categories, want %d", len(categories), len(expectedCategories))
-	}
+	// Check that major festivals are included
+	expectedFestivals := []string{"Holi", "Dussehra", "Diwali", "Janmashtami", "Ram Navami"}
 
-	// Check for specific categories
-	categoryMap := make(map[string]bool)
-	for _, cat := range categories {
-		categoryMap[cat] = true
-	}
-
-	for _, expected := range expectedCategories {
-		if !categoryMap[expected] {
-			t.Errorf("Expected category %s not found", expected)
+	for _, festivalName := range expectedFestivals {
+		found := false
+		for _, festival := range festivals {
+			if festival.Name == festivalName {
+				found = true
+				if festival.Category != "hindu" {
+					t.Errorf("Expected %s to be hindu category, got %s", festivalName, festival.Category)
+				}
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected to find major festival: %s", festivalName)
 		}
 	}
-}
 
-func TestINProvider_Languages(t *testing.T) {
-	provider := NewINProvider()
-	holidays := provider.LoadHolidays(2024)
-
-	// Test that holidays have multilingual names
-	republicDay := time.Date(2024, 1, 26, 0, 0, 0, 0, time.UTC)
-	if holiday, exists := holidays[republicDay]; exists {
-		if holiday.Languages == nil {
-			t.Error("Republic Day should have language translations")
-		}
-		if holiday.Languages["en"] != "Republic Day" {
-			t.Errorf("Expected English name 'Republic Day', got %s", holiday.Languages["en"])
-		}
-		if holiday.Languages["hi"] == "" {
-			t.Error("Hindi translation should not be empty")
-		}
+	// Check for non-Hindu festivals
+	nonHinduFestivals := map[string]string{
+		"Buddha Purnima":     "buddhist",
+		"Mahavir Jayanti":    "jain",
+		"Guru Nanak Jayanti": "sikh",
 	}
-}
 
-func BenchmarkINProvider_LoadHolidays(b *testing.B) {
-	provider := NewINProvider()
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		provider.LoadHolidays(2024)
+	for festivalName, expectedCategory := range nonHinduFestivals {
+		found := false
+		for _, festival := range festivals {
+			if festival.Name == festivalName {
+				found = true
+				if festival.Category != expectedCategory {
+					t.Errorf("Expected %s to be %s category, got %s", festivalName, expectedCategory, festival.Category)
+				}
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected to find festival: %s", festivalName)
+		}
 	}
 }
 
 func TestINProvider_EasterCalculation(t *testing.T) {
 	provider := NewINProvider()
 
-	// Test known Easter dates
+	// Test Easter dates for known years
 	testCases := []struct {
 		year     int
 		expected time.Time
 	}{
-		{2024, time.Date(2024, 3, 31, 0, 0, 0, 0, time.UTC)}, // March 31, 2024
-		{2025, time.Date(2025, 4, 20, 0, 0, 0, 0, time.UTC)}, // April 20, 2025
+		{2024, time.Date(2024, 3, 31, 0, 0, 0, 0, time.UTC)},
+		{2025, time.Date(2025, 4, 20, 0, 0, 0, 0, time.UTC)},
+		{2026, time.Date(2026, 4, 5, 0, 0, 0, 0, time.UTC)},
 	}
 
 	for _, tc := range testCases {
 		easter := provider.calculateEaster(tc.year)
 		if !easter.Equal(tc.expected) {
-			t.Errorf("calculateEaster(%d) = %v, want %v", tc.year, easter, tc.expected)
+			t.Errorf("Easter %d: expected %s, got %s", tc.year, tc.expected.Format("2006-01-02"), easter.Format("2006-01-02"))
+		}
+	}
+}
+
+func TestINProvider_HolidayCategories(t *testing.T) {
+	provider := NewINProvider()
+	holidays := provider.LoadHolidays(2024)
+
+	validCategories := map[string]bool{
+		"national":   true,
+		"gazetted":   true,
+		"restricted": true,
+		"hindu":      true,
+		"muslim":     true,
+		"christian":  true,
+		"sikh":       true,
+		"buddhist":   true,
+		"jain":       true,
+		"regional":   true,
+	}
+
+	for _, holiday := range holidays {
+		if !validCategories[holiday.Category] {
+			t.Errorf("Holiday %s has invalid category: %s", holiday.Name, holiday.Category)
+		}
+	}
+}
+
+func TestINProvider_DiverseReligions(t *testing.T) {
+	provider := NewINProvider()
+	holidays := provider.LoadHolidays(2024)
+	festivals := provider.GetMajorFestivals(2024)
+
+	// Combine all holidays
+	allHolidays := make(map[time.Time]*Holiday)
+	for date, holiday := range holidays {
+		allHolidays[date] = holiday
+	}
+	for date, festival := range festivals {
+		allHolidays[date] = festival
+	}
+
+	// Check that multiple religions are represented
+	religionCategories := map[string]bool{
+		"hindu":     false,
+		"christian": false,
+		"buddhist":  false,
+		"sikh":      false,
+		"jain":      false,
+	}
+
+	for _, holiday := range allHolidays {
+		if _, exists := religionCategories[holiday.Category]; exists {
+			religionCategories[holiday.Category] = true
+		}
+	}
+
+	for religion, found := range religionCategories {
+		if !found {
+			t.Errorf("Expected to find holidays from %s tradition", religion)
+		}
+	}
+}
+
+func TestINProvider_UniqueIndianHolidays(t *testing.T) {
+	provider := NewINProvider()
+	holidays := provider.LoadHolidays(2024)
+
+	// Check that India has unique holidays
+	uniqueHolidays := []string{
+		"Republic Day",
+		"Independence Day",
+		"Gandhi Jayanti",
+	}
+
+	for _, uniqueName := range uniqueHolidays {
+		found := false
+		for _, holiday := range holidays {
+			if holiday.Name == uniqueName {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected to find unique Indian holiday: %s", uniqueName)
 		}
 	}
 }

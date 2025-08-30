@@ -12,6 +12,9 @@ import (
 	goholidays "github.com/coredds/GoHoliday"
 )
 
+// For testing
+var osExit = os.Exit
+
 func main() {
 	var (
 		country      = flag.String("country", "", "Country code (e.g., US, GB, CA)")
@@ -42,7 +45,7 @@ func main() {
 	if *country == "" {
 		fmt.Println("Error: country code is required")
 		flag.Usage()
-		os.Exit(1)
+		osExit(1)
 	}
 
 	// Parse subdivisions
@@ -73,7 +76,9 @@ func main() {
 func checkSpecificDate(country *goholidays.Country, dateStr, format string, showBusiness bool) {
 	date, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
-		log.Fatalf("Invalid date format. Use YYYY-MM-DD: %v", err)
+		log.Printf("Invalid date format. Use YYYY-MM-DD: %v", err)
+		osExit(1)
+		return
 	}
 
 	holiday, isHoliday := country.IsHoliday(date)
@@ -89,7 +94,7 @@ func checkSpecificDate(country *goholidays.Country, dateStr, format string, show
 		}
 		if err := json.NewEncoder(os.Stdout).Encode(result); err != nil {
 			fmt.Fprintf(os.Stderr, "Error encoding JSON output: %v\n", err)
-			os.Exit(1)
+			osExit(1)
 		}
 	default:
 		if isHoliday {
@@ -115,6 +120,11 @@ func checkSpecificDate(country *goholidays.Country, dateStr, format string, show
 }
 
 func showCalendar(country *goholidays.Country, year int, month time.Month) {
+	// Validate month range
+	if month < 1 || month > 12 {
+		fmt.Printf("Error: Invalid month %d. Month must be between 1 and 12.\n", month)
+		return
+	}
 	calendar := goholidays.NewHolidayCalendar(country)
 	calendar.PrintMonth(year, month)
 }
@@ -126,7 +136,7 @@ func listHolidaysForYear(country *goholidays.Country, year int, format string) {
 	case "json":
 		if err := json.NewEncoder(os.Stdout).Encode(holidays); err != nil {
 			fmt.Fprintf(os.Stderr, "Error encoding JSON output: %v\n", err)
-			os.Exit(1)
+			osExit(1)
 		}
 	case "csv":
 		fmt.Println("Date,Name,Category,Observed")

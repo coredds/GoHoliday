@@ -109,8 +109,8 @@ func TestHolidayCategories(t *testing.T) {
 		t.Fatal("Independence Day should be a holiday")
 	}
 
-	if holiday.Category != CategoryPublic {
-		t.Errorf("Expected category '%s', got '%s'", CategoryPublic, holiday.Category)
+	if holiday.Category != "federal" {
+		t.Errorf("Expected category 'federal', got '%s'", holiday.Category)
 	}
 }
 

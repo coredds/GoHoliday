@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/coredds/GoHoliday/config"
 	"github.com/coredds/GoHoliday/updater"
 )
 
@@ -22,16 +23,46 @@ func main() {
 		listOnly  = flag.Bool("list", false, "Only list available countries")
 		validate  = flag.Bool("validate", false, "Validate existing data against Python source")
 		force     = flag.Bool("force", false, "Force sync even if data appears up-to-date")
+		token     = flag.String("token", "", "GitHub Personal Access Token for authentication (optional)")
 	)
 	flag.Parse()
 
 	fmt.Println("GoHolidays Python Sync Tool")
 	fmt.Println("===========================")
 
-	// Create GitHub syncer
-	syncer := updater.NewGitHubSyncer()
+	// Get GitHub token from flag, config file, or environment variable
+	githubToken := *token
+	if githubToken == "" {
+		githubToken = config.LoadGitHubToken()
+	}
+
+	// Create GitHub syncer with optional token
+	var syncer updater.Syncer
+	if githubToken != "" {
+		syncer = updater.NewGitHubSyncerWithToken(githubToken)
+		if *verbose {
+			fmt.Println("Using authenticated GitHub API access")
+		}
+	} else {
+		syncer = updater.NewGitHubSyncer()
+		if *verbose {
+			fmt.Println("Using unauthenticated GitHub API access (rate limited)")
+		}
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
+
+	// Validate token if provided
+	if githubToken != "" {
+		if githubSyncer, ok := syncer.(*updater.GitHubSyncer); ok {
+			if err := githubSyncer.ValidateToken(ctx); err != nil {
+				log.Fatalf("GitHub token validation failed: %v", err)
+			}
+			if *verbose {
+				fmt.Println("✓ GitHub token validated successfully")
+			}
+		}
+	}
 
 	if *listOnly {
 		if err := listCountries(ctx, syncer); err != nil {
@@ -60,7 +91,7 @@ func main() {
 	}
 }
 
-func listCountries(ctx context.Context, syncer *updater.GitHubSyncer) error {
+func listCountries(ctx context.Context, syncer updater.Syncer) error {
 	fmt.Println("Fetching available countries from Python holidays repository...")
 
 	countries, err := syncer.FetchCountryList(ctx)
@@ -80,7 +111,7 @@ func listCountries(ctx context.Context, syncer *updater.GitHubSyncer) error {
 	return nil
 }
 
-func syncSingleCountry(ctx context.Context, syncer *updater.GitHubSyncer, countryCode, outputDir string, dryRun, verbose bool) error {
+func syncSingleCountry(ctx context.Context, syncer updater.Syncer, countryCode, outputDir string, dryRun, verbose bool) error {
 	fmt.Printf("Syncing country: %s\n", countryCode)
 
 	if dryRun {
@@ -156,7 +187,7 @@ func syncSingleCountry(ctx context.Context, syncer *updater.GitHubSyncer, countr
 	return nil
 }
 
-func syncAllCountries(ctx context.Context, syncer *updater.GitHubSyncer, outputDir string, dryRun, verbose, force bool) error {
+func syncAllCountries(ctx context.Context, syncer updater.Syncer, outputDir string, dryRun, verbose, force bool) error {
 	fmt.Println("Syncing all available countries...")
 
 	if dryRun {
@@ -203,7 +234,7 @@ func syncAllCountries(ctx context.Context, syncer *updater.GitHubSyncer, outputD
 	return nil
 }
 
-func validateData(ctx context.Context, syncer *updater.GitHubSyncer, dataDir string, verbose bool) error {
+func validateData(ctx context.Context, syncer updater.Syncer, dataDir string, verbose bool) error {
 	fmt.Println("Validating existing data against Python source...")
 
 	// This would compare existing JSON files with fresh Python source

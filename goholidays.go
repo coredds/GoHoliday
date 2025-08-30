@@ -11,7 +11,7 @@ import (
 )
 
 // Version represents the current version of the GoHoliday library
-const Version = "0.5.0"
+const Version = "0.5.3"
 
 // HolidayCategory represents different types of holidays
 type HolidayCategory string
@@ -243,41 +243,20 @@ func (c *Country) loadCountryHolidays(year int) {
 	}
 }
 
-// Placeholder implementations for specific countries
+// loadUSHolidays loads US holidays using the US provider
 func (c *Country) loadUSHolidays(year int) {
-	holidays := c.years[year]
+	provider := countries.NewUSProvider()
+	holidayMap := provider.LoadHolidays(year)
 
-	// New Year's Day
-	holidays[time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)] = &Holiday{
-		Name:     "New Year's Day",
-		Date:     time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC),
-		Category: CategoryPublic,
-		Languages: map[string]string{
-			"en": "New Year's Day",
-			"es": "Año Nuevo",
-		},
-	}
-
-	// Independence Day
-	holidays[time.Date(year, 7, 4, 0, 0, 0, 0, time.UTC)] = &Holiday{
-		Name:     "Independence Day",
-		Date:     time.Date(year, 7, 4, 0, 0, 0, 0, time.UTC),
-		Category: CategoryPublic,
-		Languages: map[string]string{
-			"en": "Independence Day",
-			"es": "Día de la Independencia",
-		},
-	}
-
-	// Christmas Day
-	holidays[time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)] = &Holiday{
-		Name:     "Christmas Day",
-		Date:     time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC),
-		Category: CategoryPublic,
-		Languages: map[string]string{
-			"en": "Christmas Day",
-			"es": "Navidad",
-		},
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:       holiday.Name,
+			Date:       holiday.Date,
+			Category:   HolidayCategory(holiday.Category),
+			Languages:  holiday.Languages,
+			Observed:   holiday.Observed,
+			IsObserved: holiday.IsObserved,
+		}
 	}
 }
 

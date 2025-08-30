@@ -20,6 +20,9 @@ type PythonHolidaysSync struct {
 
 // NewPythonHolidaysSync creates a new sync instance
 func NewPythonHolidaysSync(dataDir string) *PythonHolidaysSync {
+	if dataDir == "" {
+		dataDir = "./holiday_data"
+	}
 	return &PythonHolidaysSync{
 		repoURL:    "https://api.github.com/repos/vacanza/holidays",
 		dataDir:    dataDir,

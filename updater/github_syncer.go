@@ -22,18 +22,31 @@ type GitHubSyncer struct {
 	repoOwner   string
 	repoName    string
 	branch      string
+	token       string // GitHub Personal Access Token
 	rateLimiter chan struct{}
 }
 
 // NewGitHubSyncer creates a new GitHub API syncer
 func NewGitHubSyncer() *GitHubSyncer {
-	// Rate limiter: GitHub allows 60 requests/hour for unauthenticated requests
-	// We'll be conservative and limit to 1 request per second
+	return NewGitHubSyncerWithToken("")
+}
+
+// NewGitHubSyncerWithToken creates a new GitHub API syncer with optional authentication token
+func NewGitHubSyncerWithToken(token string) *GitHubSyncer {
+	// Rate limiter: GitHub allows different limits based on authentication
+	// - Unauthenticated: 60 requests/hour
+	// - Authenticated: 5000 requests/hour
+	// We'll be conservative: 1 req/sec for unauth, 10 req/sec for auth
+	rateLimitInterval := 1 * time.Second
+	if token != "" {
+		rateLimitInterval = 100 * time.Millisecond // 10 requests per second
+	}
+
 	rateLimiter := make(chan struct{}, 1)
 	go func() {
 		for {
 			rateLimiter <- struct{}{}
-			time.Sleep(1 * time.Second)
+			time.Sleep(rateLimitInterval)
 		}
 	}()
 
@@ -43,8 +56,53 @@ func NewGitHubSyncer() *GitHubSyncer {
 		repoOwner:   "vacanza",
 		repoName:    "holidays",
 		branch:      "dev", // Python holidays uses 'dev' as main branch
+		token:       token,
 		rateLimiter: rateLimiter,
 	}
+}
+
+// addAuthHeaders adds authentication headers to the request
+func (gs *GitHubSyncer) addAuthHeaders(req *http.Request) {
+	req.Header.Set("Accept", "application/vnd.github.v3+json")
+	req.Header.Set("User-Agent", fmt.Sprintf("GoHolidays/%s", goholidays.Version))
+
+	// Add authentication if token is provided
+	if gs.token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", gs.token))
+	}
+}
+
+// ValidateToken checks if the provided GitHub token is valid
+func (gs *GitHubSyncer) ValidateToken(ctx context.Context) error {
+	if gs.token == "" {
+		return nil // No token to validate
+	}
+
+	// Test the token by making a simple API call
+	url := fmt.Sprintf("%s/user", gs.baseURL)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create validation request: %w", err)
+	}
+
+	gs.addAuthHeaders(req)
+
+	resp, err := gs.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to validate token: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		return fmt.Errorf("invalid GitHub token: unauthorized")
+	} else if resp.StatusCode == http.StatusForbidden {
+		return fmt.Errorf("GitHub token lacks required permissions")
+	} else if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("token validation failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	return nil
 }
 
 // GitHubFile represents a file from GitHub API
@@ -87,8 +145,7 @@ func (gs *GitHubSyncer) FetchCountryList(ctx context.Context) ([]string, error) 
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	req.Header.Set("Accept", "application/vnd.github.v3+json")
-	req.Header.Set("User-Agent", fmt.Sprintf("GoHolidays/%s", goholidays.Version))
+	gs.addAuthHeaders(req)
 
 	resp, err := gs.client.Do(req)
 	if err != nil {
@@ -133,8 +190,7 @@ func (gs *GitHubSyncer) FetchCountryFile(ctx context.Context, countryCode string
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
 
-	req.Header.Set("Accept", "application/vnd.github.v3+json")
-	req.Header.Set("User-Agent", fmt.Sprintf("GoHolidays/%s", goholidays.Version))
+	gs.addAuthHeaders(req)
 
 	resp, err := gs.client.Do(req)
 	if err != nil {
@@ -317,8 +373,14 @@ func (gs *GitHubSyncer) getCountryFilename(countryCode string) string {
 		"AU": "australia.py",
 		"DE": "germany.py",
 		"FR": "france.py",
+		"IT": "italy.py",
+		"PT": "portugal.py",
+		"IN": "india.py",
 		"NZ": "new_zealand.py",
 		"ZA": "south_africa.py",
+		"KR": "south_korea.py",
+		"AE": "united_arab_emirates.py",
+		"SA": "saudi_arabia.py",
 		// Add more mappings as needed
 	}
 

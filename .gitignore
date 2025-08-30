@@ -81,6 +81,8 @@ desktop.ini
 # Configuration overrides for local development
 config/local.yaml
 config/dev-local.yaml
+config/github_token.txt
+config/*.token
 
 # Example output files
 examples/*/*.exe

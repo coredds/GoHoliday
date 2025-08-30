@@ -5,6 +5,49 @@ All notable changes to the GoHoliday project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.3] - 2025-08-30
+
+### Added
+- **Portugal (PT) Holiday Provider**: Complete Iberian implementation with Catholic traditions
+  - 14 national holidays including Freedom Day, Portugal Day, Republic Day
+  - Easter-based holidays: Carnival Tuesday, Good Friday, Easter Sunday, Corpus Christi
+  - Portuguese/English bilingual support
+  - 20 subdivisions (18 districts + 2 autonomous regions)
+- **Italy (IT) Holiday Provider**: Comprehensive Italian holiday system with regional variations
+  - 11 national holidays including Epiphany, Liberation Day, Republic Day, St. Stephen's Day
+  - Regional patron saint holidays (St. Ambrose, St. Mark, etc.)
+  - Italian/English bilingual support
+  - All 20 Italian regions supported
+- **India (IN) Holiday Provider**: Multi-religious implementation with diverse cultural celebrations
+  - National holidays: Republic Day, Independence Day, Gandhi Jayanti
+  - Hindu festivals: Diwali, Holi, Dussehra, Janmashtami, Ram Navami (approximate dates)
+  - Buddhist, Sikh, Jain festivals: Buddha Purnima, Guru Nanak Jayanti, Mahavir Jayanti
+  - State-specific holidays for major states
+  - Hindi/English bilingual support
+  - 36 subdivisions (28 states + 8 union territories)
+
+### Enhanced
+- **GitHub API Integration**: Added secure token authentication system
+  - Token-based authentication for higher API rate limits (5000 vs 60 requests/hour)
+  - Automatic token loading from environment variables or config files
+  - Token validation and error handling
+  - Updated sync tool with authentication support
+- **Holiday Sync System**: Improved Python holidays repository integration
+  - Enhanced filename mapping for new countries
+  - Better error handling and rate limiting
+  - Mock testing system for reliable CI/CD
+
+### Technical
+- **Test Coverage**: Added comprehensive test suites for all new countries
+  - 20+ test functions covering creation, holidays, languages, categories
+  - Regional/state holiday testing
+  - Multi-language support validation
+  - Easter calculation accuracy tests
+- **Code Quality**: All new implementations follow established patterns
+  - Consistent API design across all providers
+  - Proper error handling and validation
+  - Clean separation of concerns
+
 ## [0.5.0] - 2025-08-28
 
 ### Added

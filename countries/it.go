@@ -13,11 +13,14 @@ type ITProvider struct {
 func NewITProvider() *ITProvider {
 	base := NewBaseProvider("IT")
 	base.subdivisions = []string{
-		// 20 regions
+		// 20 regions of Italy
 		"ABR", "BAS", "CAL", "CAM", "EMR", "FVG", "LAZ", "LIG", "LOM", "MAR",
 		"MOL", "PIE", "PUG", "SAR", "SIC", "TOS", "TAA", "UMB", "VDA", "VEN",
+		// Abruzzo, Basilicata, Calabria, Campania, Emilia-Romagna, Friuli-Venezia Giulia,
+		// Lazio, Liguria, Lombardy, Marche, Molise, Piedmont, Apulia, Sardinia,
+		// Sicily, Tuscany, Trentino-Alto Adige, Umbria, Aosta Valley, Veneto
 	}
-	base.categories = []string{"public", "national", "religious", "regional"}
+	base.categories = []string{"public", "religious", "regional", "patron"}
 
 	return &ITProvider{BaseProvider: base}
 }
@@ -26,161 +29,84 @@ func NewITProvider() *ITProvider {
 func (it *ITProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	holidays := make(map[time.Time]*Holiday)
 
-	// Fixed national holidays
-
-	// New Year's Day - January 1
-	newYear := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
-	holidays[newYear] = it.CreateHoliday(
-		"Capodanno",
-		newYear,
-		"public",
-		map[string]string{
-			"it": "Capodanno",
-			"en": "New Year's Day",
-		},
-	)
-
-	// Epiphany - January 6
-	epiphany := time.Date(year, 1, 6, 0, 0, 0, 0, time.UTC)
-	holidays[epiphany] = it.CreateHoliday(
-		"Epifania",
-		epiphany,
-		"religious",
-		map[string]string{
-			"it": "Epifania",
-			"en": "Epiphany",
-		},
-	)
-
-	// Liberation Day - April 25
-	liberation := time.Date(year, 4, 25, 0, 0, 0, 0, time.UTC)
-	holidays[liberation] = it.CreateHoliday(
-		"Festa della Liberazione",
-		liberation,
-		"public",
-		map[string]string{
-			"it": "Festa della Liberazione",
-			"en": "Liberation Day",
-		},
-	)
-
-	// Labour Day - May 1
-	labourDay := time.Date(year, 5, 1, 0, 0, 0, 0, time.UTC)
-	holidays[labourDay] = it.CreateHoliday(
-		"Festa del Lavoro",
-		labourDay,
-		"public",
-		map[string]string{
-			"it": "Festa del Lavoro",
-			"en": "Labour Day",
-		},
-	)
-
-	// Republic Day - June 2
-	republic := time.Date(year, 6, 2, 0, 0, 0, 0, time.UTC)
-	holidays[republic] = it.CreateHoliday(
-		"Festa della Repubblica",
-		republic,
-		"public",
-		map[string]string{
-			"it": "Festa della Repubblica",
-			"en": "Republic Day",
-		},
-	)
-
-	// Assumption of Mary - August 15
-	assumption := time.Date(year, 8, 15, 0, 0, 0, 0, time.UTC)
-	holidays[assumption] = it.CreateHoliday(
-		"Assunzione di Maria",
-		assumption,
-		"religious",
-		map[string]string{
-			"it": "Assunzione di Maria",
-			"en": "Assumption of Mary",
-		},
-	)
-
-	// All Saints' Day - November 1
-	allSaints := time.Date(year, 11, 1, 0, 0, 0, 0, time.UTC)
-	holidays[allSaints] = it.CreateHoliday(
-		"Ognissanti",
-		allSaints,
-		"religious",
-		map[string]string{
-			"it": "Ognissanti",
-			"en": "All Saints' Day",
-		},
-	)
-
-	// Immaculate Conception - December 8
-	immaculate := time.Date(year, 12, 8, 0, 0, 0, 0, time.UTC)
-	holidays[immaculate] = it.CreateHoliday(
-		"Immacolata Concezione",
-		immaculate,
-		"religious",
-		map[string]string{
-			"it": "Immacolata Concezione",
-			"en": "Immaculate Conception",
-		},
-	)
-
-	// Christmas Day - December 25
-	christmas := time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)
-	holidays[christmas] = it.CreateHoliday(
-		"Natale",
-		christmas,
-		"religious",
-		map[string]string{
-			"it": "Natale",
-			"en": "Christmas Day",
-		},
-	)
-
-	// St. Stephen's Day - December 26
-	stephens := time.Date(year, 12, 26, 0, 0, 0, 0, time.UTC)
-	holidays[stephens] = it.CreateHoliday(
-		"Santo Stefano",
-		stephens,
-		"religious",
-		map[string]string{
-			"it": "Santo Stefano",
-			"en": "St. Stephen's Day",
-		},
-	)
+	// Fixed date holidays
+	it.addFixedHolidays(holidays, year)
 
 	// Easter-based holidays
-	easterDate := it.CalculateEaster(year)
-
-	// Easter Monday (Lunedì di Pasqua)
-	easterMonday := easterDate.AddDate(0, 0, 1)
-	holidays[easterMonday] = it.CreateHoliday(
-		"Lunedì di Pasqua",
-		easterMonday,
-		"religious",
-		map[string]string{
-			"it": "Lunedì di Pasqua",
-			"en": "Easter Monday",
-		},
-	)
+	it.addEasterHolidays(holidays, year)
 
 	return holidays
 }
 
-// CreateHoliday creates a new holiday with Italian localization
-func (it *ITProvider) CreateHoliday(name string, date time.Time, category string, languages map[string]string) *Holiday {
-	return &Holiday{
-		Name:         name,
-		Date:         date,
-		Category:     category,
-		Languages:    languages,
-		IsObserved:   true,
-		Subdivisions: []string{},
+// addFixedHolidays adds fixed-date Italian holidays
+func (it *ITProvider) addFixedHolidays(holidays map[time.Time]*Holiday, year int) {
+	fixedHolidays := []struct {
+		month    int
+		day      int
+		name     string
+		nameIt   string
+		category string
+	}{
+		{1, 1, "New Year's Day", "Capodanno", "public"},
+		{1, 6, "Epiphany", "Epifania", "religious"},
+		{4, 25, "Liberation Day", "Festa della Liberazione", "public"},
+		{5, 1, "Labour Day", "Festa del Lavoro", "public"},
+		{6, 2, "Republic Day", "Festa della Repubblica", "public"},
+		{8, 15, "Assumption of Mary", "Assunzione di Maria", "religious"},
+		{11, 1, "All Saints' Day", "Ognissanti", "religious"},
+		{12, 8, "Immaculate Conception", "Immacolata Concezione", "religious"},
+		{12, 25, "Christmas Day", "Natale", "religious"},
+		{12, 26, "St. Stephen's Day", "Santo Stefano", "religious"},
+	}
+
+	for _, h := range fixedHolidays {
+		date := time.Date(year, time.Month(h.month), h.day, 0, 0, 0, 0, time.UTC)
+		holidays[date] = &Holiday{
+			Name:     h.name,
+			Date:     date,
+			Category: h.category,
+			Languages: map[string]string{
+				"en": h.name,
+				"it": h.nameIt,
+			},
+			IsObserved: true,
+		}
 	}
 }
 
-// CalculateEaster calculates Easter date for a given year using the Western (Gregorian) calculation
-func (it *ITProvider) CalculateEaster(year int) time.Time {
-	// Using the anonymous Gregorian algorithm
+// addEasterHolidays adds Easter-based Italian holidays
+func (it *ITProvider) addEasterHolidays(holidays map[time.Time]*Holiday, year int) {
+	easter := it.calculateEaster(year)
+
+	easterHolidays := []struct {
+		offset   int
+		name     string
+		nameIt   string
+		category string
+	}{
+		{1, "Easter Monday", "Lunedì dell'Angelo", "religious"}, // Easter Monday (Pasquetta)
+	}
+
+	for _, h := range easterHolidays {
+		date := easter.AddDate(0, 0, h.offset)
+		holidays[date] = &Holiday{
+			Name:     h.name,
+			Date:     date,
+			Category: h.category,
+			Languages: map[string]string{
+				"en": h.name,
+				"it": h.nameIt,
+			},
+			IsObserved: true,
+		}
+	}
+}
+
+// calculateEaster calculates Easter Sunday for a given year using the Western (Gregorian) calendar
+func (it *ITProvider) calculateEaster(year int) time.Time {
+	// Using the algorithm for Western Easter (Gregorian calendar)
+	// This is the standard algorithm used in Western Christianity
+
 	a := year % 19
 	b := year / 100
 	c := year % 100
@@ -197,4 +123,52 @@ func (it *ITProvider) CalculateEaster(year int) time.Time {
 	day := ((h + l - 7*m + 114) % 31) + 1
 
 	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+}
+
+// GetRegionalHolidays returns region-specific holidays for Italy
+func (it *ITProvider) GetRegionalHolidays(year int, region string) map[time.Time]*Holiday {
+	holidays := make(map[time.Time]*Holiday)
+
+	// Some examples of regional patron saint days
+	regionalHolidays := map[string][]struct {
+		month  int
+		day    int
+		name   string
+		nameIt string
+	}{
+		"LOM": { // Lombardy
+			{12, 7, "St. Ambrose Day", "Sant'Ambrogio"}, // Milan patron saint
+		},
+		"VEN": { // Veneto
+			{4, 25, "St. Mark's Day", "San Marco"}, // Venice patron saint
+		},
+		"SIC": { // Sicily
+			{7, 15, "St. Rosalia Day", "Santa Rosalia"}, // Palermo patron saint
+		},
+		"LAZ": { // Lazio (Rome)
+			{6, 29, "St. Peter and Paul Day", "Santi Pietro e Paolo"}, // Rome patron saints
+		},
+		"CAM": { // Campania (Naples)
+			{9, 19, "St. Januarius Day", "San Gennaro"}, // Naples patron saint
+		},
+	}
+
+	if regionHolidays, exists := regionalHolidays[region]; exists {
+		for _, h := range regionHolidays {
+			date := time.Date(year, time.Month(h.month), h.day, 0, 0, 0, 0, time.UTC)
+			holidays[date] = &Holiday{
+				Name:     h.name,
+				Date:     date,
+				Category: "patron",
+				Languages: map[string]string{
+					"en": h.name,
+					"it": h.nameIt,
+				},
+				IsObserved:   true,
+				Subdivisions: []string{region},
+			}
+		}
+	}
+
+	return holidays
 }
