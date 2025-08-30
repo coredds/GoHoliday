@@ -53,9 +53,9 @@ func main() {
 				break
 			}
 			holiday := holidays[date]
-			fmt.Printf("   • %s - %s (%s)\n", 
-				date.Format("Jan 02"), 
-				holiday.Name, 
+			fmt.Printf("   • %s - %s (%s)\n",
+				date.Format("Jan 02"),
+				holiday.Name,
 				holiday.Category)
 			count++
 		}
@@ -75,9 +75,9 @@ func main() {
 	if len(lombardyHolidays) > 0 {
 		fmt.Println("🇮🇹 Italy - Lombardy Region:")
 		for _, holiday := range lombardyHolidays {
-			fmt.Printf("   • %s - %s (%s)\n", 
-				holiday.Date.Format("Jan 02"), 
-				holiday.Name, 
+			fmt.Printf("   • %s - %s (%s)\n",
+				holiday.Date.Format("Jan 02"),
+				holiday.Name,
 				holiday.Category)
 		}
 		fmt.Println()
@@ -89,9 +89,9 @@ func main() {
 	if len(maharashtraHolidays) > 0 {
 		fmt.Println("🇮🇳 India - Maharashtra State:")
 		for _, holiday := range maharashtraHolidays {
-			fmt.Printf("   • %s - %s (%s)\n", 
-				holiday.Date.Format("Jan 02"), 
-				holiday.Name, 
+			fmt.Printf("   • %s - %s (%s)\n",
+				holiday.Date.Format("Jan 02"),
+				holiday.Name,
 				holiday.Category)
 		}
 		fmt.Println()
@@ -101,11 +101,11 @@ func main() {
 	majorFestivals := inProvider.GetMajorFestivals(year)
 	if len(majorFestivals) > 0 {
 		fmt.Println("🇮🇳 India - Major Religious Festivals (Approximate Dates):")
-		
+
 		// Group by religion
 		religionFestivals := make(map[string][]string)
 		for _, festival := range majorFestivals {
-			religionFestivals[festival.Category] = append(religionFestivals[festival.Category], 
+			religionFestivals[festival.Category] = append(religionFestivals[festival.Category],
 				fmt.Sprintf("%s - %s", festival.Date.Format("Jan 02"), festival.Name))
 		}
 
@@ -124,7 +124,7 @@ func main() {
 
 	// Show Christmas in different countries with local names
 	christmasDate := time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)
-	
+
 	for countryName, provider := range providers {
 		holidays := provider.LoadHolidays(year)
 		if christmas, exists := holidays[christmasDate]; exists {
@@ -139,10 +139,10 @@ func main() {
 	// Easter calculation demonstration
 	fmt.Println("🐰 Easter Calculation Accuracy")
 	fmt.Println("==============================")
-	
+
 	ptProvider := countries.NewPTProvider()
 	easterYears := []int{2024, 2025, 2026, 2027}
-	
+
 	fmt.Println("Easter Sunday dates:")
 	for _, testYear := range easterYears {
 		holidays := ptProvider.LoadHolidays(testYear)

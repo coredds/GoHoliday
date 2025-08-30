@@ -55,4 +55,3 @@ func main() {
 
 	fmt.Println("\nThat's it! Check out the other examples for more features.")
 }
-

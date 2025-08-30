@@ -45,10 +45,10 @@ func main() {
 	// 2. Country-specific holidays
 	fmt.Println("\n2. Unique National Holidays (2024)")
 	uniqueHolidays := map[string]time.Time{
-		"US": time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),   // Independence Day
-		"GB": time.Date(2024, 6, 8, 0, 0, 0, 0, time.UTC),   // Queen's Birthday
-		"JP": time.Date(2024, 2, 11, 0, 0, 0, 0, time.UTC),  // National Foundation Day
-		"AU": time.Date(2024, 1, 26, 0, 0, 0, 0, time.UTC),  // Australia Day
+		"US": time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),  // Independence Day
+		"GB": time.Date(2024, 6, 8, 0, 0, 0, 0, time.UTC),  // Queen's Birthday
+		"JP": time.Date(2024, 2, 11, 0, 0, 0, 0, time.UTC), // National Foundation Day
+		"AU": time.Date(2024, 1, 26, 0, 0, 0, 0, time.UTC), // Australia Day
 	}
 
 	for code, date := range uniqueHolidays {
@@ -118,4 +118,3 @@ func printSortedHolidays(holidays map[time.Time]*goholidays.Holiday) {
 		fmt.Printf("- %s: %s\n", date.Format("Jan 2"), holidays[date].Name)
 	}
 }
-

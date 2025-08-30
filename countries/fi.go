@@ -228,4 +228,3 @@ func (fi *FIProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 
 	return holidays
 }
-

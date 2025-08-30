@@ -313,5 +313,3 @@ func BenchmarkCNProvider_LoadHolidays(b *testing.B) {
 		provider.LoadHolidays(year)
 	}
 }
-
-

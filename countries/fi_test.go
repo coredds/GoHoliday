@@ -82,4 +82,3 @@ func TestFIHolidays(t *testing.T) {
 		t.Errorf("Expected Swedish name 'Juldagen', got '%s'", christmas.Languages["sv"])
 	}
 }
-

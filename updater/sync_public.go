@@ -94,4 +94,3 @@ func (phs *PythonHolidaysSync) saveLastSyncTime(t time.Time) error {
 	path := filepath.Join(phs.dataDir, "last_sync")
 	return os.WriteFile(path, []byte(t.Format(time.RFC3339)), 0644)
 }
-

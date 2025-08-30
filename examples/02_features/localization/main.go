@@ -48,13 +48,13 @@ func main() {
 
 	// 2. Regional Holiday Names
 	fmt.Println("\n2. Regional Holiday Variations")
-	
+
 	// Create Swiss provider with different language regions
 	languages := []string{"de", "fr", "it"}
 	for _, lang := range languages {
 		ch := goholidays.NewCountry("CH", goholidays.CountryOptions{Language: lang})
 		fmt.Printf("\nSwiss holidays in %s:\n", lang)
-		
+
 		holidays := ch.HolidaysForYear(2024)
 		printSortedHolidaysWithLanguage(holidays, lang)
 	}
@@ -62,7 +62,7 @@ func main() {
 	// 3. Country-Specific Formatting
 	fmt.Println("\n3. Country-Specific Date Formats")
 	sampleDate := time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC)
-	
+
 	dateFormats := map[string]string{
 		"US": "January 2, 2006",
 		"GB": "2 January 2006",
@@ -99,7 +99,7 @@ func main() {
 
 	// 5. Regional Variations
 	fmt.Println("\n5. Regional Holiday Variations")
-	
+
 	// Create US provider with state-specific holidays
 	usStates := []string{"CA", "NY", "TX"}
 	for _, state := range usStates {
@@ -146,4 +146,3 @@ func printSortedHolidaysWithLanguage(holidays map[time.Time]*goholidays.Holiday,
 		fmt.Printf("- %s: %s\n", date.Format("Jan 2"), name)
 	}
 }
-

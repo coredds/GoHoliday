@@ -424,5 +424,3 @@ func (cn *CNProvider) GetRegionalHolidays(year int, regions []string) map[time.T
 
 	return holidays
 }
-
-

@@ -300,4 +300,3 @@ func (be *BEProvider) GetSpecialObservances(year int) map[time.Time]*Holiday {
 
 	return holidays
 }
-

@@ -359,4 +359,3 @@ func (pl *PLProvider) GetSpecialObservances(year int) map[time.Time]*Holiday {
 
 	return holidays
 }
-

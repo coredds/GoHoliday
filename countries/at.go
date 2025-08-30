@@ -416,4 +416,3 @@ func (at *ATProvider) GetSpecialObservances(year int) map[time.Time]*Holiday {
 
 	return holidays
 }
-

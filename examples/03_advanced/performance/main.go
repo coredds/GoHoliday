@@ -191,4 +191,3 @@ func benchmarkCachePerformance(country *goholidays.Country) {
 	fmt.Printf("Warm cache access: %v\n", warmDuration)
 	fmt.Printf("Cache performance improvement: %.2fx\n", float64(coldDuration)/float64(warmDuration))
 }
-

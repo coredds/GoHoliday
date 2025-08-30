@@ -28,10 +28,10 @@ func main() {
 	// 2. Check specific dates
 	fmt.Println("\n2. Holiday Checks")
 	checkDates := []time.Time{
-		time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),  // New Year's Day
-		time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),  // Independence Day
+		time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),   // New Year's Day
+		time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),   // Independence Day
 		time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC), // Christmas
-		time.Date(2024, 3, 15, 0, 0, 0, 0, time.UTC), // Regular day
+		time.Date(2024, 3, 15, 0, 0, 0, 0, time.UTC),  // Regular day
 	}
 
 	for _, date := range checkDates {
@@ -94,4 +94,3 @@ func printSortedHolidays(holidays map[time.Time]*goholidays.Holiday) {
 		fmt.Printf("- %s: %s\n", entry.date.Format("Jan 2"), entry.holiday.Name)
 	}
 }
-
