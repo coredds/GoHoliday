@@ -237,6 +237,8 @@ func (c *Country) loadCountryHolidays(year int) {
 		c.loadNLHolidays(year)
 	case "KR":
 		c.loadKRHolidays(year)
+	case "UA":
+		c.loadUAHolidays(year)
 	// Add more countries as needed
 	default:
 		// Load from generic holiday data or return empty
@@ -1084,6 +1086,21 @@ func (c *Country) loadNLHolidays(year int) {
 // loadKRHolidays loads South Korea holidays using the KR provider
 func (c *Country) loadKRHolidays(year int) {
 	provider := countries.NewKRProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:      holiday.Name,
+			Date:      holiday.Date,
+			Category:  HolidayCategory(holiday.Category),
+			Languages: holiday.Languages,
+		}
+	}
+}
+
+// loadUAHolidays loads Ukraine holidays using the UA provider
+func (c *Country) loadUAHolidays(year int) {
+	provider := countries.NewUAProvider()
 	holidayMap := provider.LoadHolidays(year)
 
 	for date, holiday := range holidayMap {
