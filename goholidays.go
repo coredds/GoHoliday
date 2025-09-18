@@ -4,6 +4,8 @@
 package goholidays
 
 import (
+	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -12,6 +14,174 @@ import (
 
 // Version represents the current version of the GoHoliday library
 const Version = "0.5.3"
+
+// ErrorCode represents different types of errors that can occur
+type ErrorCode int
+
+const (
+	// ErrInvalidCountry indicates an unsupported or invalid country code
+	ErrInvalidCountry ErrorCode = iota
+
+	// ErrInvalidYear indicates an invalid year value
+	ErrInvalidYear
+
+	// ErrDataLoadFailed indicates failure to load holiday data
+	ErrDataLoadFailed
+
+	// ErrCancelled indicates the operation was cancelled via context
+	ErrCancelled
+
+	// ErrInvalidDate indicates an invalid date parameter
+	ErrInvalidDate
+
+	// ErrProviderNotFound indicates no provider exists for the country
+	ErrProviderNotFound
+)
+
+// HolidayError represents a structured error with context about what went wrong
+type HolidayError struct {
+	Code    ErrorCode
+	Country string
+	Year    int
+	Date    string
+	Message string
+	Cause   error
+}
+
+// Error implements the error interface
+func (e *HolidayError) Error() string {
+	if e.Cause != nil {
+		return fmt.Sprintf("%s: %v", e.Message, e.Cause)
+	}
+	return e.Message
+}
+
+// Unwrap returns the underlying cause error
+func (e *HolidayError) Unwrap() error {
+	return e.Cause
+}
+
+// Is checks if the error matches a specific error code
+func (e *HolidayError) Is(target error) bool {
+	if he, ok := target.(*HolidayError); ok {
+		return e.Code == he.Code
+	}
+	return false
+}
+
+// NewHolidayError creates a new HolidayError
+func NewHolidayError(code ErrorCode, message string) *HolidayError {
+	return &HolidayError{
+		Code:    code,
+		Message: message,
+	}
+}
+
+// NewHolidayErrorWithCause creates a new HolidayError with an underlying cause
+func NewHolidayErrorWithCause(code ErrorCode, message string, cause error) *HolidayError {
+	return &HolidayError{
+		Code:    code,
+		Message: message,
+		Cause:   cause,
+	}
+}
+
+// NewCountryError creates a country-specific error
+func NewCountryError(code ErrorCode, country, message string) *HolidayError {
+	return &HolidayError{
+		Code:    code,
+		Country: country,
+		Message: message,
+	}
+}
+
+// NewYearError creates a year-specific error
+func NewYearError(code ErrorCode, country string, year int, message string) *HolidayError {
+	return &HolidayError{
+		Code:    code,
+		Country: country,
+		Year:    year,
+		Message: message,
+	}
+}
+
+// SupportedCountries contains all countries that have holiday providers
+var SupportedCountries = map[string]bool{
+	"AR": true, "AT": true, "AU": true, "BE": true, "BR": true, "CA": true,
+	"CH": true, "CN": true, "DE": true, "ES": true, "FI": true, "FR": true,
+	"GB": true, "ID": true, "IN": true, "IT": true, "JP": true, "KR": true,
+	"MX": true, "NL": true, "NO": true, "NZ": true, "PL": true, "PT": true,
+	"RU": true, "SE": true, "SG": true, "TH": true, "TR": true, "UA": true,
+	"US": true,
+}
+
+// ValidateCountryCode checks if a country code is supported
+func ValidateCountryCode(code string) error {
+	if code == "" {
+		return NewCountryError(ErrInvalidCountry, code, "country code cannot be empty")
+	}
+
+	if !SupportedCountries[code] {
+		return NewCountryError(ErrInvalidCountry, code,
+			fmt.Sprintf("country code '%s' is not supported", code))
+	}
+
+	return nil
+}
+
+// ValidateYear checks if a year is valid for holiday calculations
+func ValidateYear(year int) error {
+	// Reasonable bounds for holiday calculations
+	if year < 1900 || year > 2200 {
+		return NewHolidayError(ErrInvalidYear,
+			fmt.Sprintf("year %d is outside valid range (1900-2200)", year))
+	}
+	return nil
+}
+
+// IsContextCancelled checks if an error is due to context cancellation
+func IsContextCancelled(err error) bool {
+	if err == context.Canceled || err == context.DeadlineExceeded {
+		return true
+	}
+
+	if he, ok := err.(*HolidayError); ok {
+		return he.Code == ErrCancelled
+	}
+
+	return false
+}
+
+// WrapContextError wraps a context error as a HolidayError
+func WrapContextError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if err == context.Canceled {
+		return NewHolidayErrorWithCause(ErrCancelled, "operation was cancelled", err)
+	}
+
+	if err == context.DeadlineExceeded {
+		return NewHolidayErrorWithCause(ErrCancelled, "operation timed out", err)
+	}
+
+	return err
+}
+
+// IsValidCountry checks if a country code is supported
+func IsValidCountry(countryCode string) bool {
+	return SupportedCountries[countryCode]
+}
+
+// GetSupportedCountries returns a list of all supported country codes
+func GetSupportedCountries() []string {
+	countries := make([]string, 0, len(SupportedCountries))
+	for code := range SupportedCountries {
+		countries = append(countries, code)
+	}
+	return countries
+}
 
 // HolidayCategory represents different types of holidays
 type HolidayCategory string
@@ -57,6 +227,7 @@ type CountryOptions struct {
 }
 
 // NewCountry creates a new Country holiday provider
+// Note: For error handling, use NewCountryWithError instead
 func NewCountry(countryCode string, options ...CountryOptions) *Country {
 	c := &Country{
 		code:       countryCode,
@@ -1111,4 +1282,225 @@ func (c *Country) loadUAHolidays(year int) {
 			Languages: holiday.Languages,
 		}
 	}
+}
+
+// ============================================================================
+// Enhanced API Methods with Error Handling and Context Support
+// ============================================================================
+
+// NewCountryWithError creates a new Country with validation
+// This is the recommended way to create countries with proper error handling
+func NewCountryWithError(countryCode string, options ...CountryOptions) (*Country, error) {
+	// Validate country code
+	if err := ValidateCountryCode(countryCode); err != nil {
+		return nil, err
+	}
+
+	// Use existing NewCountry function
+	country := NewCountry(countryCode, options...)
+	return country, nil
+}
+
+// IsHolidayWithError checks if the given date is a holiday with error handling
+func (c *Country) IsHolidayWithError(date time.Time) (*Holiday, bool, error) {
+	year := date.Year()
+
+	// Validate year
+	if err := ValidateYear(year); err != nil {
+		return nil, false, err
+	}
+
+	// Use existing IsHoliday method
+	holiday, isHoliday := c.IsHoliday(date)
+	return holiday, isHoliday, nil
+}
+
+// IsHolidayWithContext checks if the given date is a holiday with context support
+func (c *Country) IsHolidayWithContext(ctx context.Context, date time.Time) (*Holiday, bool, error) {
+	// Check for context cancellation
+	select {
+	case <-ctx.Done():
+		return nil, false, WrapContextError(ctx.Err())
+	default:
+	}
+
+	year := date.Year()
+
+	// Validate year
+	if err := ValidateYear(year); err != nil {
+		return nil, false, err
+	}
+
+	// Load year with context if needed
+	if err := c.loadYearWithContext(ctx, year); err != nil {
+		return nil, false, err
+	}
+
+	// Use existing IsHoliday method for the actual lookup
+	holiday, isHoliday := c.IsHoliday(date)
+	return holiday, isHoliday, nil
+}
+
+// HolidaysForYearWithError returns all holidays for a specific year with error handling
+func (c *Country) HolidaysForYearWithError(year int) (map[time.Time]*Holiday, error) {
+	// Validate year
+	if err := ValidateYear(year); err != nil {
+		return nil, err
+	}
+
+	// Use existing HolidaysForYear method
+	holidays := c.HolidaysForYear(year)
+	return holidays, nil
+}
+
+// HolidaysForYearWithContext returns all holidays for a specific year with context support
+func (c *Country) HolidaysForYearWithContext(ctx context.Context, year int) (map[time.Time]*Holiday, error) {
+	// Check for context cancellation
+	select {
+	case <-ctx.Done():
+		return nil, WrapContextError(ctx.Err())
+	default:
+	}
+
+	// Validate year
+	if err := ValidateYear(year); err != nil {
+		return nil, err
+	}
+
+	// Load year with context
+	if err := c.loadYearWithContext(ctx, year); err != nil {
+		return nil, err
+	}
+
+	// Use existing HolidaysForYear method
+	holidays := c.HolidaysForYear(year)
+	return holidays, nil
+}
+
+// HolidaysForDateRangeWithError returns all holidays within a date range with error handling
+func (c *Country) HolidaysForDateRangeWithError(start, end time.Time) (map[time.Time]*Holiday, error) {
+	// Validate date range
+	if start.After(end) {
+		return nil, NewHolidayError(ErrInvalidDate, "start date cannot be after end date")
+	}
+
+	startYear := start.Year()
+	endYear := end.Year()
+
+	// Validate years
+	if err := ValidateYear(startYear); err != nil {
+		return nil, err
+	}
+	if err := ValidateYear(endYear); err != nil {
+		return nil, err
+	}
+
+	// Use existing HolidaysForDateRange method
+	holidays := c.HolidaysForDateRange(start, end)
+	return holidays, nil
+}
+
+// HolidaysForDateRangeWithContext returns all holidays within a date range with context support
+func (c *Country) HolidaysForDateRangeWithContext(ctx context.Context, start, end time.Time) (map[time.Time]*Holiday, error) {
+	// Check for context cancellation
+	select {
+	case <-ctx.Done():
+		return nil, WrapContextError(ctx.Err())
+	default:
+	}
+
+	// Validate date range
+	if start.After(end) {
+		return nil, NewHolidayError(ErrInvalidDate, "start date cannot be after end date")
+	}
+
+	startYear := start.Year()
+	endYear := end.Year()
+
+	// Validate and load all required years with context
+	for year := startYear; year <= endYear; year++ {
+		select {
+		case <-ctx.Done():
+			return nil, WrapContextError(ctx.Err())
+		default:
+		}
+
+		if err := ValidateYear(year); err != nil {
+			return nil, err
+		}
+
+		if err := c.loadYearWithContext(ctx, year); err != nil {
+			return nil, err
+		}
+	}
+
+	// Use existing HolidaysForDateRange method
+	holidays := c.HolidaysForDateRange(start, end)
+	return holidays, nil
+}
+
+// GetHolidayCount returns the number of holidays for a given year
+func (c *Country) GetHolidayCount(year int) (int, error) {
+	holidays, err := c.HolidaysForYearWithError(year)
+	if err != nil {
+		return 0, err
+	}
+	return len(holidays), nil
+}
+
+// GetHolidayCountWithContext returns the number of holidays for a given year with context
+func (c *Country) GetHolidayCountWithContext(ctx context.Context, year int) (int, error) {
+	holidays, err := c.HolidaysForYearWithContext(ctx, year)
+	if err != nil {
+		return 0, err
+	}
+	return len(holidays), nil
+}
+
+// loadYearWithContext loads holidays for a specific year with context support
+func (c *Country) loadYearWithContext(ctx context.Context, year int) error {
+	// Check if already loaded
+	c.mu.RLock()
+	_, exists := c.years[year]
+	c.mu.RUnlock()
+
+	if exists {
+		return nil // Already loaded
+	}
+
+	// Check for context cancellation before acquiring write lock
+	select {
+	case <-ctx.Done():
+		return WrapContextError(ctx.Err())
+	default:
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Double-check after acquiring write lock
+	if c.years[year] != nil {
+		return nil // Already loaded by another goroutine
+	}
+
+	// Check for context cancellation again
+	select {
+	case <-ctx.Done():
+		return WrapContextError(ctx.Err())
+	default:
+	}
+
+	// Use existing loadYear method but with error handling
+	c.years[year] = make(map[time.Time]*Holiday)
+
+	// Validate country code and load holidays
+	if err := ValidateCountryCode(c.code); err != nil {
+		delete(c.years, year)
+		return err
+	}
+
+	// Use existing loadCountryHolidays method
+	c.loadCountryHolidays(year)
+
+	return nil
 }

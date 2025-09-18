@@ -19,6 +19,8 @@ A comprehensive Go library for holiday data and business day calculations. Provi
 - **Enterprise Configuration**: YAML-based configuration with environment support
 - **Regional Variations**: State, province, and regional holiday support
 - **Historical Accuracy**: Proper handling of holiday transitions and changes
+- **Robust Error Handling**: Structured errors with context support and validation
+- **Backward Compatible**: V2 API alongside original API
 
 ## Supported Countries
 
@@ -157,6 +159,66 @@ func main() {
 }
 ```
 
+### Error Handling
+
+```go
+package main
+
+import (
+    "context"
+    "errors"
+    "fmt"
+    "time"
+    
+    "github.com/coredds/GoHoliday"
+)
+
+func main() {
+    // Create country with validation
+    country, err := goholidays.NewCountryWithError("US")
+    if err != nil {
+        var holidayErr *goholidays.HolidayError
+        if errors.As(err, &holidayErr) {
+            switch holidayErr.Code {
+            case goholidays.ErrInvalidCountry:
+                fmt.Printf("Unsupported country: %s\n", holidayErr.Country)
+            default:
+                fmt.Printf("Error: %v\n", err)
+            }
+        }
+        return
+    }
+    
+    // Check holiday with error handling
+    date := time.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC)
+    holiday, isHoliday, err := country.IsHolidayWithError(date)
+    if err != nil {
+        fmt.Printf("Error: %v\n", err)
+        return
+    }
+    
+    if isHoliday {
+        fmt.Printf("Holiday: %s\n", holiday.Name)
+    }
+    
+    // Use context for cancellation/timeout
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+    
+    holidays, err := country.HolidaysForYearWithContext(ctx, 2024)
+    if err != nil {
+        if goholidays.IsContextCancelled(err) {
+            fmt.Println("Operation timed out")
+        } else {
+            fmt.Printf("Error: %v\n", err)
+        }
+        return
+    }
+    
+    fmt.Printf("Found %d holidays\n", len(holidays))
+}
+```
+
 ## Performance
 
 | Operation | Duration | Throughput |
@@ -202,6 +264,35 @@ GoHoliday/
 ├── updater/            # Python holidays syncer
 └── examples/           # Demo applications
 ```
+
+## Error Handling
+
+### API Methods
+
+**Original API (backward compatible):**
+- `NewCountry(countryCode string, options ...CountryOptions) *Country`
+- `IsHoliday(date time.Time) (*Holiday, bool)`
+- `HolidaysForYear(year int) map[time.Time]*Holiday`
+- `HolidaysForDateRange(start, end time.Time) map[time.Time]*Holiday`
+
+**Enhanced API (with error handling):**
+- `NewCountryWithError(countryCode string, options ...CountryOptions) (*Country, error)`
+- `IsHolidayWithError(date time.Time) (*Holiday, bool, error)`
+- `HolidaysForYearWithError(year int) (map[time.Time]*Holiday, error)`
+- `HolidaysForDateRangeWithError(start, end time.Time) (map[time.Time]*Holiday, error)`
+
+**Context API (with cancellation/timeout support):**
+- `IsHolidayWithContext(ctx context.Context, date time.Time) (*Holiday, bool, error)`
+- `HolidaysForYearWithContext(ctx context.Context, year int) (map[time.Time]*Holiday, error)`
+- `HolidaysForDateRangeWithContext(ctx context.Context, start, end time.Time) (map[time.Time]*Holiday, error)`
+
+GoHoliday provides comprehensive error handling with structured errors, context support, and input validation while maintaining full backward compatibility.
+
+Key features:
+- **Structured Errors**: Typed errors with specific error codes
+- **Context Support**: Cancellation and timeout handling  
+- **Input Validation**: Country codes, years, and date ranges
+- **Backward Compatibility**: Original API remains unchanged
 
 ## Testing
 
