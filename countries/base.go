@@ -146,5 +146,6 @@ func NthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int) 
 		return lastDay.AddDate(0, 0, -daysBack)
 	}
 
-	panic("Invalid n value for NthWeekdayOfMonth")
+	// Return zero time for invalid n values
+	return time.Time{}
 }

@@ -245,10 +245,146 @@ func syncAllCountries(ctx context.Context, syncer updater.Syncer, outputDir stri
 func validateData(ctx context.Context, syncer updater.Syncer, dataDir string, verbose bool) error {
 	fmt.Println("Validating existing data against Python source...")
 
-	// This would compare existing JSON files with fresh Python source
-	// Implementation would check for discrepancies and report them
+	// Get list of existing JSON files
+	files, err := filepath.Glob(filepath.Join(dataDir, "*.json"))
+	if err != nil {
+		return fmt.Errorf("failed to list data files: %w", err)
+	}
 
-	fmt.Println("Validation complete - feature not yet implemented")
+	if len(files) == 0 {
+		fmt.Println("No data files found to validate")
+		return nil
+	}
+
+	var validationErrors []string
+	validatedCount := 0
+
+	for _, file := range files {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
+		// Extract country code from filename
+		basename := filepath.Base(file)
+		countryCode := strings.TrimSuffix(basename, ".json")
+		countryCode = strings.ToUpper(countryCode)
+
+		if verbose {
+			fmt.Printf("Validating %s...\n", countryCode)
+		}
+
+		// Load existing data
+		existingData, err := loadExistingData(file)
+		if err != nil {
+			validationErrors = append(validationErrors, fmt.Sprintf("%s: failed to load existing data: %v", countryCode, err))
+			continue
+		}
+
+		// Fetch fresh data from source
+		sourceContent, err := syncer.FetchCountryFile(ctx, countryCode)
+		if err != nil {
+			validationErrors = append(validationErrors, fmt.Sprintf("%s: failed to fetch source: %v", countryCode, err))
+			continue
+		}
+
+		freshData, err := syncer.ParseHolidayDefinitions(sourceContent)
+		if err != nil {
+			validationErrors = append(validationErrors, fmt.Sprintf("%s: failed to parse fresh data: %v", countryCode, err))
+			continue
+		}
+
+		// Compare data
+		if err := compareCountryData(existingData, freshData, countryCode, verbose); err != nil {
+			validationErrors = append(validationErrors, fmt.Sprintf("%s: %v", countryCode, err))
+		} else {
+			validatedCount++
+		}
+	}
+
+	// Report results
+	fmt.Printf("\nValidation Results:\n")
+	fmt.Printf("- Files validated: %d\n", validatedCount)
+	fmt.Printf("- Validation errors: %d\n", len(validationErrors))
+
+	if len(validationErrors) > 0 {
+		fmt.Printf("\nValidation Errors:\n")
+		for _, err := range validationErrors {
+			fmt.Printf("- %s\n", err)
+		}
+		return fmt.Errorf("validation failed with %d errors", len(validationErrors))
+	}
+
+	fmt.Println("All data files validated successfully")
+	return nil
+}
+
+func loadExistingData(filename string) (*updater.CountryData, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var data updater.CountryData
+	if err := json.NewDecoder(file).Decode(&data); err != nil {
+		return nil, err
+	}
+
+	return &data, nil
+}
+
+func compareCountryData(existing, fresh *updater.CountryData, countryCode string, verbose bool) error {
+	var differences []string
+
+	// Compare basic metadata
+	if existing.Name != fresh.Name {
+		differences = append(differences, fmt.Sprintf("name changed: %s -> %s", existing.Name, fresh.Name))
+	}
+
+	// Compare holiday counts
+	if len(existing.Holidays) != len(fresh.Holidays) {
+		differences = append(differences, fmt.Sprintf("holiday count changed: %d -> %d", len(existing.Holidays), len(fresh.Holidays)))
+	}
+
+	// Compare individual holidays
+	for key, existingHoliday := range existing.Holidays {
+		freshHoliday, exists := fresh.Holidays[key]
+		if !exists {
+			differences = append(differences, fmt.Sprintf("holiday removed: %s", key))
+			continue
+		}
+
+		if existingHoliday.Name != freshHoliday.Name {
+			differences = append(differences, fmt.Sprintf("holiday %s name changed: %s -> %s", key, existingHoliday.Name, freshHoliday.Name))
+		}
+
+		if existingHoliday.Category != freshHoliday.Category {
+			differences = append(differences, fmt.Sprintf("holiday %s category changed: %s -> %s", key, existingHoliday.Category, freshHoliday.Category))
+		}
+	}
+
+	// Check for new holidays
+	for key := range fresh.Holidays {
+		if _, exists := existing.Holidays[key]; !exists {
+			differences = append(differences, fmt.Sprintf("new holiday added: %s", key))
+		}
+	}
+
+	if len(differences) > 0 {
+		if verbose {
+			fmt.Printf("  Differences found:\n")
+			for _, diff := range differences {
+				fmt.Printf("    - %s\n", diff)
+			}
+		}
+		return fmt.Errorf("found %d differences", len(differences))
+	}
+
+	if verbose {
+		fmt.Printf("  No differences found\n")
+	}
 	return nil
 }
 

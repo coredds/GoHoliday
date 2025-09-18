@@ -104,10 +104,10 @@ func TestPythonHolidaysSync_SyncCountry(t *testing.T) {
 		t.Error("Expected data file to be created")
 	}
 
-	// Test syncing an invalid country
+	// Test syncing an invalid country - should now return an error
 	err = sync.SyncCountry(ctx, "XX")
-	if err != nil {
-		t.Error("Expected success for invalid country code")
+	if err == nil {
+		t.Error("Expected error for invalid country code")
 	}
 }
 

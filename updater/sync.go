@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/coredds/GoHoliday/countries"
 )
 
 // PythonHolidaysSync handles synchronization with the Python holidays repository
@@ -107,17 +109,40 @@ func (phs *PythonHolidaysSync) SyncData() error {
 
 // getSupportedCountries retrieves the list of supported countries
 func (phs *PythonHolidaysSync) getSupportedCountries() ([]CountryInfo, error) {
-	// This is a placeholder implementation
-	// In a real implementation, this would parse the Python source code or
-	// use a metadata file to get the list of supported countries
-
+	// Return the comprehensive list of supported countries
+	// This matches the countries available in our providers
 	countries := []CountryInfo{
-		{CountryCode: "US", Name: "United States"},
-		{CountryCode: "GB", Name: "United Kingdom"},
-		{CountryCode: "CA", Name: "Canada"},
+		{CountryCode: "AR", Name: "Argentina"},
+		{CountryCode: "AT", Name: "Austria"},
 		{CountryCode: "AU", Name: "Australia"},
+		{CountryCode: "BE", Name: "Belgium"},
+		{CountryCode: "BR", Name: "Brazil"},
+		{CountryCode: "CA", Name: "Canada"},
+		{CountryCode: "CH", Name: "Switzerland"},
+		{CountryCode: "CN", Name: "China"},
 		{CountryCode: "DE", Name: "Germany"},
+		{CountryCode: "ES", Name: "Spain"},
+		{CountryCode: "FI", Name: "Finland"},
 		{CountryCode: "FR", Name: "France"},
+		{CountryCode: "GB", Name: "United Kingdom"},
+		{CountryCode: "ID", Name: "Indonesia"},
+		{CountryCode: "IN", Name: "India"},
+		{CountryCode: "IT", Name: "Italy"},
+		{CountryCode: "JP", Name: "Japan"},
+		{CountryCode: "KR", Name: "South Korea"},
+		{CountryCode: "MX", Name: "Mexico"},
+		{CountryCode: "NL", Name: "Netherlands"},
+		{CountryCode: "NO", Name: "Norway"},
+		{CountryCode: "NZ", Name: "New Zealand"},
+		{CountryCode: "PL", Name: "Poland"},
+		{CountryCode: "PT", Name: "Portugal"},
+		{CountryCode: "RU", Name: "Russia"},
+		{CountryCode: "SE", Name: "Sweden"},
+		{CountryCode: "SG", Name: "Singapore"},
+		{CountryCode: "TH", Name: "Thailand"},
+		{CountryCode: "TR", Name: "Turkey"},
+		{CountryCode: "UA", Name: "Ukraine"},
+		{CountryCode: "US", Name: "United States"},
 	}
 
 	return countries, nil
@@ -131,50 +156,56 @@ type CountryInfo struct {
 
 // fetchCountryData fetches holiday data for a specific country
 func (phs *PythonHolidaysSync) fetchCountryData(countryCode string) (*CountryData, error) {
-	// This is a placeholder implementation
-	// In a real implementation, this would:
-	// 1. Fetch the Python source file for the country
-	// 2. Parse the Python AST to extract holiday definitions
-	// 3. Convert the definitions to our JSON format
-
+	// Generate holiday data using our existing country providers
+	// This provides a realistic implementation that uses actual holiday data
+	
 	countryData := &CountryData{
 		CountryCode: countryCode,
 		Name:        phs.getCountryName(countryCode),
-		Categories:  []string{"public", "bank", "government"},
+		Categories:  []string{"public", "bank", "government", "religious", "optional"},
 		Languages:   []string{"en"},
 		Holidays:    make(map[string]HolidayDefinition),
 		UpdatedAt:   time.Now(),
 	}
 
-	// Add some sample holidays based on country
-	switch countryCode {
-	case "US":
-		countryData.Holidays["new_years_day"] = HolidayDefinition{
-			Name:        "New Year's Day",
-			Category:    "public",
-			Languages:   map[string]string{"en": "New Year's Day", "es": "Año Nuevo"},
-			Calculation: "fixed",
-			Month:       1,
-			Day:         1,
+	// Use our country providers to get actual holiday data
+	// This is more realistic than hardcoded sample data
+	provider, err := phs.getCountryProvider(countryCode)
+	if err != nil {
+		return nil, fmt.Errorf("no provider available for country %s: %w", countryCode, err)
+	}
+
+	// Generate holidays for current year as sample data
+	currentYear := time.Now().Year()
+	holidays := provider.LoadHolidays(currentYear)
+
+	// Convert to our sync format
+	for _, holiday := range holidays {
+		// Create a unique key for the holiday
+		key := phs.createHolidayKey(holiday.Name, holiday.Date)
+		
+		// Determine calculation type based on the holiday
+		calculation := "fixed"
+		var weekdayRule *WeekdayRule
+		
+		// Simple heuristic to determine calculation type
+		if holiday.Date.Day() > 28 || (holiday.Date.Month() == 11 && holiday.Date.Weekday() == time.Thursday) {
+			calculation = "weekday_based"
+			weekdayRule = &WeekdayRule{
+				Month:      int(holiday.Date.Month()),
+				Weekday:    holiday.Date.Weekday(),
+				Occurrence: phs.calculateOccurrence(holiday.Date),
+			}
 		}
-		countryData.Holidays["independence_day"] = HolidayDefinition{
-			Name:        "Independence Day",
-			Category:    "public",
-			Languages:   map[string]string{"en": "Independence Day", "es": "Día de la Independencia"},
-			Calculation: "fixed",
-			Month:       7,
-			Day:         4,
-		}
-		countryData.Holidays["thanksgiving"] = HolidayDefinition{
-			Name:        "Thanksgiving Day",
-			Category:    "public",
-			Languages:   map[string]string{"en": "Thanksgiving Day", "es": "Día de Acción de Gracias"},
-			Calculation: "weekday_based",
-			WeekdayRule: &WeekdayRule{
-				Month:      11,
-				Weekday:    time.Thursday,
-				Occurrence: 4,
-			},
+
+		countryData.Holidays[key] = HolidayDefinition{
+			Name:        holiday.Name,
+			Category:    string(holiday.Category),
+			Languages:   holiday.Languages,
+			Calculation: calculation,
+			Month:       int(holiday.Date.Month()),
+			Day:         holiday.Date.Day(),
+			WeekdayRule: weekdayRule,
 		}
 	}
 
@@ -262,4 +293,108 @@ func (phs *PythonHolidaysSync) CheckForUpdates() (bool, error) {
 	// Parse response and check dates
 	// This is a simplified implementation
 	return true, nil
+}
+
+// getCountryProvider returns the appropriate country provider for the given country code
+func (phs *PythonHolidaysSync) getCountryProvider(countryCode string) (countries.HolidayProvider, error) {
+	switch countryCode {
+	case "US":
+		return countries.NewUSProvider(), nil
+	case "GB":
+		return countries.NewGBProvider(), nil
+	case "CA":
+		return countries.NewCAProvider(), nil
+	case "AU":
+		return countries.NewAUProvider(), nil
+	case "NZ":
+		return countries.NewNZProvider(), nil
+	case "DE":
+		return countries.NewDEProvider(), nil
+	case "FR":
+		return countries.NewFRProvider(), nil
+	case "JP":
+		return countries.NewJPProvider(), nil
+	case "IN":
+		return countries.NewINProvider(), nil
+	case "BR":
+		return countries.NewBRProvider(), nil
+	case "MX":
+		return countries.NewMXProvider(), nil
+	case "IT":
+		return countries.NewITProvider(), nil
+	case "ES":
+		return countries.NewESProvider(), nil
+	case "NL":
+		return countries.NewNLProvider(), nil
+	case "KR":
+		return countries.NewKRProvider(), nil
+	case "UA":
+		return countries.NewUAProvider(), nil
+	case "AR":
+		return countries.NewARProvider(), nil
+	case "AT":
+		return countries.NewATProvider(), nil
+	case "BE":
+		return countries.NewBEProvider(), nil
+	case "CH":
+		return countries.NewCHProvider(), nil
+	case "CN":
+		return countries.NewCNProvider(), nil
+	case "FI":
+		return countries.NewFIProvider(), nil
+	case "ID":
+		return countries.NewIDProvider(), nil
+	case "NO":
+		return countries.NewNOProvider(), nil
+	case "PL":
+		return countries.NewPLProvider(), nil
+	case "PT":
+		return countries.NewPTProvider(), nil
+	case "RU":
+		return countries.NewRUProvider(), nil
+	case "SE":
+		return countries.NewSEProvider(), nil
+	case "SG":
+		return countries.NewSGProvider(), nil
+	case "TH":
+		return countries.NewTHProvider(), nil
+	case "TR":
+		return countries.NewTRProvider(), nil
+	default:
+		return nil, fmt.Errorf("no provider available for country %s", countryCode)
+	}
+}
+
+// createHolidayKey creates a unique key for a holiday based on its name and date
+func (phs *PythonHolidaysSync) createHolidayKey(name string, date time.Time) string {
+	// Convert name to lowercase and replace spaces with underscores
+	key := strings.ToLower(name)
+	key = strings.ReplaceAll(key, " ", "_")
+	key = strings.ReplaceAll(key, "'", "")
+	key = strings.ReplaceAll(key, ".", "")
+	key = strings.ReplaceAll(key, "-", "_")
+	
+	// Add month/day suffix if needed to ensure uniqueness
+	return fmt.Sprintf("%s_%02d_%02d", key, date.Month(), date.Day())
+}
+
+// calculateOccurrence determines which occurrence of a weekday in a month (1st, 2nd, 3rd, 4th, or last)
+func (phs *PythonHolidaysSync) calculateOccurrence(date time.Time) int {
+	// Calculate which occurrence this is (1st, 2nd, 3rd, 4th, or -1 for last)
+	firstOfMonth := time.Date(date.Year(), date.Month(), 1, 0, 0, 0, 0, time.UTC)
+	
+	// Find the first occurrence of this weekday in the month
+	daysToAdd := (int(date.Weekday()) - int(firstOfMonth.Weekday()) + 7) % 7
+	firstOccurrence := firstOfMonth.AddDate(0, 0, daysToAdd)
+	
+	// Calculate which occurrence this date represents
+	occurrence := ((date.Day() - firstOccurrence.Day()) / 7) + 1
+	
+	// Check if this is the last occurrence of the weekday in the month
+	nextWeek := date.AddDate(0, 0, 7)
+	if nextWeek.Month() != date.Month() {
+		return -1 // Last occurrence
+	}
+	
+	return occurrence
 }
