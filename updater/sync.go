@@ -330,6 +330,12 @@ func (phs *PythonHolidaysSync) getCountryProvider(countryCode string) (countries
 		return countries.NewKRProvider(), nil
 	case "UA":
 		return countries.NewUAProvider(), nil
+	case "CL":
+		return countries.NewCLProvider(), nil
+	case "IE":
+		return countries.NewIEProvider(), nil
+	case "IL":
+		return countries.NewILProvider(), nil
 	case "AR":
 		return countries.NewARProvider(), nil
 	case "AT":

@@ -41,6 +41,9 @@ func (hm *HolidayManager) initializeProviders(config *Config) {
 	hm.providers["DE"] = countries.NewDEProvider()
 	hm.providers["FR"] = countries.NewFRProvider()
 	hm.providers["UA"] = countries.NewUAProvider()
+	hm.providers["CL"] = countries.NewCLProvider()
+	hm.providers["IE"] = countries.NewIEProvider()
+	hm.providers["IL"] = countries.NewILProvider()
 }
 
 // GetHolidays returns holidays for a country with configuration applied

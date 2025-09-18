@@ -46,6 +46,12 @@ func Checker(countryCode string) *FastCountryChecker {
 		provider = countries.NewJPProvider()
 	case "UA":
 		provider = countries.NewUAProvider()
+	case "CL":
+		provider = countries.NewCLProvider()
+	case "IE":
+		provider = countries.NewIEProvider()
+	case "IL":
+		provider = countries.NewILProvider()
 	default:
 		// Fallback to US if country not supported
 		provider = countries.NewUSProvider()

@@ -108,11 +108,11 @@ func NewYearError(code ErrorCode, country string, year int, message string) *Hol
 // SupportedCountries contains all countries that have holiday providers
 var SupportedCountries = map[string]bool{
 	"AR": true, "AT": true, "AU": true, "BE": true, "BR": true, "CA": true,
-	"CH": true, "CN": true, "DE": true, "ES": true, "FI": true, "FR": true,
-	"GB": true, "ID": true, "IN": true, "IT": true, "JP": true, "KR": true,
-	"MX": true, "NL": true, "NO": true, "NZ": true, "PL": true, "PT": true,
-	"RU": true, "SE": true, "SG": true, "TH": true, "TR": true, "UA": true,
-	"US": true,
+	"CH": true, "CL": true, "CN": true, "DE": true, "ES": true, "FI": true, 
+	"FR": true, "GB": true, "ID": true, "IE": true, "IL": true, "IN": true, 
+	"IT": true, "JP": true, "KR": true, "MX": true, "NL": true, "NO": true, 
+	"NZ": true, "PL": true, "PT": true, "RU": true, "SE": true, "SG": true, 
+	"TH": true, "TR": true, "UA": true, "US": true,
 }
 
 // ValidateCountryCode checks if a country code is supported
@@ -409,6 +409,12 @@ func (c *Country) loadCountryHolidays(year int) {
 		c.loadKRHolidays(year)
 	case "UA":
 		c.loadUAHolidays(year)
+	case "CL":
+		c.loadCLHolidays(year)
+	case "IE":
+		c.loadIEHolidays(year)
+	case "IL":
+		c.loadILHolidays(year)
 	// Add more countries as needed
 	default:
 		// Load from generic holiday data or return empty
@@ -1568,4 +1574,55 @@ func (c *Country) loadYearWithContext(ctx context.Context, year int) error {
 	c.loadCountryHolidays(year)
 
 	return nil
+}
+
+// loadCLHolidays loads Chile holidays using the CL provider
+func (c *Country) loadCLHolidays(year int) {
+	provider := countries.NewCLProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:       holiday.Name,
+			Date:       holiday.Date,
+			Category:   HolidayCategory(holiday.Category),
+			Languages:  holiday.Languages,
+			Observed:   holiday.Observed,
+			IsObserved: holiday.IsObserved,
+		}
+	}
+}
+
+// loadIEHolidays loads Ireland holidays using the IE provider
+func (c *Country) loadIEHolidays(year int) {
+	provider := countries.NewIEProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:       holiday.Name,
+			Date:       holiday.Date,
+			Category:   HolidayCategory(holiday.Category),
+			Languages:  holiday.Languages,
+			Observed:   holiday.Observed,
+			IsObserved: holiday.IsObserved,
+		}
+	}
+}
+
+// loadILHolidays loads Israel holidays using the IL provider
+func (c *Country) loadILHolidays(year int) {
+	provider := countries.NewILProvider()
+	holidayMap := provider.LoadHolidays(year)
+
+	for date, holiday := range holidayMap {
+		c.years[year][date] = &Holiday{
+			Name:       holiday.Name,
+			Date:       holiday.Date,
+			Category:   HolidayCategory(holiday.Category),
+			Languages:  holiday.Languages,
+			Observed:   holiday.Observed,
+			IsObserved: holiday.IsObserved,
+		}
+	}
 }
