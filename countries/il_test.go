@@ -84,7 +84,7 @@ func TestILProvider_HebrewCalendarHolidays(t *testing.T) {
 		// Check for major holidays that should exist every year
 		majorHolidays := []string{
 			"Rosh Hashanah",
-			"Yom Kippur", 
+			"Yom Kippur",
 			"Passover",
 			"Shavuot",
 		}
@@ -108,9 +108,9 @@ func TestILProvider_MemorialDays(t *testing.T) {
 	provider := NewILProvider()
 
 	testCases := []struct {
-		year int
-		yomHaShoah time.Time
-		yomHaZikaron time.Time
+		year            int
+		yomHaShoah      time.Time
+		yomHaZikaron    time.Time
 		independenceDay time.Time
 	}{
 		{2023, time.Date(2023, 4, 18, 0, 0, 0, 0, time.UTC), time.Date(2023, 4, 25, 0, 0, 0, 0, time.UTC), time.Date(2023, 4, 26, 0, 0, 0, 0, time.UTC)},

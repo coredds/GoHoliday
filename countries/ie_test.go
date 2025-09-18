@@ -51,7 +51,7 @@ func TestIEProvider_LoadHolidays2024(t *testing.T) {
 		{time.Date(2024, 5, 1, 0, 0, 0, 0, time.UTC), "May Day", "cultural"},
 		{time.Date(2024, 6, 3, 0, 0, 0, 0, time.UTC), "June Bank Holiday", "bank"}, // First Monday in June
 		{time.Date(2024, 8, 1, 0, 0, 0, 0, time.UTC), "Lughnasadh", "cultural"},
-		{time.Date(2024, 8, 5, 0, 0, 0, 0, time.UTC), "August Bank Holiday", "bank"}, // First Monday in August
+		{time.Date(2024, 8, 5, 0, 0, 0, 0, time.UTC), "August Bank Holiday", "bank"},    // First Monday in August
 		{time.Date(2024, 10, 28, 0, 0, 0, 0, time.UTC), "October Bank Holiday", "bank"}, // Last Monday in October
 		{time.Date(2024, 10, 31, 0, 0, 0, 0, time.UTC), "Samhain", "cultural"},
 		{time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC), "Christmas Day", "religious"},
@@ -81,7 +81,7 @@ func TestIEProvider_SaintPatricksDay(t *testing.T) {
 
 	stPatricksDay := time.Date(2024, 3, 17, 0, 0, 0, 0, time.UTC)
 	holiday, exists := holidays[stPatricksDay]
-	
+
 	if !exists {
 		t.Fatal("Saint Patrick's Day should exist")
 	}
@@ -120,7 +120,7 @@ func TestIEProvider_BankHolidays(t *testing.T) {
 
 	for _, tc := range testCases {
 		holidays := provider.LoadHolidays(tc.year)
-		
+
 		holiday, exists := holidays[tc.expectedDate]
 		if !exists {
 			t.Errorf("Expected %s on %s in %d", tc.name, tc.expectedDate.Format("2006-01-02"), tc.year)
@@ -217,7 +217,7 @@ func TestIEProvider_BrigidsPublicHoliday(t *testing.T) {
 	// Test Saint Brigid's Day public holiday (introduced in 2023)
 	t.Run("Before 2023", func(t *testing.T) {
 		holidays2022 := provider.LoadHolidays(2022)
-		
+
 		// Should have cultural Brigid's Day but not public holiday
 		brigidsDay := time.Date(2022, 2, 1, 0, 0, 0, 0, time.UTC)
 		if holiday, exists := holidays2022[brigidsDay]; exists {
@@ -236,10 +236,10 @@ func TestIEProvider_BrigidsPublicHoliday(t *testing.T) {
 
 	t.Run("From 2023 onwards", func(t *testing.T) {
 		testYears := []int{2023, 2024, 2025}
-		
+
 		for _, year := range testYears {
 			holidays := provider.LoadHolidays(year)
-			
+
 			// Should have public Brigid's holiday
 			found := false
 			for _, holiday := range holidays {
@@ -252,7 +252,7 @@ func TestIEProvider_BrigidsPublicHoliday(t *testing.T) {
 					break
 				}
 			}
-			
+
 			if !found {
 				t.Errorf("Public Saint Brigid's Day should exist in %d", year)
 			}

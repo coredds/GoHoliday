@@ -90,7 +90,7 @@ func TestCLProvider_VariableHolidays(t *testing.T) {
 
 	for _, tc := range testCases {
 		holidays := provider.LoadHolidays(tc.year)
-		
+
 		// Check that the holiday exists on the expected (observed) date
 		holiday, exists := holidays[tc.expectedDate]
 		if !exists {
@@ -105,7 +105,7 @@ func TestCLProvider_VariableHolidays(t *testing.T) {
 		// Check that it doesn't exist on the original date (if different)
 		if !tc.originalDate.Equal(tc.expectedDate) {
 			if _, exists := holidays[tc.originalDate]; exists {
-				t.Errorf("Holiday %s should not exist on original date %s, only on observed date %s", 
+				t.Errorf("Holiday %s should not exist on original date %s, only on observed date %s",
 					tc.name, tc.originalDate.Format("2006-01-02"), tc.expectedDate.Format("2006-01-02"))
 			}
 		}

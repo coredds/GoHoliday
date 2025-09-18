@@ -5,6 +5,48 @@ All notable changes to the GoHoliday project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] - 2025-09-18
+
+### Added
+- **Chile (CL) Holiday Provider**: Complete South American implementation with unique legal framework
+  - 16 holidays including Independence Day, Army Day, Navy Day
+  - Variable holidays that move to Monday per Chilean "Ley de Feriados" (Holidays Law)
+  - Regional holidays: Battle of Arica (2020+), Chillán Foundation Day (2019+)
+  - Easter-based holidays: Good Friday, Holy Saturday
+  - Spanish/English bilingual support
+  - All 16 Chilean regions supported
+
+- **Ireland (IE) Holiday Provider**: Comprehensive Celtic and Catholic tradition implementation
+  - 14 holidays including Saint Patrick's Day, bank holidays, Celtic festivals
+  - Celtic seasonal festivals: Saint Brigid's Day, May Day, Lughnasadh, Samhain
+  - Bank holidays on first/last Mondays of specific months
+  - Saint Brigid's Day public holiday (introduced 2023)
+  - Irish Gaelic/English bilingual support
+  - All 30 counties and provinces supported
+
+- **Israel (IL) Holiday Provider**: Hebrew calendar holiday system with religious and national observances
+  - 11 holidays including major Jewish holidays and memorial days
+  - Hebrew calendar holidays: Rosh Hashanah (2 days), Yom Kippur, Passover, Shavuot, Sukkot, Simchat Torah, Hanukkah
+  - Memorial sequence: Holocaust Remembrance Day, Memorial Day, Independence Day
+  - Accurate Hebrew calendar calculations for 2023-2026
+  - Hebrew/English bilingual support
+  - All 6 Israeli districts supported
+
+### Enhanced
+- **Multi-language Support**: Added Spanish, Irish Gaelic (GA), and Hebrew (HE) language support
+- **Variable Holiday Laws**: Support for Chilean holiday movement laws and Irish bank holiday patterns
+- **Hebrew Calendar Integration**: Accurate Hebrew calendar calculations for Jewish holidays
+- **Regional Holiday Variations**: Enhanced support for region-specific holiday introductions and changes
+- **Comprehensive Test Coverage**: 100% test coverage for all new countries with edge case validation
+
+### Updated
+- **Country Count**: Increased from 34 to 37 supported countries
+- **SupportedCountries Map**: Added CL, IE, IL to validation and integration points
+- **ChronoGo Integration**: Updated fast holiday checking for new countries
+- **Configuration System**: Enhanced provider initialization for new countries
+- **Sync Functionality**: Added data synchronization support for new countries
+- **Documentation**: Updated README with new countries and improved examples
+
 ## [0.5.3] - 2025-08-30
 
 ### Added

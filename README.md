@@ -7,7 +7,7 @@
 
 A comprehensive Go library for holiday data and business day calculations. Provides high-performance holiday checking with multi-country support, designed for integration with date/time applications including [ChronoGo](https://github.com/davidhintelmann/ChronoGo).
 
-**Current Version**: 0.6.0
+**Current Version**: 0.6.3
 
 ## Features
 
@@ -289,7 +289,7 @@ go test ./...
 
 ## Recent Changes
 
-### Version 0.6.0 (2025-09-18)
+### Version 0.6.3 (2025-09-18)
 - Added Chile, Ireland, and Israel support
 - Enhanced multi-language support (Spanish, Irish Gaelic, Hebrew)
 - Variable holiday laws and regional variations

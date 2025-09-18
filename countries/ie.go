@@ -253,7 +253,7 @@ func (ie *IEProvider) addCulturalHolidays(holidays map[time.Time]*Holiday, year 
 // getFirstMondayOfMonth returns the first Monday of the specified month
 func (ie *IEProvider) getFirstMondayOfMonth(year, month int) time.Time {
 	firstDay := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
-	
+
 	// Find the first Monday
 	daysUntilMonday := (int(time.Monday) - int(firstDay.Weekday()) + 7) % 7
 	return firstDay.AddDate(0, 0, daysUntilMonday)
@@ -263,7 +263,7 @@ func (ie *IEProvider) getFirstMondayOfMonth(year, month int) time.Time {
 func (ie *IEProvider) getLastMondayOfMonth(year, month int) time.Time {
 	// Get the last day of the month
 	lastDay := time.Date(year, time.Month(month+1), 0, 0, 0, 0, 0, time.UTC)
-	
+
 	// Find the last Monday
 	daysBackToMonday := (int(lastDay.Weekday()) - int(time.Monday) + 7) % 7
 	return lastDay.AddDate(0, 0, -daysBackToMonday)
@@ -272,12 +272,12 @@ func (ie *IEProvider) getLastMondayOfMonth(year, month int) time.Time {
 // getBrigidsPublicHoliday returns the observed date for Saint Brigid's Day public holiday
 func (ie *IEProvider) getBrigidsPublicHoliday(year int) time.Time {
 	brigidsDay := time.Date(year, 2, 1, 0, 0, 0, 0, time.UTC)
-	
+
 	// If February 1st is a Monday, it's observed on that day
 	if brigidsDay.Weekday() == time.Monday {
 		return brigidsDay
 	}
-	
+
 	// Otherwise, it's observed on the first Monday in February
 	return ie.getFirstMondayOfMonth(year, 2)
 }

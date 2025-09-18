@@ -158,7 +158,7 @@ type CountryInfo struct {
 func (phs *PythonHolidaysSync) fetchCountryData(countryCode string) (*CountryData, error) {
 	// Generate holiday data using our existing country providers
 	// This provides a realistic implementation that uses actual holiday data
-	
+
 	countryData := &CountryData{
 		CountryCode: countryCode,
 		Name:        phs.getCountryName(countryCode),
@@ -183,11 +183,11 @@ func (phs *PythonHolidaysSync) fetchCountryData(countryCode string) (*CountryDat
 	for _, holiday := range holidays {
 		// Create a unique key for the holiday
 		key := phs.createHolidayKey(holiday.Name, holiday.Date)
-		
+
 		// Determine calculation type based on the holiday
 		calculation := "fixed"
 		var weekdayRule *WeekdayRule
-		
+
 		// Simple heuristic to determine calculation type
 		if holiday.Date.Day() > 28 || (holiday.Date.Month() == 11 && holiday.Date.Weekday() == time.Thursday) {
 			calculation = "weekday_based"
@@ -379,7 +379,7 @@ func (phs *PythonHolidaysSync) createHolidayKey(name string, date time.Time) str
 	key = strings.ReplaceAll(key, "'", "")
 	key = strings.ReplaceAll(key, ".", "")
 	key = strings.ReplaceAll(key, "-", "_")
-	
+
 	// Add month/day suffix if needed to ensure uniqueness
 	return fmt.Sprintf("%s_%02d_%02d", key, date.Month(), date.Day())
 }
@@ -388,19 +388,19 @@ func (phs *PythonHolidaysSync) createHolidayKey(name string, date time.Time) str
 func (phs *PythonHolidaysSync) calculateOccurrence(date time.Time) int {
 	// Calculate which occurrence this is (1st, 2nd, 3rd, 4th, or -1 for last)
 	firstOfMonth := time.Date(date.Year(), date.Month(), 1, 0, 0, 0, 0, time.UTC)
-	
+
 	// Find the first occurrence of this weekday in the month
 	daysToAdd := (int(date.Weekday()) - int(firstOfMonth.Weekday()) + 7) % 7
 	firstOccurrence := firstOfMonth.AddDate(0, 0, daysToAdd)
-	
+
 	// Calculate which occurrence this date represents
 	occurrence := ((date.Day() - firstOccurrence.Day()) / 7) + 1
-	
+
 	// Check if this is the last occurrence of the weekday in the month
 	nextWeek := date.AddDate(0, 0, 7)
 	if nextWeek.Month() != date.Month() {
 		return -1 // Last occurrence
 	}
-	
+
 	return occurrence
 }

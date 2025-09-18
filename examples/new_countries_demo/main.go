@@ -16,7 +16,7 @@ func main() {
 	chile := goholidays.NewCountry("CL")
 	holidays := chile.HolidaysForYear(2024)
 	fmt.Printf("Found %d holidays in 2024\n", len(holidays))
-	
+
 	// Check for Independence Day
 	independenceDay := time.Date(2024, 9, 18, 0, 0, 0, 0, time.UTC)
 	if holiday, exists := holidays[independenceDay]; exists {
@@ -28,7 +28,7 @@ func main() {
 	ireland := goholidays.NewCountry("IE")
 	holidays = ireland.HolidaysForYear(2024)
 	fmt.Printf("Found %d holidays in 2024\n", len(holidays))
-	
+
 	// Check for Saint Patrick's Day
 	stPatricksDay := time.Date(2024, 3, 17, 0, 0, 0, 0, time.UTC)
 	if holiday, exists := holidays[stPatricksDay]; exists {
@@ -40,7 +40,7 @@ func main() {
 	israel := goholidays.NewCountry("IL")
 	holidays = israel.HolidaysForYear(2024)
 	fmt.Printf("Found %d holidays in 2024\n", len(holidays))
-	
+
 	// Check for Passover
 	for date, holiday := range holidays {
 		if holiday.Name == "Passover" {

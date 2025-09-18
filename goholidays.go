@@ -13,7 +13,7 @@ import (
 )
 
 // Version represents the current version of the GoHoliday library
-const Version = "0.5.3"
+const Version = "0.6.3"
 
 // ErrorCode represents different types of errors that can occur
 type ErrorCode int
@@ -108,10 +108,10 @@ func NewYearError(code ErrorCode, country string, year int, message string) *Hol
 // SupportedCountries contains all countries that have holiday providers
 var SupportedCountries = map[string]bool{
 	"AR": true, "AT": true, "AU": true, "BE": true, "BR": true, "CA": true,
-	"CH": true, "CL": true, "CN": true, "DE": true, "ES": true, "FI": true, 
-	"FR": true, "GB": true, "ID": true, "IE": true, "IL": true, "IN": true, 
-	"IT": true, "JP": true, "KR": true, "MX": true, "NL": true, "NO": true, 
-	"NZ": true, "PL": true, "PT": true, "RU": true, "SE": true, "SG": true, 
+	"CH": true, "CL": true, "CN": true, "DE": true, "ES": true, "FI": true,
+	"FR": true, "GB": true, "ID": true, "IE": true, "IL": true, "IN": true,
+	"IT": true, "JP": true, "KR": true, "MX": true, "NL": true, "NO": true,
+	"NZ": true, "PL": true, "PT": true, "RU": true, "SE": true, "SG": true,
 	"TH": true, "TR": true, "UA": true, "US": true,
 }
 
@@ -1026,30 +1026,30 @@ func (c *Country) calculateDiwali(year int) time.Time {
 	// Diwali typically occurs 20 days before Kartik Purnima (full moon)
 	// This is a simplified calculation - for production use, integrate with
 	// an astronomical library for precise lunar calendar calculations
-	
+
 	// Base calculation: Diwali usually falls in late October/early November
 	// Use a 19-year Metonic cycle approximation
 	baseYear := 2024
 	baseDate := knownDates[baseYear]
-	
+
 	yearDiff := year - baseYear
-	
+
 	// Lunar year is approximately 354.37 days, solar year is 365.25 days
 	// The difference causes Diwali to shift by about 11 days earlier each year
 	dayShift := (yearDiff * 11) % 365
 	if dayShift < 0 {
 		dayShift += 365
 	}
-	
+
 	approximateDate := baseDate.AddDate(yearDiff, 0, -dayShift)
-	
+
 	// Adjust to ensure it falls in the typical October/November range
 	if approximateDate.Month() < 10 {
 		approximateDate = approximateDate.AddDate(0, 0, 30)
 	} else if approximateDate.Month() > 11 {
 		approximateDate = approximateDate.AddDate(0, 0, -30)
 	}
-	
+
 	return approximateDate
 }
 
@@ -1077,29 +1077,29 @@ func (c *Country) calculateHoli(year int) time.Time {
 
 	// For years outside our known range, use lunar cycle approximation
 	// Holi occurs on Phalguna Purnima (full moon in Phalguna month)
-	
+
 	// Base calculation using lunar cycle
 	baseYear := 2024
 	baseDate := knownDates[baseYear]
-	
+
 	yearDiff := year - baseYear
-	
+
 	// Lunar year is approximately 354.37 days, solar year is 365.25 days
 	// The difference causes Holi to shift by about 11 days earlier each year
 	dayShift := (yearDiff * 11) % 365
 	if dayShift < 0 {
 		dayShift += 365
 	}
-	
+
 	approximateDate := baseDate.AddDate(yearDiff, 0, -dayShift)
-	
+
 	// Adjust to ensure it falls in the typical February/March/April range
 	if approximateDate.Month() < 2 {
 		approximateDate = approximateDate.AddDate(0, 0, 30)
 	} else if approximateDate.Month() > 4 {
 		approximateDate = approximateDate.AddDate(0, 0, -30)
 	}
-	
+
 	return approximateDate
 }
 
