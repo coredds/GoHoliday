@@ -115,14 +115,22 @@ func (au *AUProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 
 	// Variable date holidays (most states)
 
-	// Queen's Birthday - 2nd Monday in June (most states)
-	queensBirthday := NthWeekdayOfMonth(year, 6, time.Monday, 2)
-	holidays[queensBirthday] = au.CreateHoliday(
-		"Queen's Birthday",
-		queensBirthday,
+	// King's/Queen's Birthday - 2nd Monday in June (most states)
+	// Changed from Queen's Birthday to King's Birthday after September 2022
+	var birthdayName string
+	if year >= 2023 {
+		birthdayName = "King's Birthday"
+	} else {
+		birthdayName = "Queen's Birthday"
+	}
+
+	kingsBirthday := NthWeekdayOfMonth(year, 6, time.Monday, 2)
+	holidays[kingsBirthday] = au.CreateHoliday(
+		birthdayName,
+		kingsBirthday,
 		"public",
 		map[string]string{
-			"en": "Queen's Birthday",
+			"en": birthdayName,
 		},
 	)
 
@@ -204,14 +212,21 @@ func (au *AUProvider) GetStateHolidays(year int, states []string) map[time.Time]
 				},
 			)
 
-			// Queen's Birthday - 1st Monday in October (different from other states)
-			queensBirthdayQLD := NthWeekdayOfMonth(year, 10, time.Monday, 1)
-			holidays[queensBirthdayQLD] = au.CreateHoliday(
-				"Queen's Birthday",
-				queensBirthdayQLD,
+			// King's/Queen's Birthday - 1st Monday in October (different from other states)
+			var birthdayNameQLD string
+			if year >= 2023 {
+				birthdayNameQLD = "King's Birthday"
+			} else {
+				birthdayNameQLD = "Queen's Birthday"
+			}
+
+			kingsBirthdayQLD := NthWeekdayOfMonth(year, 10, time.Monday, 1)
+			holidays[kingsBirthdayQLD] = au.CreateHoliday(
+				birthdayNameQLD,
+				kingsBirthdayQLD,
 				"public",
 				map[string]string{
-					"en": "Queen's Birthday",
+					"en": birthdayNameQLD,
 				},
 			)
 

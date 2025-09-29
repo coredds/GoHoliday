@@ -39,18 +39,37 @@ func (nl *NLProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 		},
 	)
 
-	// King's Day - April 27 (or April 26 if April 27 is Sunday)
-	kingsDay := time.Date(year, 4, 27, 0, 0, 0, 0, time.UTC)
-	if kingsDay.Weekday() == time.Sunday {
-		kingsDay = time.Date(year, 4, 26, 0, 0, 0, 0, time.UTC)
+	// King's Day / Queen's Day - April 27 (or April 26 if April 27 is Sunday)
+	// Changed from Queen's Day (April 30) to King's Day (April 27) in 2014
+	var royalDay time.Time
+	var royalName string
+	var royalNameNL string
+
+	if year >= 2014 {
+		// King's Day - April 27 (or April 26 if Sunday)
+		royalDay = time.Date(year, 4, 27, 0, 0, 0, 0, time.UTC)
+		if royalDay.Weekday() == time.Sunday {
+			royalDay = time.Date(year, 4, 26, 0, 0, 0, 0, time.UTC)
+		}
+		royalName = "King's Day"
+		royalNameNL = "Koningsdag"
+	} else {
+		// Queen's Day - April 30 (or April 29 if Sunday)
+		royalDay = time.Date(year, 4, 30, 0, 0, 0, 0, time.UTC)
+		if royalDay.Weekday() == time.Sunday {
+			royalDay = time.Date(year, 4, 29, 0, 0, 0, 0, time.UTC)
+		}
+		royalName = "Queen's Day"
+		royalNameNL = "Koninginnedag"
 	}
-	holidays[kingsDay] = nl.CreateHoliday(
-		"Koningsdag",
-		kingsDay,
+
+	holidays[royalDay] = nl.CreateHoliday(
+		royalNameNL,
+		royalDay,
 		"royal",
 		map[string]string{
-			"nl": "Koningsdag",
-			"en": "King's Day",
+			"nl": royalNameNL,
+			"en": royalName,
 		},
 	)
 

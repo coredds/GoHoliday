@@ -164,6 +164,20 @@ func (ca *CAProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 		},
 	)
 
+	// National Day for Truth and Reconciliation - September 30 (since 2021)
+	if year >= 2021 {
+		truthReconciliation := time.Date(year, 9, 30, 0, 0, 0, 0, time.UTC)
+		holidays[truthReconciliation] = ca.CreateHoliday(
+			"National Day for Truth and Reconciliation",
+			truthReconciliation,
+			"public",
+			map[string]string{
+				"en": "National Day for Truth and Reconciliation",
+				"fr": "Journée nationale de la vérité et de la réconciliation",
+			},
+		)
+	}
+
 	return holidays
 }
 

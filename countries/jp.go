@@ -136,7 +136,16 @@ func (p *JPProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	}
 
 	// Marine Day (海の日, Umi no Hi) - Third Monday of July
-	marine := NthWeekdayOfMonth(year, 7, time.Monday, 3)
+	// Special dates for Tokyo Olympics: July 23 in 2020, July 22 in 2021
+	var marine time.Time
+	if year == 2020 {
+		marine = time.Date(year, 7, 23, 0, 0, 0, 0, time.UTC) // Moved for Olympics
+	} else if year == 2021 {
+		marine = time.Date(year, 7, 22, 0, 0, 0, 0, time.UTC) // Moved for Olympics
+	} else {
+		marine = NthWeekdayOfMonth(year, 7, time.Monday, 3) // Normal third Monday
+	}
+
 	holidays[marine] = &Holiday{
 		Name:     "Marine Day",
 		Date:     marine,
@@ -148,15 +157,26 @@ func (p *JPProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	}
 
 	// Mountain Day (山の日, Yama no Hi)
-	mountain := time.Date(year, 8, 11, 0, 0, 0, 0, time.UTC)
-	holidays[mountain] = &Holiday{
-		Name:     "Mountain Day",
-		Date:     mountain,
-		Category: "public",
-		Languages: map[string]string{
-			"en": "Mountain Day",
-			"ja": "山の日",
-		},
+	// Special dates for Tokyo Olympics: August 10 in 2020, August 8 in 2021
+	var mountain time.Time
+	if year == 2020 {
+		mountain = time.Date(year, 8, 10, 0, 0, 0, 0, time.UTC) // Moved for Olympics
+	} else if year == 2021 {
+		mountain = time.Date(year, 8, 8, 0, 0, 0, 0, time.UTC) // Moved for Olympics
+	} else if year >= 2016 {
+		mountain = time.Date(year, 8, 11, 0, 0, 0, 0, time.UTC) // Normal date since 2016
+	}
+
+	if year >= 2016 {
+		holidays[mountain] = &Holiday{
+			Name:     "Mountain Day",
+			Date:     mountain,
+			Category: "public",
+			Languages: map[string]string{
+				"en": "Mountain Day",
+				"ja": "山の日",
+			},
+		}
 	}
 
 	// Respect for the Aged Day (敬老の日, Keirō no Hi) - Third Monday of September
@@ -184,11 +204,24 @@ func (p *JPProvider) LoadHolidays(year int) map[time.Time]*Holiday {
 	}
 
 	// Sports Day (スポーツの日, Supōtsu no Hi) - Second Monday of October
-	sports := NthWeekdayOfMonth(year, 10, time.Monday, 2)
-	sportsName := "Sports Day"
-	if year < 2020 {
+	// Special dates for Tokyo Olympics: July 24 in 2020, July 23 in 2021
+	var sports time.Time
+	var sportsName string
+
+	if year == 2020 {
+		sports = time.Date(year, 7, 24, 0, 0, 0, 0, time.UTC) // Moved for Olympics
+		sportsName = "Sports Day"
+	} else if year == 2021 {
+		sports = time.Date(year, 7, 23, 0, 0, 0, 0, time.UTC) // Moved for Olympics
+		sportsName = "Sports Day"
+	} else if year >= 2020 {
+		sports = NthWeekdayOfMonth(year, 10, time.Monday, 2) // Normal second Monday
+		sportsName = "Sports Day"
+	} else {
+		sports = NthWeekdayOfMonth(year, 10, time.Monday, 2) // Normal second Monday
 		sportsName = "Health and Sports Day"
 	}
+
 	holidays[sports] = &Holiday{
 		Name:     sportsName,
 		Date:     sports,

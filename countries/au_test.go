@@ -11,16 +11,16 @@ func TestAUProvider_BasicHolidays(t *testing.T) {
 	holidays := provider.LoadHolidays(year)
 
 	expectedHolidays := map[string]time.Time{
-		"New Year's Day":   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
-		"Australia Day":    time.Date(2024, 1, 26, 0, 0, 0, 0, time.UTC),
-		"Good Friday":      time.Date(2024, 3, 29, 0, 0, 0, 0, time.UTC),
-		"Easter Saturday":  time.Date(2024, 3, 30, 0, 0, 0, 0, time.UTC),
-		"Easter Monday":    time.Date(2024, 4, 1, 0, 0, 0, 0, time.UTC),
-		"ANZAC Day":        time.Date(2024, 4, 25, 0, 0, 0, 0, time.UTC),
-		"Queen's Birthday": time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC), // 2nd Monday in June
-		"Labour Day":       time.Date(2024, 10, 7, 0, 0, 0, 0, time.UTC), // 1st Monday in October
-		"Christmas Day":    time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC),
-		"Boxing Day":       time.Date(2024, 12, 26, 0, 0, 0, 0, time.UTC),
+		"New Year's Day":  time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+		"Australia Day":   time.Date(2024, 1, 26, 0, 0, 0, 0, time.UTC),
+		"Good Friday":     time.Date(2024, 3, 29, 0, 0, 0, 0, time.UTC),
+		"Easter Saturday": time.Date(2024, 3, 30, 0, 0, 0, 0, time.UTC),
+		"Easter Monday":   time.Date(2024, 4, 1, 0, 0, 0, 0, time.UTC),
+		"ANZAC Day":       time.Date(2024, 4, 25, 0, 0, 0, 0, time.UTC),
+		"King's Birthday": time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC), // 2nd Monday in June
+		"Labour Day":      time.Date(2024, 10, 7, 0, 0, 0, 0, time.UTC), // 1st Monday in October
+		"Christmas Day":   time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC),
+		"Boxing Day":      time.Date(2024, 12, 26, 0, 0, 0, 0, time.UTC),
 	}
 
 	for name, expectedDate := range expectedHolidays {

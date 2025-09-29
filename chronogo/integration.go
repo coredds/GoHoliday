@@ -28,30 +28,74 @@ func Checker(countryCode string) *FastCountryChecker {
 	var provider countries.HolidayProvider
 
 	switch countryCode {
-	case "US":
-		provider = countries.NewUSProvider()
-	case "CA":
-		provider = countries.NewCAProvider()
-	case "GB":
-		provider = countries.NewGBProvider()
+	case "AR":
+		provider = countries.NewARProvider()
+	case "AT":
+		provider = countries.NewATProvider()
 	case "AU":
 		provider = countries.NewAUProvider()
-	case "NZ":
-		provider = countries.NewNZProvider()
-	case "DE":
-		provider = countries.NewDEProvider()
-	case "FR":
-		provider = countries.NewFRProvider()
-	case "JP":
-		provider = countries.NewJPProvider()
-	case "UA":
-		provider = countries.NewUAProvider()
+	case "BE":
+		provider = countries.NewBEProvider()
+	case "BR":
+		provider = countries.NewBRProvider()
+	case "CA":
+		provider = countries.NewCAProvider()
+	case "CH":
+		provider = countries.NewCHProvider()
 	case "CL":
 		provider = countries.NewCLProvider()
+	case "CN":
+		provider = countries.NewCNProvider()
+	case "DE":
+		provider = countries.NewDEProvider()
+	case "ES":
+		provider = countries.NewESProvider()
+	case "FI":
+		provider = countries.NewFIProvider()
+	case "FR":
+		provider = countries.NewFRProvider()
+	case "GB":
+		provider = countries.NewGBProvider()
+	case "ID":
+		provider = countries.NewIDProvider()
 	case "IE":
 		provider = countries.NewIEProvider()
 	case "IL":
 		provider = countries.NewILProvider()
+	case "IN":
+		provider = countries.NewINProvider()
+	case "IT":
+		provider = countries.NewITProvider()
+	case "JP":
+		provider = countries.NewJPProvider()
+	case "KR":
+		provider = countries.NewKRProvider()
+	case "MX":
+		provider = countries.NewMXProvider()
+	case "NL":
+		provider = countries.NewNLProvider()
+	case "NO":
+		provider = countries.NewNOProvider()
+	case "NZ":
+		provider = countries.NewNZProvider()
+	case "PL":
+		provider = countries.NewPLProvider()
+	case "PT":
+		provider = countries.NewPTProvider()
+	case "RU":
+		provider = countries.NewRUProvider()
+	case "SE":
+		provider = countries.NewSEProvider()
+	case "SG":
+		provider = countries.NewSGProvider()
+	case "TH":
+		provider = countries.NewTHProvider()
+	case "TR":
+		provider = countries.NewTRProvider()
+	case "UA":
+		provider = countries.NewUAProvider()
+	case "US":
+		provider = countries.NewUSProvider()
 	default:
 		// Fallback to US if country not supported
 		provider = countries.NewUSProvider()

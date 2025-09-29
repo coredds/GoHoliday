@@ -1,5 +1,5 @@
 # GoHoliday API Documentation
-*Comprehensive Guide to the GoHoliday Library v1.0*
+*Comprehensive Guide to the GoHoliday Library v0.6.4*
 
 ## Table of Contents
 1. [Quick Start](#quick-start)

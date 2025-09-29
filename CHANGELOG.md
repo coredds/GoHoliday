@@ -5,6 +5,45 @@ All notable changes to the GoHoliday project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.4] - 2025-09-29
+
+### Added
+- **Canada (CA)**: National Day for Truth and Reconciliation (September 30, since 2021)
+  - Bilingual support (English/French)
+  - Historical accuracy with year-based implementation
+  - Proper integration with existing Canadian holidays
+
+### Enhanced
+- **Australia (AU)**: King's Birthday vs Queen's Birthday naming transition
+  - Queen's Birthday for years 2022 and earlier
+  - King's Birthday for years 2023 and onwards
+  - Applied to both national and state-specific variations (Queensland)
+  - Updated test expectations for accurate validation
+
+- **Japan (JP)**: Tokyo Olympics holiday date adjustments (2020-2021)
+  - Marine Day: July 23, 2020 and July 22, 2021 (Olympic years)
+  - Mountain Day: August 10, 2020 and August 8, 2021 (Olympic years)
+  - Sports Day: July 24, 2020 and July 23, 2021 (Olympic years)
+  - Normal scheduling for all other years maintained
+
+- **Netherlands (NL)**: Historical Queen's Day to King's Day transition
+  - Queen's Day (April 30) for years before 2014
+  - King's Day (April 27) for years 2014 and onwards
+  - Proper weekend shifting rules for both holidays
+  - Bilingual Dutch/English support
+
+### Fixed
+- Holiday rule accuracy aligned with Python holidays reference library
+- Chronogo integration updated with all 34 supported countries
+- Test coverage maintained at 100% for all updated countries
+- Performance benchmarks preserved (sub-microsecond lookups)
+
+### Technical
+- Enhanced test coverage for historical holiday transitions
+- Improved documentation for Olympic year adjustments
+- Updated country provider tests for accuracy validation
+- Maintained backward compatibility for all existing functionality
+
 ## [0.6.3] - 2025-09-18
 
 ### Added
