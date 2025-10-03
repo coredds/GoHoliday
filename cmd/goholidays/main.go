@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 // For testing
@@ -32,7 +32,7 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Printf("GoHolidays CLI v%s\n", goholidays.Version)
+		fmt.Printf("goholidays CLI v%s\n", goholidays.Version)
 		fmt.Println("A Go library for comprehensive holiday data")
 		return
 	}

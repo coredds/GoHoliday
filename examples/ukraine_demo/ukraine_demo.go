@@ -5,12 +5,12 @@ import (
 	"sort"
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
-	"github.com/coredds/GoHoliday/countries"
+	goholidays "github.com/coredds/goholiday"
+	"github.com/coredds/goholiday/countries"
 )
 
 func main() {
-	fmt.Println("🇺🇦 GoHoliday - Ukraine Demo")
+	fmt.Println("🇺🇦 goholiday - Ukraine Demo")
 	fmt.Println("=============================")
 	fmt.Println()
 

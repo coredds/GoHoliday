@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 // GitHubSyncer handles real GitHub API integration for Python holidays sync
@@ -64,7 +64,7 @@ func NewGitHubSyncerWithToken(token string) *GitHubSyncer {
 // addAuthHeaders adds authentication headers to the request
 func (gs *GitHubSyncer) addAuthHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
-	req.Header.Set("User-Agent", fmt.Sprintf("GoHolidays/%s", goholidays.Version))
+	req.Header.Set("User-Agent", fmt.Sprintf("goholidays/%s", goholidays.Version))
 
 	// Add authentication if token is provided
 	if gs.token != "" {

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the GoHoliday project will be documented in this file.
+All notable changes to the goholiday project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -81,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - **Country Count**: Increased from 34 to 37 supported countries
 - **SupportedCountries Map**: Added CL, IE, IL to validation and integration points
-- **ChronoGo Integration**: Updated fast holiday checking for new countries
+- **chronogo Integration**: Updated fast holiday checking for new countries
 - **Configuration System**: Enhanced provider initialization for new countries
 - **Sync Functionality**: Added data synchronization support for new countries
 - **Documentation**: Updated README with new countries and improved examples
@@ -250,7 +250,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Japan (JP) Holiday Provider with 16 public holidays
 - India (IN) Holiday Provider with multi-religious festivals
 - France (FR) Holiday Provider with regional observances
-- Enhanced ChronoGo integration
+- Enhanced chronogo integration
 - Performance optimization framework
 - API stability system
 
@@ -271,7 +271,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - Initial Release
 
 ### Added
-- Initial GoHoliday library structure
+- Initial goholiday library structure
 - Basic holiday calculation framework
 - Configuration system
 - Initial test suite

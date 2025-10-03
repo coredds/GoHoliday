@@ -5,11 +5,11 @@ import (
 	"sort"
 	"time"
 
-	"github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 func main() {
-	fmt.Println("GoHoliday Basic Features")
+	fmt.Println("goholiday Basic Features")
 	fmt.Println("=======================")
 
 	// Create a holiday provider

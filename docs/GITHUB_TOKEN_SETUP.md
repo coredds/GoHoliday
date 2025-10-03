@@ -1,10 +1,10 @@
 # GitHub Token Authentication Setup
 
-This guide explains how to set up GitHub Personal Access Token (PAT) authentication for the GoHoliday sync functionality.
+This guide explains how to set up GitHub Personal Access Token (PAT) authentication for the goholiday sync functionality.
 
 ## Why Use a GitHub Token?
 
-The GoHoliday syncer fetches holiday data from the [vacanza/holidays](https://github.com/vacanza/holidays) repository via GitHub's API. Without authentication:
+The goholiday syncer fetches holiday data from the [vacanza/holidays](https://github.com/vacanza/holidays) repository via GitHub's API. Without authentication:
 
 - **Rate limit**: 60 requests per hour
 - **IP-based limiting**: Shared across all unauthenticated requests from your IP
@@ -74,7 +74,7 @@ package main
 
 import (
     "context"
-    "github.com/coredds/GoHoliday/updater"
+    "github.com/coredds/goholiday/updater"
 )
 
 func main() {
@@ -180,7 +180,7 @@ echo $env:GITHUB_TOKEN # Windows PowerShell
 
 ### With Token:
 ```
-GoHolidays Python Sync Tool
+goholidays Python Sync Tool
 ===========================
 Using authenticated GitHub API access
 ✓ GitHub token validated successfully
@@ -189,7 +189,7 @@ Found 100+ countries: [US GB CA AU DE]
 
 ### Without Token:
 ```
-GoHolidays Python Sync Tool
+goholidays Python Sync Tool
 ===========================
 Using unauthenticated GitHub API access (rate limited)
 Found 100+ countries: [US GB CA AU DE]

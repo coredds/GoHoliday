@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/coredds/GoHoliday/updater"
+	"github.com/coredds/goholiday/updater"
 )
 
 func main() {
-	fmt.Println("GoHolidays Python AST Parser Demo")
+	fmt.Println("goholidays Python AST Parser Demo")
 	fmt.Println("=================================")
 
 	// Sample Python holidays code (similar to what's in the python-holidays library)

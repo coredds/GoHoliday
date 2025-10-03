@@ -1,5 +1,5 @@
-# GoHoliday API Documentation
-*Comprehensive Guide to the GoHoliday Library v0.6.4*
+# goholiday API Documentation
+*Comprehensive Guide to the goholiday Library v0.6.4*
 
 ## Table of Contents
 1. [Quick Start](#quick-start)
@@ -16,7 +16,7 @@
 
 ### Installation
 ```bash
-go get github.com/coredds/GoHoliday
+go get github.com/coredds/goholiday
 ```
 
 ### Basic Usage
@@ -26,7 +26,7 @@ package main
 import (
     "fmt"
     "time"
-    "github.com/coredds/GoHoliday"
+    "github.com/coredds/goholiday"
 )
 
 func main() {
@@ -415,10 +415,10 @@ wg.Wait()
 1. Update import if needed:
 ```go
 // Old (still works)
-import "github.com/coredds/GoHoliday"
+import "github.com/coredds/goholiday"
 
 // New (recommended)
-import "github.com/coredds/GoHoliday"
+import "github.com/coredds/goholiday"
 ```
 
 2. Add France support:
@@ -444,7 +444,7 @@ package main
 import (
     "fmt"
     "time"
-    "github.com/coredds/GoHoliday"
+    "github.com/coredds/goholiday"
 )
 
 func main() {
@@ -471,7 +471,7 @@ package main
 
 import (
     "time"
-    "github.com/coredds/GoHoliday"
+    "github.com/coredds/goholiday"
 )
 
 func isBusinessDay(date time.Time, country *goholidays.Country) bool {
@@ -504,7 +504,7 @@ package main
 import (
     "fmt"
     "time"
-    "github.com/coredds/GoHoliday"
+    "github.com/coredds/goholiday"
 )
 
 func printHolidayCalendar(country *goholidays.Country, year int) {
@@ -531,13 +531,13 @@ func main() {
 ## Support & Contributing
 
 ### Documentation
-- **API Reference**: [GoDoc](https://pkg.go.dev/github.com/coredds/GoHoliday)
+- **API Reference**: [GoDoc](https://pkg.go.dev/github.com/coredds/goholiday)
 - **Examples**: `/examples` directory
 - **Performance**: `/examples/performance-analysis`
 
 ### Community
-- **Issues**: [GitHub Issues](https://github.com/coredds/GoHoliday/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/coredds/GoHoliday/discussions)
+- **Issues**: [GitHub Issues](https://github.com/coredds/goholiday/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/coredds/goholiday/discussions)
 - **Contributing**: See `CONTRIBUTING.md`
 
 ### Performance Analysis
@@ -548,5 +548,5 @@ go run examples/performance-analysis/main.go
 
 ---
 
-*GoHoliday v1.0.0 - Production-ready holiday data for Go applications*
+*goholiday v1.0.0 - Production-ready holiday data for Go applications*
 *Performance: 40M+ ops/sec | Coverage: 9 countries | Thread-safe: ✅*

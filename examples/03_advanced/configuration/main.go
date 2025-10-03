@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/coredds/GoHoliday/config"
+	"github.com/coredds/goholiday/config"
 	"gopkg.in/yaml.v3"
 )
 
 func main() {
-	fmt.Println("GoHoliday Configuration Management")
+	fmt.Println("goholiday Configuration Management")
 	fmt.Println("=================================")
 
 	// 1. Basic Configuration Loading

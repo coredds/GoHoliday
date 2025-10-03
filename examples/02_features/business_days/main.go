@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 func main() {
-	fmt.Println("GoHoliday Business Day Features")
+	fmt.Println("goholiday Business Day Features")
 	fmt.Println("==============================")
 
 	// Create a US holiday provider with business day settings
@@ -102,5 +102,5 @@ func main() {
 		fmt.Printf("- %s: %s\n", date.Format("Jan 2"), holiday.Name)
 	}
 
-	fmt.Println("\nThis demonstrates GoHoliday's business day calculation features!")
+	fmt.Println("\nThis demonstrates goholiday's business day calculation features!")
 }

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 // Helper function to capture stdout
@@ -220,7 +220,7 @@ func TestMainFunctionality(t *testing.T) {
 			main()
 		})
 
-		if !strings.Contains(output, "GoHolidays CLI") {
+		if !strings.Contains(output, "goholidays CLI") {
 			t.Error("Version output should contain CLI version")
 		}
 	})

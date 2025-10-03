@@ -4,17 +4,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/coredds/GoHoliday/countries"
+	"github.com/coredds/goholiday/countries"
 )
 
-// HolidayChecker provides the minimal interface ChronoGo needs
+// HolidayChecker provides the minimal interface chronogo needs
 type HolidayChecker interface {
 	IsHoliday(date time.Time) bool
 	GetHolidayName(date time.Time) string
 	AreHolidays(dates []time.Time) []bool
 }
 
-// FastCountryChecker - optimized for ChronoGo's business day loops
+// FastCountryChecker - optimized for chronogo's business day loops
 // Provides O(1) holiday lookups with intelligent caching
 type FastCountryChecker struct {
 	countryCode string
@@ -161,7 +161,7 @@ func (f *FastCountryChecker) GetHolidayName(date time.Time) string {
 }
 
 // AreHolidays performs batch holiday checking for efficient range operations
-// Optimized for ChronoGo's bulk date processing
+// Optimized for chronogo's bulk date processing
 func (f *FastCountryChecker) AreHolidays(dates []time.Time) []bool {
 	results := make([]bool, len(dates))
 
@@ -191,7 +191,7 @@ func (f *FastCountryChecker) AreHolidays(dates []time.Time) []bool {
 }
 
 // GetHolidaysInRange returns all holidays in the specified date range
-// Useful for ChronoGo's calendar operations
+// Useful for chronogo's calendar operations
 func (f *FastCountryChecker) GetHolidaysInRange(start, end time.Time) map[time.Time]string {
 	holidays := make(map[time.Time]string)
 
@@ -220,7 +220,7 @@ func (f *FastCountryChecker) GetHolidaysInRange(start, end time.Time) map[time.T
 }
 
 // CountHolidaysInRange counts holidays in a date range without allocating holiday data
-// Optimized for ChronoGo's business day counting
+// Optimized for chronogo's business day counting
 func (f *FastCountryChecker) CountHolidaysInRange(start, end time.Time) int {
 	count := 0
 

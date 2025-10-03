@@ -1,4 +1,4 @@
-module github.com/coredds/GoHoliday
+module github.com/coredds/goholiday
 
 go 1.23
 

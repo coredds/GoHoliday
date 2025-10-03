@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/coredds/GoHoliday/updater"
+	"github.com/coredds/goholiday/updater"
 )
 
 func TestSyncFunctionality(t *testing.T) {

@@ -5,11 +5,11 @@ import (
 	"sort"
 	"time"
 
-	"github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 func main() {
-	fmt.Println("GoHoliday Localization Features")
+	fmt.Println("goholiday Localization Features")
 	fmt.Println("==============================")
 
 	// 1. Multi-language Holiday Names
@@ -111,7 +111,7 @@ func main() {
 		printSortedHolidays(stateHolidays)
 	}
 
-	fmt.Println("\nThis demonstrates GoHoliday's localization capabilities!")
+	fmt.Println("\nThis demonstrates goholiday's localization capabilities!")
 }
 
 func printSortedHolidays(holidays map[time.Time]*goholidays.Holiday) {

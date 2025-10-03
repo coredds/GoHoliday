@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 func main() {
-	fmt.Println("GoHoliday Performance Analysis")
+	fmt.Println("goholiday Performance Analysis")
 	fmt.Println("=============================")
 
 	// 1. Basic Performance Benchmarks

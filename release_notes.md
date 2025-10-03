@@ -1,4 +1,4 @@
-## GoHoliday v0.6.4 - Holiday Rule Updates & Accuracy Improvements
+## goholiday v0.6.4 - Holiday Rule Updates & Accuracy Improvements
 
 ### Enhanced Holiday Accuracy
 - **Rule Alignment**: Updated holiday rules to match the authoritative Python holidays reference library
@@ -25,11 +25,11 @@
 - **Sub-microsecond Performance**: Maintained ~49ns holiday lookups
 - **100% Test Coverage**: All updated countries fully tested
 - **Backward Compatibility**: All existing functionality preserved
-- **ChronoGo Integration**: Updated with all 34 supported countries
+- **chronogo Integration**: Updated with all 34 supported countries
 
 ### Installation
 ```bash
-go get github.com/coredds/GoHoliday@v0.6.4
+go get github.com/coredds/goholiday@v0.6.4
 ```
 
 ### Quick Example - New Features
@@ -56,7 +56,7 @@ if holiday, isHoliday := japan.IsHoliday(time.Date(2020, 7, 23, 0, 0, 0, 0, time
 
 ---
 
-## GoHoliday v0.6.3 - Major Country Expansion
+## goholiday v0.6.3 - Major Country Expansion
 
 ### New Countries Added (3)
 - **Chile (CL)**: 16 holidays with unique legal framework
@@ -94,11 +94,11 @@ if holiday, isHoliday := japan.IsHoliday(time.Date(2020, 7, 23, 0, 0, 0, 0, time
 ### Compatibility
 - Fully backward compatible with existing API
 - Enhanced API with error handling and context support
-- ChronoGo integration maintained
+- chronogo integration maintained
 
 ### Installation
 ```bash
-go get github.com/coredds/GoHoliday@v0.6.3
+go get github.com/coredds/goholiday@v0.6.3
 ```
 
 ### Quick Example
@@ -122,4 +122,4 @@ if holiday, ok := israel.IsHoliday(time.Date(2024, 4, 23, 0, 0, 0, 0, time.UTC))
 }
 ```
 
-See the [CHANGELOG](https://github.com/coredds/GoHoliday/blob/main/CHANGELOG.md) for complete details.
+See the [CHANGELOG](https://github.com/coredds/goholiday/blob/main/CHANGELOG.md) for complete details.

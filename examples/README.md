@@ -1,11 +1,11 @@
-# GoHoliday Examples
+# goholiday Examples
 
-This directory contains examples demonstrating the features and usage of the GoHoliday library.
+This directory contains examples demonstrating the features and usage of the goholiday library.
 
 ## Directory Structure
 
 ### 1. Quick Start
-- `01_quickstart/`: A simple 5-minute introduction to GoHoliday's basic features
+- `01_quickstart/`: A simple 5-minute introduction to goholiday's basic features
   - Basic holiday lookup
   - Year calendar
   - Multi-language support

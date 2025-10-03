@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 func main() {
-	fmt.Println("GoHoliday Quickstart Example")
+	fmt.Println("goholiday Quickstart Example")
 	fmt.Println("==========================")
 
 	// Create a holiday provider for the United States

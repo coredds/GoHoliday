@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/coredds/GoHoliday/countries"
+	"github.com/coredds/goholiday/countries"
 )
 
-// Version represents the current version of the GoHoliday library
+// Version represents the current version of the goholiday library
 const Version = "0.6.4"
 
 // ErrorCode represents different types of errors that can occur

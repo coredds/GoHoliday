@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/coredds/GoHoliday/countries"
+	"github.com/coredds/goholiday/countries"
 )
 
 func TestBasicConfigurationLoading(t *testing.T) {

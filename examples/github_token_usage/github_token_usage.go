@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/coredds/GoHoliday/config"
-	"github.com/coredds/GoHoliday/updater"
+	"github.com/coredds/goholiday/config"
+	"github.com/coredds/goholiday/updater"
 )
 
 func main() {

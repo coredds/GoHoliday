@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coredds/GoHoliday/countries"
+	"github.com/coredds/goholiday/countries"
 )
 
 // PythonHolidaysSync handles synchronization with the Python holidays repository

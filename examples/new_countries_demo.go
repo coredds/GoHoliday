@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/coredds/GoHoliday/countries"
+	"github.com/coredds/goholiday/countries"
 )
 
 func main() {
-	fmt.Println("🌍 GoHoliday - New Countries Demo")
+	fmt.Println("🌍 goholiday - New Countries Demo")
 	fmt.Println("==================================")
 	fmt.Println()
 

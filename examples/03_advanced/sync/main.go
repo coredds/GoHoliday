@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/coredds/GoHoliday/updater"
+	"github.com/coredds/goholiday/updater"
 )
 
 func main() {
-	fmt.Println("GoHoliday Sync System Example")
+	fmt.Println("goholiday Sync System Example")
 	fmt.Println("============================")
 
 	// Create temporary directory for demo

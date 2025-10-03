@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coredds/GoHoliday/config"
-	"github.com/coredds/GoHoliday/updater"
+	"github.com/coredds/goholiday/config"
+	"github.com/coredds/goholiday/updater"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	)
 	flag.Parse()
 
-	fmt.Println("GoHolidays Python Sync Tool")
+	fmt.Println("goholidays Python Sync Tool")
 	fmt.Println("===========================")
 
 	// Get GitHub token from flag, config file, or environment variable

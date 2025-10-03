@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 func main() {
-	fmt.Println("GoHoliday Error Handling Example")
+	fmt.Println("goholiday Error Handling Example")
 	fmt.Println("=================================")
 
 	// 1. Original API (backward compatible)

@@ -1,11 +1,11 @@
-# GoHoliday
+# goholiday
 
-[![CI](https://github.com/coredds/GoHoliday/workflows/CI/badge.svg)](https://github.com/coredds/GoHoliday/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/coredds/GoHoliday/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/GoHoliday)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/GoHoliday?v=1.23)](https://golang.org/)
-[![License](https://img.shields.io/github/license/coredds/GoHoliday)](LICENSE)
+[![CI](https://github.com/coredds/goholiday/workflows/CI/badge.svg)](https://github.com/coredds/goholiday/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/coredds/goholiday/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/goholiday)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/goholiday?v=1.23)](https://golang.org/)
+[![License](https://img.shields.io/github/license/coredds/goholiday)](LICENSE)
 
-A comprehensive Go library for holiday data and business day calculations. Provides high-performance holiday checking with multi-country support, designed for integration with date/time applications including [ChronoGo](https://github.com/davidhintelmann/ChronoGo).
+A comprehensive Go library for holiday data and business day calculations. Provides high-performance holiday checking with multi-country support, designed for integration with date/time applications including [chronogo](https://github.com/davidhintelmann/chronogo).
 
 **Current Version**: 0.6.4
 
@@ -15,7 +15,7 @@ A comprehensive Go library for holiday data and business day calculations. Provi
 - **High Performance**: Sub-microsecond holiday lookups with intelligent caching
 - **Multi-Language**: Native language support for holiday names
 - **Thread-Safe**: Concurrent operations with built-in safety
-- **ChronoGo Integration**: Native HolidayChecker interface implementation
+- **chronogo Integration**: Native HolidayChecker interface implementation
 - **Enterprise Configuration**: YAML-based configuration with environment support
 - **Regional Variations**: State, province, and regional holiday support
 - **Historical Accuracy**: Proper handling of holiday transitions and changes
@@ -66,12 +66,12 @@ A comprehensive Go library for holiday data and business day calculations. Provi
 ## Installation
 
 ```bash
-go get github.com/coredds/GoHoliday
+go get github.com/coredds/goholiday
 ```
 
-For ChronoGo integration:
+For chronogo integration:
 ```bash
-go get github.com/coredds/GoHoliday/chronogo
+go get github.com/coredds/goholiday/chronogo
 ```
 
 ## Quick Start
@@ -85,7 +85,7 @@ import (
     "fmt"
     "time"
     
-    "github.com/coredds/GoHoliday"
+    "github.com/coredds/goholiday"
 )
 
 func main() {
@@ -105,7 +105,7 @@ func main() {
 }
 ```
 
-### ChronoGo Integration
+### chronogo Integration
 
 ```go
 package main
@@ -114,15 +114,15 @@ import (
     "fmt"
     "time"
     
-    "github.com/coredds/GoHoliday/chronogo"
+    "github.com/coredds/goholiday/chronogo"
     chronogo_lib "github.com/davidhintelmann/chronogo"
 )
 
 func main() {
-    // Create holiday checker for ChronoGo
+    // Create holiday checker for chronogo
     holidayChecker := chronogo.Checker("US")
     
-    // Use with ChronoGo for business day calculations
+    // Use with chronogo for business day calculations
     dt := chronogo_lib.Now()
     
     // Check if today is a holiday
@@ -232,8 +232,8 @@ countries:
 ## Architecture
 
 ```
-GoHoliday/
-├── chronogo/           # ChronoGo integration layer
+goholiday/
+├── chronogo/           # chronogo integration layer
 ├── config/             # Configuration system
 ├── countries/          # Country implementations
 ├── updater/            # Python holidays syncer
@@ -274,8 +274,8 @@ go test ./chronogo -bench=.    # Performance benchmarks
 ## Development
 
 ```bash
-git clone https://github.com/coredds/GoHoliday
-cd GoHoliday
+git clone https://github.com/coredds/goholiday
+cd goholiday
 go mod download
 go test ./...
 ```
@@ -305,7 +305,7 @@ go test ./...
 
 ## Attribution
 
-This project builds upon the [Python holidays library](https://github.com/vacanza/holidays) and the work of the [Vacanza organization](https://github.com/vacanza), providing a Go-native implementation optimized for performance and ChronoGo integration.
+This project builds upon the [Python holidays library](https://github.com/vacanza/holidays) and the work of the [Vacanza organization](https://github.com/vacanza), providing a Go-native implementation optimized for performance and chronogo integration.
 
 ## License
 

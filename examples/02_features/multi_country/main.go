@@ -5,11 +5,11 @@ import (
 	"sort"
 	"time"
 
-	"github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 func main() {
-	fmt.Println("GoHoliday Multi-Country Features")
+	fmt.Println("goholiday Multi-Country Features")
 	fmt.Println("================================")
 
 	// Create providers for different countries
@@ -102,7 +102,7 @@ func main() {
 		}
 	}
 
-	fmt.Println("\nThis demonstrates the power of GoHoliday's multi-country support!")
+	fmt.Println("\nThis demonstrates the power of goholiday's multi-country support!")
 }
 
 func printSortedHolidays(holidays map[time.Time]*goholidays.Holiday) {

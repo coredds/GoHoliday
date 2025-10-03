@@ -1,6 +1,6 @@
-# Contributing to GoHolidays
+# Contributing to goholidays
 
-Thank you for your interest in contributing to GoHolidays! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to goholidays! This document provides guidelines for contributing to the project.
 
 ## Development Setup
 
@@ -10,7 +10,7 @@ Thank you for your interest in contributing to GoHolidays! This document provide
 
 2. **Clone the repository**
    ```bash
-   git clone https://github.com/coredds/GoHoliday.git
+   git clone https://github.com/coredds/goholiday.git
    cd goholidays
    ```
 
@@ -27,7 +27,7 @@ Thank you for your interest in contributing to GoHolidays! This document provide
 ## Project Structure
 
 ```
-GoHolidays/
+goholidays/
 ├── goholidays.go           # Main library code
 ├── goholidays_test.go      # Main tests
 ├── countries/              # Country-specific implementations
@@ -157,4 +157,4 @@ When adding new countries, use official government sources for holiday informati
 - Create a new issue for bugs or feature requests
 - Use discussions for questions about implementation
 
-Thank you for contributing to GoHolidays!
+Thank you for contributing to goholidays!
