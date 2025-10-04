@@ -4,7 +4,6 @@
 - **Module Name**: Renamed from `github.com/coredds/GoHoliday` to `github.com/coredds/goholiday`
 - **All Lowercase**: Follows idiomatic Go naming conventions for packages and modules
 - **Full Compatibility**: All imports, documentation, and examples updated
-- **ChronoGo Integration**: Fixed import path to `github.com/coredds/chronogo`
 - **Breaking Change**: Users must update import paths to `github.com/coredds/goholiday`
 
 ### Installation
@@ -23,15 +22,6 @@ To:
 import "github.com/coredds/goholiday"
 ```
 
-For ChronoGo integration, update from:
-```go
-import chronogo_lib "github.com/davidhintelmann/chronogo"
-```
-
-To:
-```go
-import chronogo_lib "github.com/coredds/chronogo"
-```
 
 ---
 

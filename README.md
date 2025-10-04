@@ -5,7 +5,7 @@
 [![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/goholiday?v=1.23)](https://golang.org/)
 [![License](https://img.shields.io/github/license/coredds/goholiday)](LICENSE)
 
-A comprehensive Go library for holiday data and business day calculations. Provides high-performance holiday checking with multi-country support, designed for integration with date/time applications including [chronogo](https://github.com/coredds/chronogo).
+A comprehensive Go library for holiday data and business day calculations. Provides high-performance holiday checking with multi-country support for 37 countries worldwide.
 
 **Current Version**: 0.6.5
 
@@ -15,7 +15,6 @@ A comprehensive Go library for holiday data and business day calculations. Provi
 - **High Performance**: Sub-microsecond holiday lookups with intelligent caching
 - **Multi-Language**: Native language support for holiday names
 - **Thread-Safe**: Concurrent operations with built-in safety
-- **chronogo Integration**: Native HolidayChecker interface implementation
 - **Enterprise Configuration**: YAML-based configuration with environment support
 - **Regional Variations**: State, province, and regional holiday support
 - **Historical Accuracy**: Proper handling of holiday transitions and changes
@@ -69,10 +68,6 @@ A comprehensive Go library for holiday data and business day calculations. Provi
 go get github.com/coredds/goholiday
 ```
 
-For chronogo integration:
-```bash
-go get github.com/coredds/goholiday/chronogo
-```
 
 ## Quick Start
 
@@ -102,38 +97,6 @@ func main() {
     // Get all holidays for a year
     holidays := us.HolidaysForYear(2024)
     fmt.Printf("Found %d holidays in 2024\n", len(holidays))
-}
-```
-
-### chronogo Integration
-
-```go
-package main
-
-import (
-    "fmt"
-    "time"
-    
-    "github.com/coredds/goholiday/chronogo"
-    chronogo_lib "github.com/coredds/chronogo"
-)
-
-func main() {
-    // Create holiday checker for chronogo
-    holidayChecker := chronogo.Checker("US")
-    
-    // Use with chronogo for business day calculations
-    dt := chronogo_lib.Now()
-    
-    // Check if today is a holiday
-    if holidayChecker.IsHoliday(dt.Time) {
-        name := holidayChecker.GetHolidayName(dt.Time)
-        fmt.Printf("Today is a holiday: %s\n", name)
-    }
-    
-    // Calculate next business day
-    nextBusiness := dt.NextBusinessDay(holidayChecker)
-    fmt.Printf("Next business day: %s\n", nextBusiness.Format("2006-01-02"))
 }
 ```
 
@@ -233,7 +196,6 @@ countries:
 
 ```
 goholiday/
-├── chronogo/           # chronogo integration layer
 ├── config/             # Configuration system
 ├── countries/          # Country implementations
 ├── updater/            # Python holidays syncer
@@ -305,7 +267,7 @@ go test ./...
 
 ## Attribution
 
-This project builds upon the [Python holidays library](https://github.com/vacanza/holidays) and the work of the [Vacanza organization](https://github.com/vacanza), providing a Go-native implementation optimized for performance and chronogo integration.
+This project builds upon the [Python holidays library](https://github.com/vacanza/holidays) and the work of the [Vacanza organization](https://github.com/vacanza), providing a Go-native implementation optimized for performance.
 
 ## License
 
