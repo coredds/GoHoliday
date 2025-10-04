@@ -1,3 +1,40 @@
+## goholiday v0.6.5 - Go Naming Convention Compliance & ChronoGo Integration Fix
+
+### Go Naming Convention Compliance
+- **Module Name**: Renamed from `github.com/coredds/GoHoliday` to `github.com/coredds/goholiday`
+- **All Lowercase**: Follows idiomatic Go naming conventions for packages and modules
+- **Full Compatibility**: All imports, documentation, and examples updated
+- **ChronoGo Integration**: Fixed import path to `github.com/coredds/chronogo`
+- **Breaking Change**: Users must update import paths to `github.com/coredds/goholiday`
+
+### Installation
+```bash
+go get github.com/coredds/goholiday@v0.6.5
+```
+
+### Migration Guide
+Update your imports from:
+```go
+import "github.com/coredds/GoHoliday"
+```
+
+To:
+```go
+import "github.com/coredds/goholiday"
+```
+
+For ChronoGo integration, update from:
+```go
+import chronogo_lib "github.com/davidhintelmann/chronogo"
+```
+
+To:
+```go
+import chronogo_lib "github.com/coredds/chronogo"
+```
+
+---
+
 ## goholiday v0.6.4 - Holiday Rule Updates, Accuracy Improvements & Go Naming Convention Compliance
 
 ### Module Naming Convention

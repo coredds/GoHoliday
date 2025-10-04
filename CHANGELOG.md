@@ -5,6 +5,24 @@ All notable changes to the goholiday project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.5] - 2025-10-04
+
+### Changed
+- **BREAKING**: Module path renamed from `github.com/coredds/GoHoliday` to `github.com/coredds/goholiday` to follow Go naming conventions
+- Updated all import paths across 37 files to use lowercase naming
+- Updated ChronoGo integration import path from `github.com/davidhintelmann/chronogo` to `github.com/coredds/chronogo`
+- All documentation updated to reflect lowercase naming (README, API docs, CHANGELOG, CONTRIBUTING)
+- Updated all example code and configuration files
+
+### Fixed
+- Corrected ChronoGo library reference to point to the correct repository
+- All naming conventions now consistently use lowercase throughout the project
+
+### Migration
+Users must update their import statements:
+- From: `github.com/coredds/GoHoliday` 
+- To: `github.com/coredds/goholiday`
+
 ## [0.6.4] - 2025-09-29
 
 ### Added

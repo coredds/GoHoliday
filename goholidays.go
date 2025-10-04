@@ -13,7 +13,7 @@ import (
 )
 
 // Version represents the current version of the goholiday library
-const Version = "0.6.4"
+const Version = "0.6.5"
 
 // ErrorCode represents different types of errors that can occur
 type ErrorCode int

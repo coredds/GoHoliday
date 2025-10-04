@@ -7,7 +7,7 @@
 
 A comprehensive Go library for holiday data and business day calculations. Provides high-performance holiday checking with multi-country support, designed for integration with date/time applications including [chronogo](https://github.com/coredds/chronogo).
 
-**Current Version**: 0.6.4
+**Current Version**: 0.6.5
 
 ## Features
 
