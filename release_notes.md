@@ -1,4 +1,10 @@
-## goholiday v0.6.4 - Holiday Rule Updates & Accuracy Improvements
+## goholiday v0.6.4 - Holiday Rule Updates, Accuracy Improvements & Go Naming Convention Compliance
+
+### Module Naming Convention
+- **Go Best Practices**: Module renamed from `github.com/coredds/GoHoliday` to `github.com/coredds/goholiday`
+- **All Lowercase**: Follows idiomatic Go naming conventions for packages and modules
+- **Full Compatibility**: All imports, documentation, and examples updated
+- **Breaking Change**: Users must update import paths to `github.com/coredds/goholiday`
 
 ### Enhanced Holiday Accuracy
 - **Rule Alignment**: Updated holiday rules to match the authoritative Python holidays reference library
