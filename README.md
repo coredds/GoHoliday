@@ -5,7 +5,7 @@
 [![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/goholiday?v=1.23)](https://golang.org/)
 [![License](https://img.shields.io/github/license/coredds/goholiday)](LICENSE)
 
-A comprehensive Go library for holiday data and business day calculations. Provides high-performance holiday checking with multi-country support, designed for integration with date/time applications including [chronogo](https://github.com/davidhintelmann/chronogo).
+A comprehensive Go library for holiday data and business day calculations. Provides high-performance holiday checking with multi-country support, designed for integration with date/time applications including [chronogo](https://github.com/coredds/chronogo).
 
 **Current Version**: 0.6.4
 
@@ -115,7 +115,7 @@ import (
     "time"
     
     "github.com/coredds/goholiday/chronogo"
-    chronogo_lib "github.com/davidhintelmann/chronogo"
+    chronogo_lib "github.com/coredds/chronogo"
 )
 
 func main() {
