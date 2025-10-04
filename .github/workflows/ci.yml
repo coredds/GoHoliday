@@ -43,7 +43,7 @@ jobs:
       run: go mod verify
 
     - name: Run tests
-      run: go test -v -coverprofile coverage.out -covermode atomic . ./chronogo ./cmd/goholidays ./cmd/sync ./config ./countries ./updater
+      run: go test -v -coverprofile coverage.out -covermode atomic . ./cmd/goholidays ./cmd/sync ./config ./countries ./updater
       
     - name: Run race detector tests
       run: go test -race ./...
